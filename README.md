@@ -1,4 +1,4 @@
-Software_RMC
+RMC_Software
 ============
 
-Software Development Repository for RMC
+Software repository for Robotic Mining Competition.

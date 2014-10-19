@@ -1,0 +1,43 @@
+<robot
+  name="LunArena2">
+  <link
+    name="arena_base_link">
+    <inertial>
+      <origin
+        xyz="3.46639361537909 -5.50881801497531 3.29739562989736"
+        rpy="0 0 0" />
+      <mass
+        value="39247.099760131" />
+      <inertia
+        ixx="181480.084095213"
+        ixy="29643.2718994061"
+        ixz="4652.60341262926"
+        iyy="120193.989349595"
+        iyz="5803.15463514685"
+        izz="291998.266495554" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://LunArena2/meshes/arena_base_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://LunArena2/meshes/arena_base_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+</robot>

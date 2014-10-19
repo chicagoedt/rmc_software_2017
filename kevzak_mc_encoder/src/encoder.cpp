@@ -62,7 +62,7 @@
 #include <unistd.h>		//Needed to call the usleep command to sleep the application for so many uS.
 #include <ros/ros.h>
 #include <geometry_msgs/Twist.h>
-#include <rmc_controller/Xbox_Button_Msg.h>
+#include <base_controller/Xbox_Button_Msg.h>
 #include <iostream>
 
 
@@ -71,7 +71,7 @@ using namespace std;
 //*********************************
 //Function Prototypes:
 //*********************************
-void Button_Callback(const rmc_controller::Xbox_Button_Msg &Controller_Buttons);
+void Button_Callback(const base_controller::Xbox_Button_Msg &Controller_Buttons);
 void Joystick_Callback(const geometry_msgs::Twist &Controller_Joystick);
 uint8_t Send_UDP (const unsigned char *data);
 void ERROR (const char *msg);
@@ -94,7 +94,7 @@ int main (int argc, char** argv)
 	return 0;
 }//End main
 
-void Button_Callback(const rmc_controller::Xbox_Button_Msg &Controller_Buttons)
+void Button_Callback(const base_controller::Xbox_Button_Msg &Controller_Buttons)
 {
 	Flags = 0;
 

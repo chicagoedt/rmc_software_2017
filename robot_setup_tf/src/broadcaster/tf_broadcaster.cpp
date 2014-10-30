@@ -2,6 +2,7 @@
 #include <tf/transform_broadcaster.h>
 #include <geometry_msgs/TransformStamped.h>
 #include <nav_msgs/Odometry.h>
+#include <math.h>
 
 /* @TODO
 
@@ -35,8 +36,8 @@ int main(int argc, char** argv)
   		        ros::Time::now(),"base_link", "laser"));
 
 			broadcaster.sendTransform(
-				tf::StampedTransform(tf::Transform(tf::Quaternion(0, 0, 0, 1), tf::Vector3(0.1905, 0.0, 0.6112)),
-  		        ros::Time::now(),"base_link", "stereo_camera"));
+				tf::StampedTransform(tf::Transform(tf::Quaternion(-M_PI_2,0,M_PI_2), tf::Vector3(0.1905, 0.0, 0.6112)),
+  		        ros::Time::now(),"base_link", "bumblebee_mount_link"));
 
 		r.sleep();
 	}

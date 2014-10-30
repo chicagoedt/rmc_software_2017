@@ -1,0 +1,9 @@
+You are in this folder: ../src/LunArena2/
+
+Make sure you stay in this folder, and then type this below:
+mkdir ~/.gazebo/models/LunArena2
+
+Then type 
+cp -r * ~/.gazebo/models/LunArena2
+
+You should now have the launch, meshes, textures, robots folders in the .gazebo/models/LunArena2 folder. Along with that the rmc_simulation.sdf and the model.config. MAKE SURE ALL THE FILES ARE THERE.

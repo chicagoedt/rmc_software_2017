@@ -1,0 +1,16 @@
+<?xml version="1.0" ?>
+<sdf version="1.4">
+  <world name="RMC_World">
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+    <include>
+      <uri>model://sun</uri>
+    </include>
+    <include>
+      <uri>model://LunArena2</uri>
+      <name>LunArena2</name>
+      <pose>2 -3 -1 0 0 0</pose>
+    </include>
+  </world>
+</sdf>

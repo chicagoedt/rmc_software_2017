@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<COLLADA xmlns="http://www.collada.org/2005/11/COLLADASchema" version="1.4.1">
+  <asset>
+    <contributor>
+      <author>Michael</author>
+      <authoring_tool>OpenCOLLADA for 3ds Max;  Version: 1.4.1;  Revision: exported;  Platform: x64;  Configuration: Release_Max2013_static</authoring_tool>
+      <source_data>file:///C:/Users/Michael/Documents/3dsMax/scenes/dumping_bin.max</source_data>
+    </contributor>
+    <created>2014-10-13T13:43:18</created>
+    <modified>2014-10-13T13:43:18</modified>
+    <unit name="inch" meter="0.0254"/>
+    <up_axis>Z_UP</up_axis>
+  </asset>
+  <library_effects>
+    <effect id="ColorEffectR86G86B86">
+      <profile_COMMON>
+        <technique sid="common">
+          <phong>
+            <ambient>
+              <color>0.3372549 0.3372549 0.3372549 1</color>
+            </ambient>
+            <diffuse>
+              <color>0.3372549 0.3372549 0.3372549 1</color>
+            </diffuse>
+            <specular>
+              <color>1 1 1 1</color>
+            </specular>
+            <shininess>
+              <float>10</float>
+            </shininess>
+            <reflective>
+              <color>0 0 0 1</color>
+            </reflective>
+            <transparent>
+              <color>1 1 1 1</color>
+            </transparent>
+            <transparency>
+              <float>1</float>
+            </transparency>
+          </phong>
+        </technique>
+      </profile_COMMON>
+    </effect>
+  </library_effects>
+  <library_materials>
+    <material id="ColorEffectR86G86B86-material" name="ColorEffectR86G86B86-material">
+      <instance_effect url="#ColorEffectR86G86B86"/>
+    </material>
+  </library_materials>
+  <library_geometries>
+    <geometry id="geom-dumping_bin_link" name="dumping_bin_link">
+      <mesh>
+        <source id="geom-dumping_bin_link-positions">
+          <float_array id="geom-dumping_bin_link-positions-array" count="60">-0.7063529 0.03558677 -0.124551 -0.7063856 0.03558677 0.1245876 -0.7870502 0.1351738 -0.227736 -0.7871895 0.1354194 0.2277145 -0.7986333 0.1267186 -0.2259362 -0.7984558 0.1264993 0.2257091 0.7871897 0.1354194 -0.2277146 0.7063856 0.03558677 -0.1245876 -0.785306 0.1253418 -0.238173 0.7853854 0.1254399 -0.2382745 0.7063529 0.03558677 0.124551 0.7870502 0.1351738 0.2277359 0.7986333 0.1267186 0.2259363 0.7984557 0.1264993 -0.2257091 -0.7853855 0.1254399 0.2382745 0.7853061 0.1253418 0.238173 -0.7070417 -0.4230243 -0.1253215 -0.7066785 -0.4227421 0.1249152 0.7066786 -0.4227421 -0.1249152 0.7070417 -0.4230243 0.1253215</float_array>
+          <technique_common>
+            <accessor source="#geom-dumping_bin_link-positions-array" count="20" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="geom-dumping_bin_link-normals">
+          <float_array id="geom-dumping_bin_link-normals-array" count="309">0.7771884 0.6292681 -7.00801e-5 0.7768909 0.6296353 1.01854e-4 0.7770286 0.6294652 2.22534e-5 0.777243 0.6292005 -1.01683e-4 0.6201079 -0.7845163 5.89694e-4 0.5895281 -0.8077475 -6.23903e-4 0.5902203 -0.807242 -5.96824e-4 0.6206754 -0.7840675 6.12555e-4 -0.590244 0.8072247 -5.92634e-4 -0.6208107 0.7839603 6.24641e-4 -0.6201335 0.7844961 5.97278e-4 -0.5896538 0.8076559 -6.15791e-4 -1.1513e-4 0.7185838 0.6954405 -1.21541e-4 0.7185373 0.6954885 5.36061e-6 0.719456 0.694538 1.79926e-5 0.7195474 0.6944434 -0.6023165 0.5733873 0.5553754 5.378e-6 0.7185741 0.6954503 -1.15253e-4 0.7194464 0.694548 -1.21677e-4 0.7194928 0.6944999 -1.04251e-4 0.7278841 -0.6857002 -8.98356e-5 0.7268128 -0.6868355 -1.04172e-4 0.7278782 -0.6857064 -8.97442e-5 0.726806 -0.6868427 8.97377e-5 -0.7278852 0.6856989 1.03991e-4 -0.7268131 0.6868353 8.98291e-5 -0.7278784 0.6857062 1.04068e-4 -0.7268072 0.6868414 0.7768909 -0.6296353 1.01854e-4 0.7768909 -0.6296353 1.01854e-4 0.7768909 -0.6296353 1.01854e-4 -0.7772424 0.6292014 1.01277e-4 -0.7772424 0.6292014 1.01277e-4 -0.7772424 0.6292013 1.01277e-4 -0.6201198 -0.784507 -5.90009e-4 -0.5895262 -0.807749 6.24137e-4 -0.5902185 -0.8072434 5.97048e-4 -0.6206874 -0.7840579 -6.12878e-4 0.5902423 0.807226 5.92933e-4 0.6208228 0.7839506 -6.24887e-4 0.6201453 0.7844867 -5.97513e-4 0.5896519 0.8076573 6.161e-4 -1.21544e-4 -0.718537 0.6954886 -1.15133e-4 -0.7185835 0.6954406 5.35783e-6 -0.7194558 0.6945382 1.79897e-5 -0.7195472 0.6944436 8.98357e-5 0.7268149 0.6868335 8.97443e-5 0.726808 0.6868407 1.04173e-4 0.7278802 0.6857044 1.04252e-4 0.727886 0.6856982 1.21677e-4 0.7194927 -0.6945001 1.15252e-4 0.7194461 -0.6945482 -5.3782e-6 0.7185739 -0.6954506 -1.80182e-5 0.7184824 -0.6955451 -8.97377e-5 -0.7278873 -0.6856968 -1.03991e-4 -0.7268151 -0.6868332 -8.9829e-5 -0.7278805 -0.6857041 -1.04068e-4 -0.7268093 -0.6868393 -0.9999978 0.001499468 0.001449854 -0.9999987 0.001226872 9.49029e-4 -0.9999995 9.12649e-4 3.71726e-4 -0.9999998 6.38961e-4 -1.31105e-4 -3.66631e-5 -0.001487247 0.9999988 -2.87225e-4 -7.15023e-4 0.9999997 -2.24705e-4 -9.07709e-4 0.9999996 2.59104e-5 -0.001680097 0.9999986 -0.9999987 -0.001226913 9.48866e-4 -0.9999978 -0.001499468 0.001449616 -0.9999996 -9.12738e-4 3.7165e-4 -2.87246e-4 7.15023e-4 0.9999997 -3.66716e-5 0.001487287 0.9999989 -2.24723e-4 9.07718e-4 0.9999996 2.59051e-5 0.001680146 0.9999986 0.9999987 -6.40091e-4 -0.001450825 0.9999992 -9.1347e-4 -9.49145e-4 0.9999992 -0.001228046 -3.71862e-4 0.9999989 -0.001502126 1.31105e-4 2.87032e-4 0.001679627 -0.9999986 2.87032e-4 0.001679627 -0.9999986 2.87032e-4 0.001679627 -0.9999985 2.59104e-5 -7.14823e-4 0.9999997 2.59104e-5 -7.14823e-4 0.9999997 2.59104e-5 -7.14823e-4 0.9999997 0.9999991 9.13559e-4 -9.48982e-4 0.9999987 6.40221e-4 -0.001450586 0.9999992 0.001228088 -3.71786e-4 0.9999989 0.001502126 1.31105e-4 2.87053e-4 -0.001679676 -0.9999986 2.87053e-4 -0.001679676 -0.9999986 2.87053e-4 -0.001679676 -0.9999986 2.59052e-5 7.14823e-4 0.9999997 2.59052e-5 7.14823e-4 0.9999997 2.59052e-5 7.14823e-4 0.9999998 1.9929e-4 0.9999994 0.001127435 1.54872e-4 0.9999996 8.76151e-4 -1.54872e-4 0.9999996 -8.76151e-4 -1.9929e-4 0.9999993 -0.001127435 -1.99938e-4 0.9999993 0.001128014 -1.99938e-4 0.9999993 0.001128014 -1.99938e-4 0.9999993 0.001128014 -1.99938e-4 -0.9999993 0.001128015 -1.99938e-4 -0.9999993 0.001128015 -1.99938e-4 -0.9999993 0.001128014</float_array>
+          <technique_common>
+            <accessor source="#geom-dumping_bin_link-normals-array" count="103" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <vertices id="geom-dumping_bin_link-vertices">
+          <input semantic="POSITION" source="#geom-dumping_bin_link-positions"/>
+        </vertices>
+        <triangles material="ColorMaterial" count="48">
+          <input semantic="VERTEX" source="#geom-dumping_bin_link-vertices" offset="0"/>
+          <input semantic="NORMAL" source="#geom-dumping_bin_link-normals" offset="1"/>
+          <p>1 0 0 1 2 2 1 0 2 2 3 3 5 4 4 5 2 6 5 4 2 6 3 7 4 8 5 9 3 10 4 8 3 10 2 11 7 12 6 13 2 14 7 12 2 14 0 15 7 16 6 17 0 18 0 18 6 17 2 19 2 20 6 21 8 22 8 22 6 21 9 23 8 24 9 25 2 26 2 26 9 25 6 27 10 28 7 29 11 30 7 31 11 32 6 33 13 34 12 35 11 36 13 34 11 36 6 37 12 38 13 39 6 40 12 38 6 40 11 41 3 42 1 43 11 44 11 44 1 43 10 45 3 46 14 47 15 48 3 46 15 48 11 49 11 50 10 51 3 52 3 52 10 51 1 53 15 54 14 55 11 56 11 56 14 55 3 57 16 58 17 59 0 60 0 60 17 59 1 61 16 62 18 63 7 64 16 62 7 64 0 65 18 66 19 67 10 68 18 66 10 68 7 16 17 69 19 70 1 71 1 71 19 70 10 72 17 73 16 74 1 75 1 75 16 74 0 76 18 77 16 78 0 79 0 80 18 81 7 82 19 83 18 84 7 85 19 83 7 85 10 86 19 87 17 88 10 89 17 90 10 91 1 92 19 93 18 94 17 95 17 95 18 94 16 96 19 97 18 98 16 99 16 100 19 101 17 102</p>
+        </triangles>
+      </mesh>
+    </geometry>
+  </library_geometries>
+  <library_lights>
+    <light id="EnvironmentAmbientLight" name="EnvironmentAmbientLight">
+      <technique_common>
+        <ambient>
+          <color>0 0 0</color>
+        </ambient>
+      </technique_common>
+    </light>
+  </library_lights>
+  <library_visual_scenes>
+    <visual_scene id="MaxScene">
+      <node name="EnvironmentAmbientLight">
+        <instance_light url="#EnvironmentAmbientLight"/>
+      </node>
+      <node id="node-dumping_bin_link" name="dumping_bin_link">
+        <translate>0.005571166 0.05936083 0.006169431</translate>
+        <instance_geometry url="#geom-dumping_bin_link">
+          <bind_material>
+            <technique_common>
+              <instance_material symbol="ColorMaterial" target="#ColorEffectR86G86B86-material"/>
+            </technique_common>
+          </bind_material>
+        </instance_geometry>
+        <extra>
+          <technique profile="OpenCOLLADA">
+            <cast_shadows>1</cast_shadows>
+            <primary_visibility>1</primary_visibility>
+            <receive_shadows>1</receive_shadows>
+            <secondary_visibility>1</secondary_visibility>
+          </technique>
+        </extra>
+      </node>
+    </visual_scene>
+  </library_visual_scenes>
+  <scene>
+    <instance_visual_scene url="#MaxScene"/>
+  </scene>
+</COLLADA>

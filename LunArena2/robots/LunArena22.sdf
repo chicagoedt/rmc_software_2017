@@ -1,0 +1,41 @@
+<sdf version='1.4'>
+  <model name='LunArena2'>
+    <link name='arena_base_link'>
+      <pose>0 0 0 0 -0 0</pose>
+      <inertial>
+        <pose>3.46639 -5.50882 3.2974 0 -0 0</pose>
+        <mass>39247.1</mass>
+        <inertia>
+          <ixx>181480</ixx>
+          <ixy>29643.3</ixy>
+          <ixz>4652.6</ixz>
+          <iyy>120194</iyy>
+          <iyz>5803.15</iyz>
+          <izz>291998</izz>
+        </inertia>
+      </inertial>
+      <collision name='arena_base_link_collision'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://LunArena2/meshes/arena_base_link.STL</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name='arena_base_link_visual'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://LunArena2/meshes/arena_base_link.STL</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <velocity_decay>
+        <linear>0</linear>
+        <angular>0</angular>
+      </velocity_decay>
+    </link>
+  </model>
+</sdf>

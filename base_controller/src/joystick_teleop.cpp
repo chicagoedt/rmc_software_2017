@@ -19,8 +19,6 @@ private:
 
 	int velLinear;  //
 	int velAngular; //in launch file start.launch in base_controller directory,
-	int Right_Linear;
-	int Left_Linear;
 	int buttonA;
 	int buttonB;
 	int buttonX;				//look for <param name="axis_linear" value="(input index value here from link below)"
@@ -36,14 +34,16 @@ private:
 	int right_trig;
 	int dpad_LR;
 	int dpad_UD;
+public:
+	int counter;
 };
 
 TeleopJoy::TeleopJoy()
 {
+	counter = 0;
+
 	n.param("axis_linear" 		, velLinear,  	velLinear );
 	n.param("axis_angular"		, velAngular, 	velAngular);
-	n.param("left_axis_linear"	, Left_Linear,  Left_Linear);
-	n.param("right_axis_linear"	, Right_Linear, Right_Linear);	
 	n.param("button_a"			, buttonA, 		buttonA);
 	n.param("button_b"			, buttonB, 		buttonB);
 	n.param("button_x"			, buttonX, 		buttonX);
@@ -60,20 +60,20 @@ TeleopJoy::TeleopJoy()
 	n.param("dpad_leftright"	, dpad_LR, 		dpad_LR);
 	n.param("dpad_updown"		, dpad_UD, 		dpad_UD);
 
-	pub 		= n.advertise<geometry_msgs::Twist> 			("cmd_vel", 1);
+	pub 		= n.advertise<geometry_msgs::Twist> ("cmd_vel", 1);
 	button_pub	= n.advertise<base_controller::Xbox_Button_Msg> ("xbox_controller", 1);
-	sub 		= n.subscribe<sensor_msgs::Joy>					("joy", 	1, &TeleopJoy::callback, this);
+	sub 		= n.subscribe<sensor_msgs::Joy> ("joy", 1, &TeleopJoy::callback, this);
 }
 
 void TeleopJoy::callback(const sensor_msgs::Joy::ConstPtr& joy)
 {  
+	++counter;
+
 	geometry_msgs::Twist 				vel;
 	base_controller::Xbox_Button_Msg	buttonPressed;
 
-//	vel.angular.z 	= joy->axes[velAngular];
-//	vel.linear.x 	= joy->axes[velLinear];
-	vel.linear.x	= joy->axes[Right_Linear];
-	vel.angular.z	= joy->axes[Left_Linear];
+	vel.angular.z 	= joy->axes[velAngular];
+	vel.linear.x 	= joy->axes[velLinear];
 
 	buttonPressed.a 					= joy->buttons[buttonA];
 	buttonPressed.b 					= joy->buttons[buttonB];
@@ -102,4 +102,6 @@ int main(int argc, char** argv)
 	TeleopJoy 	joystick;
 
 	ros::spin();
+
+	std::cout << "Count: " << joystick.counter << std::endl;
 }

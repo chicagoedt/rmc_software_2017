@@ -4,36 +4,31 @@ project(base_controller)
 find_package(catkin REQUIRED COMPONENTS roscpp rospy std_msgs message_generation)
 
 
+
 add_message_files(
-        FILES
-  	wheels_msg.msg
-	Xbox_Button_Msg.msg
-	diagnostics_msg.msg
-)
+    FILES
+    Xbox_Button_Msg.msg
+    )
 
 generate_messages(
-	DEPENDENCIES
-	std_msgs
-)
+    DEPENDENCIES
+    std_msgs
+    )
 
 catkin_package(
-       	CATKIN_DEPENDS
-	message_runtime
-)
+    CATKIN_DEPENDS
+    message_runtime
+    )
 
 
 
 include_directories(include ${catkin_INCLUDE_DIRS})
 
-#add_executable(keyboard_teleop src/keyboard_teleop.cpp)
-#target_link_libraries(keyboard_teleop ${catkin_LIBRARIES})
-
-add_executable(roboteq_driver src/roboteq_driver.cpp src/serialDriver/Exception.cpp src/serialDriver/SerialPort.cpp)
-target_link_libraries(roboteq_driver ${catkin_LIBRARIES})
-
-
-
 add_executable(joystick_teleop src/joystick_teleop.cpp)
 target_link_libraries(joystick_teleop ${catkin_LIBRARIES})
+set_target_properties(joystick_teleop PROPERTIES COMPILE_FLAGS -g)
 
-#add_dependencies(keyboard_teleop base_controller_gencpp)
+
+  add_dependencies(joystick_teleop ${catkin_EXPORTED_TARGETS})
+
+

@@ -1,7 +1,5 @@
 <launch>
     <node pkg="base_controller" name="joystick_teleop" type="joystick_teleop"/>
-    <param name="left_axis_linear" 	value="4" type="int"/>
-    <param name="right_axis_linear" 	value="1" type="int"/>
     <param name="axis_linear"  	value="1" type="int"/>
     <param name="axis_angular" 	value="3" type="int"/>
     <param name="button_a"				value="0" type="int"/>

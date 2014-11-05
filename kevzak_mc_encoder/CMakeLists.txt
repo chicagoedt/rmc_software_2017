@@ -2,8 +2,19 @@ cmake_minimum_required(VERSION 2.8.3)
 project(kevzak_mc_encoder)
 
 find_package(catkin REQUIRED COMPONENTS
-  roscpp
+  roscpp std_msgs message_generation base_controller
 )
+
+generate_messages(
+	DEPENDENCIES
+	std_msgs
+	)
+
+catkin_package(
+  	CATKIN_DEPENDS 
+	message_runtime
+  	)
+
 
 ## Generate messages in the 'msg' folder
 # add_message_files(

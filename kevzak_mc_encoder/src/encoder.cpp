@@ -392,7 +392,7 @@ uint8_t Send_UDP (const unsigned char * Message)
 /*ERROR*/
 void ERROR (const char *msg)
 {
-        ROS_ERROR(msg);
+        ROS_ERROR("%s", msg);
         //exit(1);
 }//End ERROR
 

@@ -1,0 +1,1015 @@
+<?xml version='1.0'?>
+<sdf version='1.4'>
+  <model name="rmc_robot">
+  <static>false</static>
+  <pose>0 0 5 0 0 3.14</pose>
+  <link name='base_link'>
+      <pose>0 0 0 0 0 0</pose>
+      <inertial>
+        <pose>0.0718949 -0.601542 0.318448 0 -0 0</pose>
+        <mass>2.92938</mass>
+        <inertia>
+          <ixx>0.148284</ixx>
+          <ixy>7.06981e-05</ixy>
+          <ixz>-1.16351e-05</ixz>
+          <iyy>0.131066</iyy>
+          <iyz>-0.0298493</iyz>
+          <izz>0.188823</izz>
+        </inertia>
+      </inertial>
+      <collision name='base_link_collision'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://rmc_simulation/meshes/base_link.STL</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name='base_link_visual'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://rmc_simulation/meshes/base_link.STL</uri>
+          </mesh>
+        </geometry>
+	<material>
+          <script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/Black</name>
+          </script>
+        </material>
+      </visual>
+      <velocity_decay>
+        <linear>0</linear>
+        <angular>0</angular>
+      </velocity_decay>
+    </link>
+
+    <link name='left_bot_link'>
+      <pose>-0.140869 -0.255808 0.217656 1.5708 -0 0</pose>
+      <inertial>
+        <pose>-0.0111125 -2.77556e-17 0 0 -0 0</pose>
+        <mass>0.188515</mass>
+        <inertia>
+          <ixx>0.0019175</ixx>
+          <ixy>4.77528e-22</ixy>
+          <ixz>1.41435e-20</ixz>
+          <iyy>0.00191594</iyy>
+          <iyz>4.20247e-21</iyz>
+          <izz>1.85554e-05</izz>
+        </inertia>
+      </inertial>
+      <collision name='left_bot_link_collision'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://rmc_simulation/meshes/left_bot_link.STL</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name='left_bot_link_visual'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://rmc_simulation/meshes/left_bot_link.STL</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <velocity_decay>
+        <linear>0</linear>
+        <angular>0</angular>
+      </velocity_decay>
+    </link>
+
+    <joint name='left_bot_joint' type='revolute'>
+      <child>left_bot_link</child>
+      <parent>base_link</parent>
+      <axis>
+        <xyz>-1 0 0</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+      </axis>
+    </joint>
+
+    <link name='left_bot_back_link'>
+      <pose>-0.163094 -0.433608 0.217656 1.5708 -3.44169e-15 1.5708</pose>
+      <inertial>
+        <pose>1.92853e-05 -0.0863283 -0.0548204 0 -0 0</pose>
+        <mass>0.205852</mass>
+        <inertia>
+          <ixx>0.00120413</ixx>
+          <ixy>-1.40154e-07</ixy>
+          <ixz>-1.2706e-07</ixz>
+          <iyy>0.000482538</iyy>
+          <iyz>0.000461297</iyz>
+          <izz>0.000755248</izz>
+        </inertia>
+      </inertial>
+      <collision name='left_bot_back_link_collision'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://rmc_simulation/meshes/left_bot_back_link.STL</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name='left_bot_back_link_visual'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://rmc_simulation/meshes/left_bot_back_link.STL</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <velocity_decay>
+        <linear>0</linear>
+        <angular>0</angular>
+      </velocity_decay>
+    </link>
+
+    <joint name='left_bot_back_joint' type='revolute'>
+      <child>left_bot_back_link</child>
+      <parent>left_bot_link</parent>
+      <axis>
+        <xyz>-1 -3.44169e-15 1.11022e-16</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+      </axis>
+    </joint>
+
+<link name='left_mid_wheel_link'>
+      <pose>-0.179282 -0.433574 0.077831 0.785403 1.57079 -0.785403</pose>
+      <inertial>
+        <pose>-7.307e-12 -0.0707952 -1.95886e-07 0 -0 0</pose>
+        <mass>0.687646</mass>
+        <inertia>
+          <ixx>0.00410397</ixx>
+          <ixy>1.97154e-13</ixy>
+          <ixz>1.06916e-14</ixz>
+          <iyy>0.00552463</iyy>
+          <iyz>5.39169e-09</iyz>
+          <izz>0.00410397</izz>
+        </inertia>
+      </inertial>
+      <collision name='left_mid_wheel_link_collision'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://rmc_simulation/meshes/left_mid_wheel_link.STL</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name='left_mid_wheel_link_visual'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://rmc_simulation/meshes/left_mid_wheel_link.STL</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <velocity_decay>
+        <linear>0</linear>
+        <angular>0</angular>
+      </velocity_decay>
+    </link>
+    <joint name='left_mid_wheel_joint' type='revolute'>
+      <child>left_mid_wheel_link</child>
+      <parent>left_bot_back_link</parent>
+      <axis>
+        <xyz>-1 -1.11022e-16 1.11022e-16</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+      </axis>
+    </joint>
+
+    <link name='left_bot_front_link'>
+      <pose>-0.147219 -0.0780078 0.217656 1.5708 -3.44169e-15 1.5708</pose>
+      <inertial>
+        <pose>1.92853e-05 -0.0863283 -0.0706954 0 -0 0</pose>
+        <mass>0.205852</mass>
+        <inertia>
+          <ixx>0.00120413</ixx>
+          <ixy>-1.40154e-07</ixy>
+          <ixz>-1.2706e-07</ixz>
+          <iyy>0.000482538</iyy>
+          <iyz>0.000461297</iyz>
+          <izz>0.000755248</izz>
+        </inertia>
+      </inertial>
+      <collision name='left_bot_front_link_collision'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://rmc_simulation/meshes/left_bot_front_link.STL</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name='left_bot_front_link_visual'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://rmc_simulation/meshes/left_bot_front_link.STL</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <velocity_decay>
+        <linear>0</linear>
+        <angular>0</angular>
+      </velocity_decay>
+    </link>
+    <joint name='left_bot_front_joiny' type='revolute'>
+      <child>left_bot_front_link</child>
+      <parent>left_bot_link</parent>
+      <axis>
+        <xyz>-1 -3.44169e-15 1.11022e-16</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+      </axis>
+    </joint>
+
+    <link name='left_front_wheel_link'>
+      <pose>-0.179282 -0.077974 0.077831 0.785403 1.57079 -0.785403</pose>
+      <inertial>
+        <pose>-7.30697e-12 -0.0707952 -1.95886e-07 0 -0 0</pose>
+        <mass>0.687646</mass>
+        <inertia>
+          <ixx>0.00410397</ixx>
+          <ixy>1.97154e-13</ixy>
+          <ixz>1.06921e-14</ixz>
+          <iyy>0.00552463</iyy>
+          <iyz>5.39169e-09</iyz>
+          <izz>0.00410397</izz>
+        </inertia>
+      </inertial>
+      <collision name='left_front_wheel_link_collision'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://rmc_simulation/meshes/left_front_wheel_link.STL</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name='left_front_wheel_link_visual'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://rmc_simulation/meshes/left_front_wheel_link.STL</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <velocity_decay>
+        <linear>0</linear>
+        <angular>0</angular>
+      </velocity_decay>
+    </link>
+    <joint name='left_front_wheel_joint' type='revolute'>
+      <child>left_front_wheel_link</child>
+      <parent>left_bot_front_link</parent>
+      <axis>
+        <xyz>-1 -1.11022e-16 1.11022e-16</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+      </axis>
+    </joint>
+
+    <link name='left_top_link'>
+      <pose>-0.140869 -0.255808 0.293856 1.5708 -0 0</pose>
+      <inertial>
+        <pose>-0.0111125 -5.55112e-17 0 0 -0 0</pose>
+        <mass>0.140249</mass>
+        <inertia>
+          <ixx>0.00137938</ixx>
+          <ixy>-1.28023e-22</ixy>
+          <ixz>7.25851e-21</ixz>
+          <iyy>0.00138148</iyy>
+          <iyz>4.32209e-22</iyz>
+          <izz>1.05254e-05</izz>
+        </inertia>
+      </inertial>
+      <collision name='left_top_link_collision'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://rmc_simulation/meshes/left_top_link.STL</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name='left_top_link_visual'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://rmc_simulation/meshes/left_top_link.STL</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <velocity_decay>
+        <linear>0</linear>
+        <angular>0</angular>
+      </velocity_decay>
+    </link>
+    <joint name='left_top_joint' type='revolute'>
+      <child>left_top_link</child>
+      <parent>base_link</parent>
+      <axis>
+        <xyz>-1 0 0</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+      </axis>
+    </joint>
+
+    <joint name='left_top_back_joint' type='revolute'>
+      <child>left_bot_back_link</child>
+      <parent>left_top_link</parent>
+      <pose>0 0.0762 0 0 0 0</pose>
+      <axis>
+        <xyz>-1 -3.44169e-15 1.11022e-16</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+      </axis>
+    </joint>
+
+<joint name='left_top_front_joint' type='revolute'>
+      <child>left_bot_front_link</child>
+      <parent>left_top_link</parent>
+      <pose> 0 0.0762 0 0 0 0 </pose>
+      <axis>
+        <xyz>-1 -3.44169e-15 1.11022e-16</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+      </axis>
+    </joint>
+<!-- END OF LEFT ROCKER OMFG YESSSSSSSS -->
+
+
+    <link name='rear_rocker_link'>
+      <pose>0.0718557 -0.753477 0.217656 1.5708 0.0049569 4.33686e-19</pose>
+      <inertial>
+        <pose>0.000471477 -0.0411046 0.0167425 0 -0 0</pose>
+        <mass>0.807447</mass>
+        <inertia>
+          <ixx>0.00288386</ixx>
+          <ixy>-1.8321e-05</ixy>
+          <ixz>-8.95563e-08</ixz>
+          <iyy>0.0397756</iyy>
+          <iyz>3.03268e-06</iyz>
+          <izz>0.0425282</izz>
+        </inertia>
+      </inertial>
+      <collision name='rear_rocker_link_collision'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://rmc_simulation/meshes/rear_rocker_link.STL</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name='rear_rocker_link_visual'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://rmc_simulation/meshes/rear_rocker_link.STL</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <velocity_decay>
+        <linear>0</linear>
+        <angular>0</angular>
+      </velocity_decay>
+    </link>
+    <joint name='rear_rocker_joint' type='revolute'>
+      <child>rear_rocker_link</child>
+      <parent>base_link</parent>
+      <axis>
+        <xyz>1.73472e-17 1 3.44167e-15</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+      </axis>
+    </joint>
+<!-- END OF REAR ROCKER -->
+
+
+    <link name='left_back_wheel_link'>
+      <pose>-0.180876 -0.770124 0.0791455 -1.5708 1.56584 3.14159</pose>
+      <inertial>
+        <pose>-7.71942e-12 -0.070792 -1.95887e-07 0 -0 0</pose>
+        <mass>0.687646</mass>
+        <inertia>
+          <ixx>0.00410397</ixx>
+          <ixy>2.09611e-13</ixy>
+          <ixz>1.05878e-14</ixz>
+          <iyy>0.00552463</iyy>
+          <iyz>5.39171e-09</iyz>
+          <izz>0.00410397</izz>
+        </inertia>
+      </inertial>
+      <collision name='left_back_wheel_link_collision'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://rmc_simulation/meshes/left_back_wheel_link.STL</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name='left_back_wheel_link_visual'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://rmc_simulation/meshes/left_back_wheel_link.STL</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <velocity_decay>
+        <linear>0</linear>
+        <angular>0</angular>
+      </velocity_decay>
+    </link>
+    <joint name='left_back_wheel_joint' type='revolute'>
+      <child>left_back_wheel_link</child>
+      <parent>rear_rocker_link</parent>
+      <axis>
+        <xyz>-0.999988 -1.11022e-16 0.00495688</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+      </axis>
+    </joint>
+
+    <link name='right_back_wheel_link'>
+      <pose>0.323202 -0.770124 0.0766469 3.13028 -1.11702 -1.56063</pose>
+      <inertial>
+        <pose>-2.56872e-12 -0.070792 -1.95886e-07 0 -0 0</pose>
+        <mass>0.687646</mass>
+        <inertia>
+          <ixx>0.00410397</ixx>
+          <ixy>7.41436e-14</ixy>
+          <ixz>7.32563e-15</ixz>
+          <iyy>0.00552463</iyy>
+          <iyz>5.3917e-09</iyz>
+          <izz>0.00410397</izz>
+        </inertia>
+      </inertial>
+      <collision name='right_back_wheel_link_collision'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://rmc_simulation/meshes/right_back_wheel_link.STL</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name='right_back_wheel_link_visual'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://rmc_simulation/meshes/right_back_wheel_link.STL</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <velocity_decay>
+        <linear>0</linear>
+        <angular>0</angular>
+      </velocity_decay>
+    </link>
+    <joint name='right_back_wheel_joint' type='revolute'>
+      <child>right_back_wheel_link</child>
+      <parent>rear_rocker_link</parent>
+      <axis>
+        <xyz>-0.999988 -2.77556e-17 0.00495688</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+      </axis>
+    </joint>
+
+    <link name='right_bot_link'>
+      <pose>0.284581 -0.255808 0.217656 1.5708 -0 0</pose>
+      <inertial>
+        <pose>0.0111125 2.77556e-17 0 0 -0 0</pose>
+        <mass>0.188515</mass>
+        <inertia>
+          <ixx>0.0019175</ixx>
+          <ixy>-7.07169e-22</ixy>
+          <ixz>-9.82756e-21</ixz>
+          <iyy>0.00191594</iyy>
+          <iyz>-2.59046e-07</iyz>
+          <izz>1.85554e-05</izz>
+        </inertia>
+      </inertial>
+      <collision name='right_bot_link_collision'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://rmc_simulation/meshes/right_bot_link.STL</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name='right_bot_link_visual'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://rmc_simulation/meshes/right_bot_link.STL</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <velocity_decay>
+        <linear>0</linear>
+        <angular>0</angular>
+      </velocity_decay>
+    </link>
+    <joint name='right_bot_joint' type='revolute'>
+      <child>right_bot_link</child>
+      <parent>base_link</parent>
+      <axis>
+        <xyz>-1 0 0</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+      </axis>
+    </joint>
+<!-- negate the roll value. swithc the angle. check right mid wheel -->
+    <link name='right_bot_back_link'>
+      <pose>0.290931 -0.433608 0.207632 -1.5708 3.44169e-15 -1.5708</pose>
+      <inertial>
+        <pose>1.92853e-05 0.0763283 0.0706954 0 -0 0</pose>
+        <mass>0.205852</mass>
+        <inertia>
+          <ixx>0.00120413</ixx>
+          <ixy>1.40154e-07</ixy>
+          <ixz>1.2706e-07</ixz>
+          <iyy>0.000482538</iyy>
+          <iyz>0.000461297</iyz>
+          <izz>0.000755248</izz>
+        </inertia>
+      </inertial>
+      <collision name='right_bot_back_link_collision'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://rmc_simulation/meshes/right_bot_back_link.STL</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name='right_bot_back_link_visual'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://rmc_simulation/meshes/right_bot_back_link.STL</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <velocity_decay>
+        <linear>0</linear>
+        <angular>0</angular>
+      </velocity_decay>
+    </link>
+    <joint name='right_bot_back_joint' type='revolute'>
+      <child>right_bot_back_link</child>
+      <parent>right_bot_link</parent>
+      <axis>
+        <xyz>-1 -3.44169e-15 1.11022e-16</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+      </axis>
+    </joint>
+
+    <link name='right_mid_wheel_link'>
+      <pose>0.323202 -0.433642 0.0766469 -2.65358e-06 1.57079 1.57079</pose>
+      <inertial>
+        <pose>-7.30706e-12 -0.0807952 -1.95886e-07 0 -0 0</pose>
+        <mass>0.687646</mass>
+        <inertia>
+          <ixx>0.00410397</ixx>
+          <ixy>1.97149e-13</ixy>
+          <ixz>1.06927e-14</ixz>
+          <iyy>0.00552463</iyy>
+          <iyz>5.39169e-09</iyz>
+          <izz>0.00410397</izz>
+        </inertia>
+      </inertial>
+      <collision name='right_mid_wheel_link_collision'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://rmc_simulation/meshes/right_mid_wheel_link.STL</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name='right_mid_wheel_link_visual'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://rmc_simulation/meshes/right_mid_wheel_link.STL</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <velocity_decay>
+        <linear>0</linear>
+        <angular>0</angular>
+      </velocity_decay>
+    </link>
+    <joint name='right_mid_wheel_joint' type='revolute'>
+      <child>right_mid_wheel_link</child>
+      <parent>right_bot_back_link</parent>
+      <axis>
+        <xyz>-1 0 0</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+      </axis>
+    </joint>
+
+<!-- Had to negate the roll angle value to make it turn around. Check the right front wheel -->
+    <link name='right_bot_front_link'>
+      <pose>0.290931 -0.0780078 0.217656 -1.5708 3.44169e-15 -1.5708</pose>
+      <inertial>
+        <pose>-4.78511e-05 0.0863041 0.0706954 0 -0 0</pose>
+        <mass>0.205852</mass>
+        <inertia>
+          <ixx>0.00120413</ixx>
+          <ixy>-4.2103e-07</ixy>
+          <ixz>-2.31693e-07</ixz>
+          <iyy>0.000482538</iyy>
+          <iyz>0.000461297</iyz>
+          <izz>0.000755248</izz>
+        </inertia>
+      </inertial>
+      <collision name='right_bot_front_link_collision'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://rmc_simulation/meshes/right_bot_front_link.STL</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name='right_bot_front_link_visual'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://rmc_simulation/meshes/right_bot_front_link.STL</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <velocity_decay>
+        <linear>0</linear>
+        <angular>0</angular>
+      </velocity_decay>
+    </link>
+    <joint name='right_bot_front_joint' type='revolute'>
+      <child>right_bot_front_link</child>
+      <parent>right_bot_link</parent>
+      <axis>
+        <xyz>-1 -3.44169e-15 1.11022e-16</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+      </axis>
+    </joint>
+
+    <link name='right_front_wheel_link'>
+      <pose>0.323202 -0.0779328 0.0766469 -5.12491e-14 1.56863 1.5708</pose>
+      <inertial>
+        <pose>-7.19148e-12 -0.0807952 -1.95886e-07 0 -0 0</pose>
+        <mass>0.687646</mass>
+        <inertia>
+          <ixx>0.00410397</ixx>
+          <ixy>1.94069e-13</ixy>
+          <ixz>1.05931e-14</ixz>
+          <iyy>0.00552463</iyy>
+          <iyz>5.39169e-09</iyz>
+          <izz>0.00410397</izz>
+        </inertia>
+      </inertial>
+      <collision name='right_front_wheel_link_collision'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://rmc_simulation/meshes/right_front_wheel_link.STL</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name='right_front_wheel_link_visual'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://rmc_simulation/meshes/right_front_wheel_link.STL</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <velocity_decay>
+        <linear>0</linear>
+        <angular>0</angular>
+      </velocity_decay>
+    </link>
+    <joint name='right_front_wheel_joint' type='revolute'>
+      <child>right_front_wheel_link</child>
+      <parent>right_bot_front_link</parent>
+      <axis>
+        <xyz>-1 -5.55112e-17 5.55112e-17</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+      </axis>
+    </joint>
+
+    <link name='right_top_link'>
+      <pose>0.284581 -0.255808 0.293856 1.5708 -0 0</pose>
+      <inertial>
+        <pose>0.0111125 0 -5.55112e-17 0 -0 0</pose>
+        <mass>0.140249</mass>
+        <inertia>
+          <ixx>0.00137938</ixx>
+          <ixy>-1.37422e-22</ixy>
+          <ixz>-1.023e-20</ixz>
+          <iyy>0.00138148</iyy>
+          <iyz>2.95551e-21</iyz>
+          <izz>1.05254e-05</izz>
+        </inertia>
+      </inertial>
+      <collision name='right_top_link_collision'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://rmc_simulation/meshes/right_top_link.STL</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name='right_top_link_visual'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://rmc_simulation/meshes/right_top_link.STL</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <velocity_decay>
+        <linear>0</linear>
+        <angular>0</angular>
+      </velocity_decay>
+    </link>
+    <joint name='right_top_joint' type='revolute'>
+      <child>right_top_link</child>
+      <parent>base_link</parent>
+      <axis>
+        <xyz>-1 0 0</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+      </axis>
+    </joint>
+
+    <joint name='right_top_back_joint' type='revolute'>
+      <child>right_bot_back_link</child>
+      <parent>right_top_link</parent>
+      <pose>0 -0.087 0 0 0 0 </pose>
+      <axis>
+        <xyz>-1 -3.44169e-15 1.11022e-16</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+      </axis>
+    </joint>
+
+<joint name='right_top_front_joint' type='revolute'>
+      <child>right_bot_front_link</child>
+      <parent>right_top_link</parent>
+      <pose>0 -0.087 0 0 0 0 </pose>
+      <axis>
+        <xyz>-1 -3.44169e-15 1.11022e-16</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+      </axis>
+    </joint>
+
+
+    <joint name="bumblebee_mount_joint" type="revolute">
+      <parent>base_link</parent>
+      <child>bumblebee_mount_link</child>
+      <pose>0 0 0 0 0 0</pose>
+      <axis>
+        <xyz>-1 0 0</xyz>
+        <limit>
+          <lower>0</lower>
+          <upper>0</upper>
+        </limit>
+      </axis>
+    </joint>
+
+    <link name='bumblebee_mount_link'>
+      <pose>0.0718557 -0.90 0.525 1.57 0 0</pose>
+      <inertial>
+        <mass>0.687646</mass>
+        <inertia>
+          <ixx>0.000101</ixx>
+          <ixy>0.0</ixy>
+          <ixz>0.0</ixz>
+          <iyy>0.000767</iyy>
+          <iyz>0.0</iyz>
+          <izz>0.000739</izz>
+        </inertia>
+      </inertial>
+      <collision name='bumblebee_mount_link_collision'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://lcsr_camera_models/cameras/bumblebee/bumblebee2.dae</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name='bumblebee_mount_link_visual'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://lcsr_camera_models/cameras/bumblebee/bumblebee2.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <gravity>1</gravity>
+      <velocity_decay>
+         <linear>0</linear>
+         <angular>0</angular>
+      </velocity_decay>
+      <self_collide>0</self_collide>
+
+    <sensor name='stereo_camera' type='multicamera'>
+       <update_rate>48</update_rate>
+       <camera name='left'>
+          <pose>0.06 0 0 -5.76279e-13 -1.5707 -1.5707</pose>
+          <horizontal_fov>1.15192</horizontal_fov>
+            <image>
+              <width>640</width>
+              <height>480</height>
+              <format>R8G8B8</format>
+            </image>
+            <clip>
+              <near>0.05</near>
+              <far>300</far>
+            </clip>
+            <noise>
+              <type>gaussian</type>
+              <mean>0</mean>
+              <stddev>0.007</stddev>
+            </noise>
+        </camera>
+        <camera name='right'>
+          <pose>-0.06 0 0 -5.76279e-13 -1.5707 -1.5707</pose>
+            <horizontal_fov>1.15192</horizontal_fov>
+            <image>
+              <width>640</width>
+              <height>480</height>
+              <format>R8G8B8</format>
+            </image>
+            <clip>
+              <near>0.05</near>
+              <far>300</far>
+            </clip>
+            <noise>
+              <type>gaussian</type>
+              <mean>0</mean>
+              <stddev>0.007</stddev>
+            </noise>
+         </camera>
+
+       <plugin name='stereo_camera_controller' filename='libgazebo_ros_multicamera.so'>
+          <alwaysOn>true</alwaysOn>
+          <cameraName>stereo_camera</cameraName>
+          <imageTopicName>image_raw</imageTopicName>
+          <cameraInfoTopicName>camera_info</cameraInfoTopicName>
+          <frameName>bumblebee_mount_link</frameName>
+          <hackBaseline>0.12</hackBaseline>
+          <distortionK1>0.0</distortionK1>
+          <distortionK2>0.0</distortionK2>
+          <distortionK3>0.0</distortionK3>
+          <distortionT1>0.0</distortionT1>
+          <distortionT2>0.0</distortionT2>
+        </plugin>
+       <pose>0 0 0 0 0 0</pose>
+      </sensor>
+   </link>
+
+
+    <plugin name="hector_6w_diff_controller" filename="libdiffdrive_plugin_6w.so">
+            <alwaysOn>1</alwaysOn>
+            <updateRate>10.0</updateRate>
+            <wheelSeparation>0.5116</wheelSeparation>
+            <wheelDiameter>0.2191</wheelDiameter>
+            <torque>35</torque>
+	    <frontLeftJoint>left_front_wheel_joint</frontLeftJoint>
+            <frontRightJoint>right_front_wheel_joint</frontRightJoint>
+            <midLeftJoint>left_mid_wheel_joint</midLeftJoint>
+            <midRightJoint>right_mid_wheel_joint</midRightJoint>
+            <rearLeftJoint>left_back_wheel_joint</rearLeftJoint>
+            <rearRightJoint>right_back_wheel_joint</rearRightJoint>
+    </plugin>
+
+    <plugin name="novatel_gps_sim" filename="libhector_gazebo_ros_gps.so">
+            <alwaysOn>1</alwaysOn>
+            <frameId>gps</frameId>
+            <updateRate>200</updateRate>
+            <bodyName>base_link</bodyName>
+            <topicName>fix</topicName>
+            <velocityTopicName>fix_velocity</velocityTopicName>
+            <drift>0 0 0</drift>
+            <gaussianNoise>0 0 0</gaussianNoise>
+            <velocityDrift>0 0 0</velocityDrift>
+            <velocityGaussianNoise>0 0 0</velocityGaussianNoise>
+        </plugin>
+<!--
+      <link name='imu_link'>
+         <inertial>
+            <pose>0 0 0 0 0 0</pose>
+            <mass>0.001</mass>
+            <inertia>
+                <ixx>0.0001</ixx>
+                <ixy>0</ixy>
+                <ixz>0</ixz>
+                <iyy>0.000001</iyy>
+                <iyz>0</iyz>
+                <izz>0.0001</izz>
+            </inertia>
+          </inertial>
+      </link>
+      <joint name='imu_joint' type='fixed'>
+          <child>imu_link</child>
+          <parent>base_link</parent>
+          <axis>
+              <xyz>0 1 0</xyz>
+          </axis>
+      </joint>
+-->
+     <plugin name="imu_controller" filename="libgazebo_ros_imu.so">
+        <alwaysOn>true</alwaysOn>
+        <updateRate>200</updateRate>
+        <bodyName>base_link</bodyName>
+        <topicName>imu/data</topicName>
+        <gaussianNoise>0.0</gaussianNoise>
+        <xyzOffset>0 0 0</xyzOffset>
+        <rpyOffset>90 90 90</rpyOffset>
+        <serviceName>/default_imu</serviceName>
+     </plugin>
+
+
+  </model>
+</sdf>

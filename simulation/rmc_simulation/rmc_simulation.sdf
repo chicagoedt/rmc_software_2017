@@ -873,7 +873,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>model://rmc_simulation/lcsr_camera_models/cameras/bumblebee/bumblebee2.dae</uri>
+            <uri>model://lcsr_camera_models/cameras/bumblebee/bumblebee2.dae</uri>
           </mesh>
         </geometry>
       </collision>
@@ -882,7 +882,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>model://rmc_simulation/lcsr_camera_models/cameras/bumblebee/bumblebee2.dae</uri>
+            <uri>model://lcsr_camera_models/cameras/bumblebee/bumblebee2.dae</uri>
           </mesh>
         </geometry>
       </visual>

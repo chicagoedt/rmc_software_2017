@@ -33,4 +33,4 @@ simulation/gazebo_config/lib/*
 *.jpeg
 *.jpg
 *.png
-/CMakeLists.txt
+./CMakeLists.txt

@@ -40,15 +40,12 @@
   <!-- Use test_depend for packages you need only for testing: -->
   <!--   <test_depend>gtest</test_depend> -->
   <buildtool_depend>catkin</buildtool_depend>
-<<<<<<< HEAD:simulation/rmc_simulation/package.xml
-=======
   <build_depend>roscpp</build_depend>
   <build_depend>base_controller</build_depend>
   <build_depend>message_generation</build_depend>
   <run_depend>roscpp</run_depend>
   <run_depend>base_controller</run_depend>
   <run_depend>message_runtime</run_depend>
->>>>>>> development:kevzak_mc_encoder/package.xml
 
 
   <!-- The export tag contains other, unspecified, tags -->

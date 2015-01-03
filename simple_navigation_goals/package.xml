@@ -32,7 +32,6 @@
   <!-- Dependencies can be catkin packages or system dependencies -->
   <!-- Examples: -->
   <!-- Use build_depend for packages you need at compile time: -->
-<<<<<<< HEAD:simple_navigation_goals/package.xml
   <!--   <build_depend>message_generation</build_depend> -->
   <!-- Use buildtool_depend for build tool packages: -->
   <!--   <buildtool_depend>catkin</buildtool_depend> -->
@@ -40,14 +39,11 @@
   <!--   <run_depend>message_runtime</run_depend> -->
   <!-- Use test_depend for packages you need only for testing: -->
   <!--   <test_depend>gtest</test_depend> -->
-=======
   <build_depend>message_generation</build_depend> 
->>>>>>> development:base_controller/package.xml
   <buildtool_depend>catkin</buildtool_depend>
   <build_depend>actionlib</build_depend>
   <build_depend>move_base_msgs</build_depend>
   <build_depend>roscpp</build_depend>
-<<<<<<< HEAD:simple_navigation_goals/package.xml
   <run_depend>actionlib</run_depend>
   <run_depend>move_base_msgs</run_depend>
   <run_depend>roscpp</run_depend>
@@ -62,16 +58,3 @@
 
   </export>
 </package>
-=======
-  <build_depend>rospy</build_depend>
-  <build_depend>std_msgs</build_depend>
-  <build_depend>tf</build_depend>
-  <build_depend>nav_msgs</build_depend>
-  <run_depend>message_runtime</run_depend> 
-  <run_depend>roscpp</run_depend>
-  <run_depend>rospy</run_depend>
-  <run_depend>std_msgs</run_depend>
-  <run_depend>tf</run_depend>
-  <run_depend>nav_msgs</run_depend>
-</package>
->>>>>>> development:base_controller/package.xml

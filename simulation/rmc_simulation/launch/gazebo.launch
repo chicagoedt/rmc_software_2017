@@ -18,5 +18,4 @@
   </node>
 
   <include file="$(find gazebo_config)/gazeboekfrmc.launch"/>
-  <include file="$(find gazebo_config)/gps.launch"/>
 </launch>

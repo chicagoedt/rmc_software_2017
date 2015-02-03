@@ -12,5 +12,14 @@
       <name>LunArena2</name>
       <pose>2 -3 -1 0 0 0</pose>
     </include>
+    <include>
+      <uri>model://aruco</uri>
+      <name>Aruco Markers</name>
+      <pose>0.48 2 0.1 0 0 0</pose>
+    </include>
+    <include>
+      <uri>model://jersey_barrier</uri>
+      <pose>0.53 2.187 0 0 0 0</pose>
+    </include>
   </world>
 </sdf>

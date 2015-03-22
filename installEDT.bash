@@ -11,7 +11,7 @@ echo "rosdep install --from-paths src --ignore-src --rosdistro indigo -y" >> pos
 sudo chmod +x post-receive
 sudo chmod +x post-update
 
-cd ../../../
+cd ../../../../
 
 catkin_make clean
 catkin_make
@@ -33,7 +33,7 @@ echo "You should now be in the /devel/ folder."
 
 echo "Now grabbing rmc's gazebo meshes from the EDT wiki..."
 cd ..
-cd src/simulation/LunArena2
+cd src/Software_RMC/simulation/LunArena2
 
 wget http://wiki.chicagoedt.org/images/7/7e/Meshes-LunArena2.tar.gz
 tar zxvf Meshes-LunArena2.tar.gz

@@ -31,13 +31,6 @@ int main(int argc, char** argv)
 				tf::StampedTransform(tf::Transform(tf::Quaternion(0, 0, 0, 1), tf::Vector3(0, 0, 0)),
   		        ros::Time::now(),"base_footprint", "base_link"));
 
-			broadcaster.sendTransform(
-				tf::StampedTransform(tf::Transform(tf::Quaternion(0, 0, 0, 1), tf::Vector3(0.4014, 0.0, 0.1686)),
-  		        ros::Time::now(),"base_link", "laser"));
-
-			broadcaster.sendTransform(
-				tf::StampedTransform(tf::Transform(tf::Quaternion(-M_PI_2,0,M_PI_2), tf::Vector3(0.1905, 0.0, 0.6112)),
-  		        ros::Time::now(),"base_link", "bumblebee_mount_link"));
 
 		r.sleep();
 	}

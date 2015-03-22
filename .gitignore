@@ -6,6 +6,8 @@ base_controller/doc/html/*
 simulation/LunArena2/meshes/
 simulation/rmc_simulation/meshes/
 
+robot_localization/
+
 
 */.DS_Store
 */._.DS_Store

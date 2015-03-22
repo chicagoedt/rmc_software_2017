@@ -112,6 +112,8 @@ add_dependencies(state_machine_node state_machine_generate_messages_cpp)
 ## Specify libraries to link a library or executable target against
 target_link_libraries(state_machine_node ${catkin_LIBRARIES} )
 
+set(CMAKE_BUILD_TYPE Debug)
+
 #############
 ## Install ##
 #############

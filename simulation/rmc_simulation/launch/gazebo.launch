@@ -16,6 +16,9 @@
     args="-sdf -param robot_description -model rmc_simulation"
     output="screen">
   </node>
-
+<!--
   <include file="$(find gazebo_config)/gazeboekfrmc.launch"/>
+ 
+ <include file="$(find gazebo_config)/aruco_markers/multi/multi-boards.launch"/>
+-->
 </launch>

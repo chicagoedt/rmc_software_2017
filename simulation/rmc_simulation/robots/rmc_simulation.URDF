@@ -4,17 +4,17 @@
     name="base_link">
     <inertial>
       <origin
-        xyz="0.0718949334793627 -0.601542299438927 0.318447910771171"
+        xyz="0.0719191525595428 -0.529514025798947 0.258354886671981"
         rpy="0 0 0" />
       <mass
-        value="2.92938025647035" />
+        value="5.21776221348033" />
       <inertia
-        ixx="0.148284038285749"
-        ixy="7.06981150223383E-05"
-        ixz="-1.1635087974078E-05"
-        iyy="0.131065614800033"
-        iyz="-0.0298492505471701"
-        izz="0.188823271201836" />
+        ixx="0.389997796058234"
+        ixy="9.71316981309733E-06"
+        ixz="-0.000223596199441625"
+        iyy="0.310798205396144"
+        iyz="-0.0567353943990997"
+        izz="0.538173547982933" />
     </inertial>
     <visual>
       <origin
@@ -41,178 +41,19 @@
     </collision>
   </link>
   <link
-    name="right_top_link">
+    name="fr_wheel_link">
     <inertial>
       <origin
-        xyz="0.0111125 0 -5.55111512312578E-17"
-        rpy="0 0 0" />
-      <mass
-        value="0.140248807038419" />
-      <inertia
-        ixx="0.0013793844509538"
-        ixy="-1.37422248113498E-22"
-        ixz="-1.0229964394016E-20"
-        iyy="0.00138147619717869"
-        iyz="2.9555073229172E-21"
-        izz="1.05253601903843E-05" />
-    </inertial>
-    <visual>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="package://rmc_simulation/meshes/right_top_link.STL" />
-      </geometry>
-      <material
-        name="">
-        <color
-          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
-      </material>
-    </visual>
-    <collision>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="package://rmc_simulation/meshes/right_top_link.STL" />
-      </geometry>
-    </collision>
-  </link>
-  <joint
-    name="right_top_joint"
-    type="continuous">
-    <origin
-      xyz="0.284580691374717 -0.255807756916524 0.293855987376602"
-      rpy="1.5707963267949 0 0" />
-    <parent
-      link="base_link" />
-    <child
-      link="right_top_link" />
-    <axis
-      xyz="-1 0 0" />
-  </joint>
-  <link
-    name="right_bot_link">
-    <inertial>
-      <origin
-        xyz="0.0111125 2.77555756156289E-17 0"
-        rpy="0 0 0" />
-      <mass
-        value="0.188515035012426" />
-      <inertia
-        ixx="0.00191750304531622"
-        ixy="-7.07169104051599E-22"
-        ixz="-9.82756479552797E-21"
-        iyy="0.00191593922101045"
-        iyz="-2.59045677249677E-07"
-        izz="1.85554120830071E-05" />
-    </inertial>
-    <visual>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="package://rmc_simulation/meshes/right_bot_link.STL" />
-      </geometry>
-      <material
-        name="">
-        <color
-          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
-      </material>
-    </visual>
-    <collision>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="package://rmc_simulation/meshes/right_bot_link.STL" />
-      </geometry>
-    </collision>
-  </link>
-  <joint
-    name="right_bot_joint"
-    type="continuous">
-    <origin
-      xyz="0.284580691374717 -0.255807756916524 0.217655987376602"
-      rpy="1.5707963267949 0 0" />
-    <parent
-      link="base_link" />
-    <child
-      link="right_bot_link" />
-    <axis
-      xyz="-1 0 0" />
-  </joint>
-  <link
-    name="right_bot_front_link">
-    <inertial>
-      <origin
-        xyz="-4.78510997409254E-05 0.0863040619939952 0.0706954067970946"
-        rpy="0 0 0" />
-      <mass
-        value="0.205851705946841" />
-      <inertia
-        ixx="0.00120412689390073"
-        ixy="-4.21030315945692E-07"
-        ixz="-2.31693328808594E-07"
-        iyy="0.000482537939948245"
-        iyz="0.000461296988031476"
-        izz="0.000755248105263728" />
-    </inertial>
-    <visual>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="package://rmc_simulation/meshes/right_bot_front_link.STL" />
-      </geometry>
-      <material
-        name="">
-        <color
-          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
-      </material>
-    </visual>
-    <collision>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="package://rmc_simulation/meshes/right_bot_front_link.STL" />
-      </geometry>
-    </collision>
-  </link>
-  <joint
-    name="right_bot_front_joint"
-    type="continuous">
-    <origin
-      xyz="0.00634999999999997 0 -0.1778"
-      rpy="0 -1.5707963267949 0" />
-    <parent
-      link="right_bot_link" />
-    <child
-      link="right_bot_front_link" />
-    <axis
-      xyz="0 0 -1" />
-  </joint>
-  <link
-    name="right_front_wheel_link">
-    <inertial>
-      <origin
-        xyz="-7.19148351979726E-12 -0.0807951640907281 -1.95886141418633E-07"
+        xyz="-7.19149739758507E-12 -0.0707951640907282 -1.95886141474144E-07"
         rpy="0 0 0" />
       <mass
         value="0.687645998614542" />
       <inertia
         ixx="0.00410397321446005"
-        ixy="1.9406880771611E-13"
-        ixz="1.05931168581396E-14"
+        ixy="1.94069035037664E-13"
+        ixz="1.05933082875857E-14"
         iyy="0.00552463397717715"
-        iyz="5.39169464344202E-09"
+        iyz="5.39169464241662E-09"
         izz="0.00410397301758295" />
     </inertial>
     <visual>
@@ -221,7 +62,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://rmc_simulation/meshes/right_front_wheel_link.STL" />
+          filename="package://rmc_simulation/meshes/fr_wheel_link.STL" />
       </geometry>
       <material
         name="">
@@ -235,91 +76,38 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://rmc_simulation/meshes/right_front_wheel_link.STL" />
+          filename="package://rmc_simulation/meshes/fr_wheel_link.STL" />
       </geometry>
     </collision>
   </link>
   <joint
-    name="right_front_wheel_joint"
+    name="fr_wheel_joint"
     type="continuous">
     <origin
-      xyz="-7.49910081595945E-05 0.139800709316761 0.0220624999999998"
-      rpy="-1.5707963267949 0 -1.56862653893505" />
+      xyz="0.322993191374717 -0.0779327659083641 0.0778552780598406"
+      rpy="3.14159265358979 -1.56862653893506 -1.5707963267949" />
     <parent
-      link="right_bot_front_link" />
+      link="base_link" />
     <child
-      link="right_front_wheel_link" />
+      link="fr_wheel_link" />
     <axis
       xyz="0 1 0" />
   </joint>
   <link
-    name="right_bot_back_link">
+    name="mr_wheel_link">
     <inertial>
       <origin
-        xyz="1.92852696755397E-05 0.0763283477484565 0.0706954067970945"
-        rpy="0 0 0" />
-      <mass
-        value="0.205851705946841" />
-      <inertia
-        ixx="0.0012041271123401"
-        ixy="1.40153636767863E-07"
-        ixz="1.27059891569488E-07"
-        iyy="0.000482537721508873"
-        iyz="0.000461297028718476"
-        izz="0.000755248105263728" />
-    </inertial>
-    <visual>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="package://rmc_simulation/meshes/right_bot_back_link.STL" />
-      </geometry>
-      <material
-        name="">
-        <color
-          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
-      </material>
-    </visual>
-    <collision>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="package://rmc_simulation/meshes/right_bot_back_link.STL" />
-      </geometry>
-    </collision>
-  </link>
-  <joint
-    name="right_bot_back_link"
-    type="continuous">
-    <origin
-      xyz="0.00635000000000019 -0.0100242746459153 0.177799998342918"
-      rpy="0 -1.5707963267949 0" />
-    <parent
-      link="right_bot_link" />
-    <child
-      link="right_bot_back_link" />
-    <axis
-      xyz="0 0 -1" />
-  </joint>
-  <link
-    name="right_mid_wheel_link">
-    <inertial>
-      <origin
-        xyz="-7.30705773666074E-12 -0.080795164091348 -1.95886142140278E-07"
+        xyz="-7.30707161444855E-12 -0.0707951640913478 -1.95886142140278E-07"
         rpy="0 0 0" />
       <mass
         value="0.687645998625396" />
       <inertia
         ixx="0.00410397321447679"
-        ixy="1.97149247814043E-13"
-        ixz="1.06927135331766E-14"
-        iyy="0.00552463397717738"
-        iyz="5.39169467314103E-09"
-        izz="0.00410397301759993" />
+        ixy="1.97149627284804E-13"
+        ixz="1.06925102452693E-14"
+        iyy="0.00552463397717739"
+        iyz="5.39169467425826E-09"
+        izz="0.00410397301759992" />
     </inertial>
     <visual>
       <origin
@@ -327,7 +115,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://rmc_simulation/meshes/right_mid_wheel_link.STL" />
+          filename="package://rmc_simulation/meshes/mr_wheel_link.STL" />
       </geometry>
       <material
         name="">
@@ -341,408 +129,37 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://rmc_simulation/meshes/right_mid_wheel_link.STL" />
+          filename="package://rmc_simulation/meshes/mr_wheel_link.STL" />
       </geometry>
     </collision>
   </link>
   <joint
-    name="right_mid_wheel_link"
+    name="mr_wheel_joint"
     type="continuous">
     <origin
-      xyz="3.37499999999435E-05 0.129825 0.0220624999999998"
-      rpy="-1.5707963267949 0 -1.5707963267949" />
+      xyz="0.322993191374717 -0.433641505259442 0.0778067127306861"
+      rpy="1.5707963267949 -1.5707963267949 0" />
     <parent
-      link="right_bot_back_link" />
+      link="base_link" />
     <child
-      link="right_mid_wheel_link" />
+      link="mr_wheel_link" />
     <axis
       xyz="0 1 0" />
   </joint>
   <link
-    name="left_top_link">
+    name="br_wheel_link">
     <inertial>
       <origin
-        xyz="-0.0111125 -5.55111512312578E-17 0"
-        rpy="0 0 0" />
-      <mass
-        value="0.140248807038419" />
-      <inertia
-        ixx="0.0013793844509538"
-        ixy="-1.28023408403359E-22"
-        ixz="7.25850987515281E-21"
-        iyy="0.00138147619717869"
-        iyz="4.32209407936441E-22"
-        izz="1.05253601903843E-05" />
-    </inertial>
-    <visual>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="package://rmc_simulation/meshes/left_top_link.STL" />
-      </geometry>
-      <material
-        name="">
-        <color
-          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
-      </material>
-    </visual>
-    <collision>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="package://rmc_simulation/meshes/left_top_link.STL" />
-      </geometry>
-    </collision>
-  </link>
-  <joint
-    name="left_top_joint"
-    type="continuous">
-    <origin
-      xyz="-0.140869308625283 -0.255807756916524 0.293855987376602"
-      rpy="1.5707963267949 0 0" />
-    <parent
-      link="base_link" />
-    <child
-      link="left_top_link" />
-    <axis
-      xyz="-1 0 0" />
-  </joint>
-  <link
-    name="left_bot_link">
-    <inertial>
-      <origin
-        xyz="-0.0111125 -2.77555756156289E-17 0"
-        rpy="0 0 0" />
-      <mass
-        value="0.188515035012425" />
-      <inertia
-        ixx="0.00191750304531621"
-        ixy="4.77528354719375E-22"
-        ixz="1.41434929247504E-20"
-        iyy="0.00191593925637738"
-        iyz="4.20246699851112E-21"
-        izz="1.85553767160658E-05" />
-    </inertial>
-    <visual>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="package://rmc_simulation/meshes/left_bot_link.STL" />
-      </geometry>
-      <material
-        name="">
-        <color
-          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
-      </material>
-    </visual>
-    <collision>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="package://rmc_simulation/meshes/left_bot_link.STL" />
-      </geometry>
-    </collision>
-  </link>
-  <joint
-    name="left_bot_joint"
-    type="continuous">
-    <origin
-      xyz="-0.140869308625283 -0.255807756916524 0.217655987376601"
-      rpy="1.5707963267949 0 0" />
-    <parent
-      link="base_link" />
-    <child
-      link="left_bot_link" />
-    <axis
-      xyz="-1 0 0" />
-  </joint>
-  <link
-    name="left_bot_front_link">
-    <inertial>
-      <origin
-        xyz="1.92852696755674E-05 -0.0863283477484565 -0.0706954067970945"
-        rpy="0 0 0" />
-      <mass
-        value="0.205851705946841" />
-      <inertia
-        ixx="0.0012041271123401"
-        ixy="-1.40153636768476E-07"
-        ixz="-1.27059891570206E-07"
-        iyy="0.000482537721508874"
-        iyz="0.000461297028718476"
-        izz="0.000755248105263727" />
-    </inertial>
-    <visual>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="package://rmc_simulation/meshes/left_bot_front_link.STL" />
-      </geometry>
-      <material
-        name="">
-        <color
-          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
-      </material>
-    </visual>
-    <collision>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="package://rmc_simulation/meshes/left_bot_front_link.STL" />
-      </geometry>
-    </collision>
-  </link>
-  <joint
-    name="left_bot_front_joiny"
-    type="continuous">
-    <origin
-      xyz="-0.00634999999999999 0 -0.1778"
-      rpy="0 1.5707963267949 0" />
-    <parent
-      link="left_bot_link" />
-    <child
-      link="left_bot_front_link" />
-    <axis
-      xyz="0 0 -1" />
-  </joint>
-  <link
-    name="left_front_wheel_link">
-    <inertial>
-      <origin
-        xyz="-7.30697446993389E-12 -0.0707951640913485 -1.95886142154156E-07"
-        rpy="0 0 0" />
-      <mass
-        value="0.687645998625407" />
-      <inertia
-        ixx="0.00410397321447676"
-        ixy="1.97154492642053E-13"
-        ixz="1.06920765644003E-14"
-        iyy="0.00552463397717734"
-        iyz="5.39169467474277E-09"
-        izz="0.0041039730175999" />
-    </inertial>
-    <visual>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="package://rmc_simulation/meshes/left_front_wheel_link.STL" />
-      </geometry>
-      <material
-        name="">
-        <color
-          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
-      </material>
-    </visual>
-    <collision>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="package://rmc_simulation/meshes/left_front_wheel_link.STL" />
-      </geometry>
-    </collision>
-  </link>
-  <joint
-    name="left_front_wheel_joint"
-    type="continuous">
-    <origin
-      xyz="3.37500000000129E-05 -0.139825 -0.0320624999999999"
-      rpy="1.5707963267949 0 -1.5707963267949" />
-    <parent
-      link="left_bot_front_link" />
-    <child
-      link="left_front_wheel_link" />
-    <axis
-      xyz="0 -1 0" />
-  </joint>
-  <link
-    name="left_bot_back_link">
-    <inertial>
-      <origin
-        xyz="1.92852696753731E-05 -0.0863283477484563 -0.0548204067970946"
-        rpy="0 0 0" />
-      <mass
-        value="0.205851705946841" />
-      <inertia
-        ixx="0.0012041271123401"
-        ixy="-1.40153636768493E-07"
-        ixz="-1.27059891570303E-07"
-        iyy="0.000482537721508874"
-        iyz="0.000461297028718476"
-        izz="0.000755248105263727" />
-    </inertial>
-    <visual>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="package://rmc_simulation/meshes/left_bot_back_link.STL" />
-      </geometry>
-      <material
-        name="">
-        <color
-          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
-      </material>
-    </visual>
-    <collision>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="package://rmc_simulation/meshes/left_bot_back_link.STL" />
-      </geometry>
-    </collision>
-  </link>
-  <joint
-    name="left_bot_back_joint"
-    type="continuous">
-    <origin
-      xyz="-0.022225 0 0.1778"
-      rpy="0 1.5707963267949 0" />
-    <parent
-      link="left_bot_link" />
-    <child
-      link="left_bot_back_link" />
-    <axis
-      xyz="0 0 -1" />
-  </joint>
-  <link
-    name="left_mid_wheel_link">
-    <inertial>
-      <origin
-        xyz="-7.30700222550951E-12 -0.0707951640913484 -1.958861422513E-07"
-        rpy="0 0 0" />
-      <mass
-        value="0.687645998625407" />
-      <inertia
-        ixx="0.00410397321447676"
-        ixy="1.97154431655681E-13"
-        ixz="1.06915751208955E-14"
-        iyy="0.00552463397717734"
-        iyz="5.39169467347561E-09"
-        izz="0.0041039730175999" />
-    </inertial>
-    <visual>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="package://rmc_simulation/meshes/left_mid_wheel_link.STL" />
-      </geometry>
-      <material
-        name="">
-        <color
-          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
-      </material>
-    </visual>
-    <collision>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="package://rmc_simulation/meshes/left_mid_wheel_link.STL" />
-      </geometry>
-    </collision>
-  </link>
-  <joint
-    name="left_mid_wheel_joint"
-    type="continuous">
-    <origin
-      xyz="3.37499999999991E-05 -0.139825 -0.0161874999999997"
-      rpy="1.5707963267949 0 -1.5707963267949" />
-    <parent
-      link="left_bot_back_link" />
-    <child
-      link="left_mid_wheel_link" />
-    <axis
-      xyz="0 -1 0" />
-  </joint>
-  <link
-    name="rear_rocker_link">
-    <inertial>
-      <origin
-        xyz="0.000471476921990954 -0.0411045723457843 0.0167424675311085"
-        rpy="0 0 0" />
-      <mass
-        value="0.807447449120922" />
-      <inertia
-        ixx="0.00288385629063271"
-        ixy="-1.83210203696015E-05"
-        ixz="-8.95562507782881E-08"
-        iyy="0.0397756072740224"
-        iyz="3.0326788227366E-06"
-        izz="0.0425282327121755" />
-    </inertial>
-    <visual>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="package://rmc_simulation/meshes/rear_rocker_link.STL" />
-      </geometry>
-      <material
-        name="">
-        <color
-          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
-      </material>
-    </visual>
-    <collision>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="package://rmc_simulation/meshes/rear_rocker_link.STL" />
-      </geometry>
-    </collision>
-  </link>
-  <joint
-    name="rear_rocker_joint"
-    type="continuous">
-    <origin
-      xyz="0.0718556913747171 -0.753476605505062 0.217655987376602"
-      rpy="1.5707963267949 0.00495690235833587 -3.03515192047388E-19" />
-    <parent
-      link="base_link" />
-    <child
-      link="rear_rocker_link" />
-    <axis
-      xyz="0 0 -1" />
-  </joint>
-  <link
-    name="right_back_wheel_link">
-    <inertial>
-      <origin
-        xyz="-2.56872301207522E-12 -0.0707920435844435 -1.95886293075098E-07"
+        xyz="-2.56872301207522E-12 -0.0707920435844434 -1.95886293075098E-07"
         rpy="0 0 0" />
       <mass
         value="0.687645998094418" />
       <inertia
         ixx="0.00410397321363925"
-        ixy="7.41435784989461E-14"
-        ixz="7.32562881883281E-15"
+        ixy="7.41448411831201E-14"
+        ixz="7.32617091991905E-15"
         iyy="0.00552463397716753"
-        iyz="5.39170125791232E-09"
+        iyz="5.39170125726693E-09"
         izz="0.00410397301675641" />
     </inertial>
     <visual>
@@ -751,7 +168,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://rmc_simulation/meshes/right_back_wheel_link.STL" />
+          filename="package://rmc_simulation/meshes/br_wheel_link.STL" />
       </geometry>
       <material
         name="">
@@ -765,37 +182,143 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://rmc_simulation/meshes/right_back_wheel_link.STL" />
+          filename="package://rmc_simulation/meshes/br_wheel_link.STL" />
       </geometry>
     </collision>
   </link>
   <joint
-    name="right_back_wheel_joint"
+    name="br_wheel_joint"
     type="continuous">
     <origin
-      xyz="0.252042320476328 -0.1397615 0.0166474014114616"
-      rpy="0 -0.453755397525004 1.5707963267949" />
+      xyz="0.323202134134549 -0.770124006916524 0.07664686034817"
+      rpy="3.13028479554889 -1.11701573915485 -1.56063278319395" />
     <parent
-      link="rear_rocker_link" />
+      link="base_link" />
     <child
-      link="right_back_wheel_link" />
+      link="br_wheel_link" />
     <axis
       xyz="0 1 0" />
   </joint>
   <link
-    name="left_back_wheel_link">
+    name="fl_wheel_link">
     <inertial>
       <origin
-        xyz="-7.71942232358214E-12 -0.0707920436121964 -1.95886686871205E-07"
+        xyz="-7.3069883477217E-12 -0.0707951640913485 -1.958861421264E-07"
+        rpy="0 0 0" />
+      <mass
+        value="0.687645998625407" />
+      <inertia
+        ixx="0.00410397321447676"
+        ixy="1.97154306294804E-13"
+        ixz="1.06921443270361E-14"
+        iyy="0.00552463397717734"
+        iyz="5.39169467501382E-09"
+        izz="0.0041039730175999" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://rmc_simulation/meshes/fl_wheel_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://rmc_simulation/meshes/fl_wheel_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="fl_wheel_joint"
+    type="continuous">
+    <origin
+      xyz="-0.179281808625283 -0.0779740069165238 0.0778309873766015"
+      rpy="1.5707963267949 1.5707963267949 0" />
+    <parent
+      link="base_link" />
+    <child
+      link="fl_wheel_link" />
+    <axis
+      xyz="0 -1 0" />
+  </joint>
+  <link
+    name="ml_wheel_link">
+    <inertial>
+      <origin
+        xyz="-7.30701610329731E-12 -0.0707951640913486 -1.95886142084767E-07"
+        rpy="0 0 0" />
+      <mass
+        value="0.687645998625407" />
+      <inertia
+        ixx="0.00410397321447676"
+        ixy="1.9715426479019E-13"
+        ixz="1.06918326189115E-14"
+        iyy="0.00552463397717734"
+        iyz="5.3916946743328E-09"
+        izz="0.0041039730175999" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://rmc_simulation/meshes/ml_wheel_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://rmc_simulation/meshes/ml_wheel_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="ml_wheel_joint"
+    type="continuous">
+    <origin
+      xyz="-0.179281808625283 -0.433574006916524 0.0778309873766015"
+      rpy="1.5707963267949 1.5707963267949 0" />
+    <parent
+      link="base_link" />
+    <child
+      link="ml_wheel_link" />
+    <axis
+      xyz="0 -1 0" />
+  </joint>
+  <link
+    name="bl_wheel_link">
+    <inertial>
+      <origin
+        xyz="-7.71939456800652E-12 -0.0707920436121963 -1.95886686760183E-07"
         rpy="0 0 0" />
       <mass
         value="0.687645998581504" />
       <inertia
         ixx="0.00410397321438875"
-        ixy="2.09611018456681E-13"
-        ixz="1.05877664993518E-14"
-        iyy="0.00552463397717643"
-        iyz="5.39171353774827E-09"
+        ixy="2.09611323388542E-13"
+        ixz="1.05896089746637E-14"
+        iyy="0.00552463397717644"
+        iyz="5.39171353515359E-09"
         izz="0.00410397301751382" />
     </inertial>
     <visual>
@@ -804,7 +327,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://rmc_simulation/meshes/left_back_wheel_link.STL" />
+          filename="package://rmc_simulation/meshes/bl_wheel_link.STL" />
       </geometry>
       <material
         name="">
@@ -818,20 +341,20 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://rmc_simulation/meshes/left_back_wheel_link.STL" />
+          filename="package://rmc_simulation/meshes/bl_wheel_link.STL" />
       </geometry>
     </collision>
   </link>
   <joint
-    name="left_back_wheel_joint"
+    name="bl_wheel_joint"
     type="continuous">
     <origin
-      xyz="-0.252042320476328 -0.1397615 0.0166474014114617"
-      rpy="0 0 -1.5707963267949" />
+      xyz="-0.180876313928926 -0.770124006916524 0.0791455484611853"
+      rpy="-1.57079632679488 1.56583942443656 -3.14159265358978" />
     <parent
-      link="rear_rocker_link" />
+      link="base_link" />
     <child
-      link="left_back_wheel_link" />
+      link="bl_wheel_link" />
     <axis
       xyz="0 -1 0" />
   </joint>

@@ -3,13 +3,15 @@
  */
 //#define USE_USBCON
 #include <ros.h>
-#include <std_msgs/Int32.h>
-#include <std_msgs/Empty.h>
+#include <tf/tf.h>
+#include <tf/transform_broadcaster.h>
+# include <geometry_msgs/Quaternion.h>
+#include <ros/time.h>
 #include <Servo.h> 
 
 ros::NodeHandle  nh;
 Servo myservo;  // create servo object to control a servo 
-int pos = 77;    // variable to store the servo position 
+int pos;    // variable to store the servo position 
 
 
 //void messageCb( const std_msgs::Empty& toggle_msg){
@@ -20,24 +22,38 @@ int pos = 77;    // variable to store the servo position
 
 
 
-std_msgs::Int32 pos_msg;
-ros::Publisher servo_pub("servo", &pos_msg);
+geometry_msgs::TransformStamped t;
+tf::TransformBroadcaster broadcaster;
+geometry_msgs::Quaternion q;
+
+char parent[] = "/servo_mount";
+char child[] = "/camera";
 
 void setup()
 {
 //  pinMode(13, OUTPUT);
-  myservo.attach(9);  // attaches the servo on pin 9 to the servo object 
-  nh.initNode();
-  nh.advertise(servo_pub);
+  myservo.attach(9);        // attaches the servo on pin 9 to the servo object 
+  nh.initNode();            // initializes ROS node
+  broadcaster.init(nh);     // initializes tf broadcaster
 //  nh.subscribe(sub);
+    pos = 0;
+    t.header.frame_id = parent;
+    t.child_frame_id = child;
 }
 
 void publish_spin_pause()
-{
-    pos_msg.data = pos;
-    servo_pub.publish( &pos_msg );
+{    
+    double angle = map(pos, 0, 180, -90, 90);
+
+    // update quaternion q based on position of servo
+    q = tf::createQuaternionFromYaw(angle * 3.14159 / 180);
+
+    
+    t.transform.rotation = q;
+    t.header.stamp = nh.now();
+    broadcaster.sendTransform(t);
     nh.spinOnce();
-    delay(100);
+    delay(10);
 }
 
 void loop()

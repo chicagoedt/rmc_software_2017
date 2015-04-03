@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package>
-  <name>base_controller</name>
+  <name>robot_setup_tf</name>
   <version>1.0.0</version>
   <description>The robot_setup_tf package for RMC</description>
 

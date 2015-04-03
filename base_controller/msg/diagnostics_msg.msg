@@ -1,4 +1,0 @@
-string amperage
-string motor_power
-string fault_flags
-string status_flags

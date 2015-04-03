@@ -1,0 +1,65 @@
+<?xml version="1.0" ?>
+<sdf version="1.4">
+  <model name="Aruco Markers">
+    <static>true</static>
+    <link name="marker781">
+      <pose>0 0 1 0 0 -1.57</pose>
+      <visual name="marker781_visual">
+        <geometry>
+	  <mesh>
+	    <scale>4.9 4.9 4.9</scale>
+	    <uri>model://aruco/meshes/artag_01.dae</uri>
+	  </mesh>
+        </geometry>
+      </visual>
+    </link>
+
+    <link name="marker904">
+      <pose>0.5 0 1 0 0 -1.57</pose>
+      <visual name="marker904_visual">
+        <geometry>
+          <mesh>
+            <scale>4.9 4.9 4.9</scale>
+            <uri>model://aruco/meshes/artag_02.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
+
+    <link name="marker644">
+      <pose>-0.5 0 1 0 0 -1.57</pose>
+      <visual name="marker644_visual">
+        <geometry>
+          <mesh>
+            <scale>4.9 4.9 4.9</scale>
+            <uri>model://aruco/meshes/artag_03.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
+
+    <link name="marker341">
+      <pose>0 0 1.25 0 0 -1.57</pose>
+      <visual name="marker341_visual">
+        <geometry>
+          <mesh>
+            <scale>4.9 4.9 4.9</scale>
+            <uri>model://aruco/meshes/artag_04.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
+
+    <link name="box_link">
+      <visual name="box_link_visual">
+        <geometry>
+	  <box>
+	    <size>0.22 0.22 0.001</size>
+	  </box>
+        </geometry>
+      </visual>
+
+    </link>
+
+  </model>
+</sdf>

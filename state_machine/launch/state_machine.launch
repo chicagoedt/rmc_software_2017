@@ -1,6 +1,7 @@
 <launch>
-  <rosparam command="load" file="$(find rmc_config)/yaml/goalpoints.yaml" />
 
-  <node pkg="state_machine" type="state_machine_node" name="state_machine" output="screen" /> 
+  <node pkg="state_machine" type="state_machine_node" name="state_machine" output="screen" >
+  	<rosparam command="load" file="$(find rmc_config)/yaml/goalpoints.yaml" />
+  </node> 
 
 </launch>

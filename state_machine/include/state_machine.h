@@ -5,8 +5,10 @@
 #include <move_base_msgs/MoveBaseAction.h>
 #include <actionlib/client/simple_action_client.h>
 #include <geometry_msgs/Pose.h>
+#include <tf/transform_datatypes.h>
 
 #include <vector>
+#include <queue>
 #include <sstream>
 
 typedef actionlib::SimpleActionClient<move_base_msgs::MoveBaseAction> MoveBaseClient;
@@ -40,7 +42,7 @@ class StateMachineBase
 		 * @brief 
 		 *
 		 * Dumping Zone: Point 1. 		This will be our 'origin' to return to dump.
-		 * Digging Zone: Point 2/3/4. 	In our vector array we wont ittirate from Point 2
+		 * Digging Zone: Point 2/3/4. 	In our queue array we wont ittirate from Point 2
 		 *								to Point 3 to Point 4, instead these will be our 
 		 *								be each one of our dig zone end points for each 
 		 *								traversial itteration (Drive, Dig, Dump). 
@@ -51,7 +53,7 @@ class StateMachineBase
 		 *						 --> Point 3 --> Point 5 --> Point 0
 		 *						 --> Point 4 --> Point 5 --> Point 0
 		 */
-		std::vector<geometry_msgs::Pose> _goalPoints;
+		std::queue<geometry_msgs::Pose> _goalPointsQueue;
 
 };
 

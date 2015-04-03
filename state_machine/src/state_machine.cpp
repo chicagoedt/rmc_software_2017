@@ -2,7 +2,7 @@
 
 StateMachineBase::StateMachineBase(void):
 	_moveBaseAC("move_base", true), _nh("state_machine"),
-   MAX_GOAL_POINTS(5)
+   MAX_GOAL_POINTS(12)
 {
 
 }
@@ -20,7 +20,7 @@ bool StateMachineBase::Initialize()
   {
     std::ostringstream gp; gp << "GoalPoint" << i;
 
-    ROS_INFO_STREAM(gp.str());
+    ROS_DEBUG_STREAM("Loaded param: " << gp.str());
 
     if (_nh.hasParam(gp.str()))
     {
@@ -30,10 +30,12 @@ bool StateMachineBase::Initialize()
 
       _nh.getParam(gp.str(), goalXY);
 
-      tmpPose.position.x = goalXY[0];
-      tmpPose.position.y = goalXY[1];
+      tmpPose.position.x  = goalXY[0];
+      tmpPose.position.y  = goalXY[1];
+      //tf::quaternionTFToMsg(tf::createIdentityQuaternion(), tmpPose.orientation);
+      //tmpPose.orientation = tf::createQuaternionMsgYaw(3.14159);
 
-      _goalPoints.push_back(tmpPose);
+      _goalPointsQueue.push(tmpPose);
     }
     else
     {
@@ -41,8 +43,6 @@ bool StateMachineBase::Initialize()
       return false;
     }
   }
-  
-
 
   return true;
 }
@@ -57,21 +57,39 @@ void StateMachineBase::run()
 
 	ROS_INFO("Established Connection with move_base ActionServer.");
 
-	_moveBaseGoal.target_pose.header.frame_id = "odom";
-  _moveBaseGoal.target_pose.header.stamp = ros::Time::now();
+  while(!_goalPointsQueue.empty())
+  {
+    _moveBaseGoal.target_pose.header.frame_id   = "odom";
+    _moveBaseGoal.target_pose.header.stamp      = ros::Time::now();
+
+    _moveBaseGoal.target_pose.pose.position     = _goalPointsQueue.front().position;
+    _moveBaseGoal.target_pose.pose.orientation  = tf::createQuaternionMsgFromYaw(0.0);
+
+    ROS_INFO_STREAM("Sending goal(X, Y):" << "[ " << _moveBaseGoal.target_pose.pose.position.x << " , "
+                                                  << _moveBaseGoal.target_pose.pose.position.y << " ]");
+
+    _moveBaseAC.sendGoal(_moveBaseGoal);
+
+    _moveBaseAC.waitForResult();
+
+    if(_moveBaseAC.getState() == actionlib::SimpleClientGoalState::SUCCEEDED)
+    {
+      _goalPointsQueue.pop();
+
+      ROS_INFO("Succesfully moved to GoalPoint.");
+    }
+    else
+    {
+      ROS_INFO("Failed to move to GoalPoint.");
+    }
+  }
+
+
 
   //_moveBaseGoal.target_pose.pose.position.x = 7.0;
   //_moveBaseGoal.target_pose.pose.orientation.w = 1.0;
 
   //_moveBaseGoal.target_pose = _goalPoints.at(0);
 
-  ROS_INFO("Sending goal");
-  _moveBaseAC.sendGoal(_moveBaseGoal);
 
-  _moveBaseAC.waitForResult();
-
-  if(_moveBaseAC.getState() == actionlib::SimpleClientGoalState::SUCCEEDED)
-  ROS_INFO("Hooray, the base moved 1 meter forward");
-  else
-  ROS_INFO("The base failed to move forward 1 meter for some reason");
 }

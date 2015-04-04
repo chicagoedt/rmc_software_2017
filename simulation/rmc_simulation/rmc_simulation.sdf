@@ -1058,7 +1058,7 @@
     </sensor>
    </link>
 -->
-<!--
+
       <link name='imu_link'>
       <pose>0.0718557 -0.433574 0.217656 0 0 0</pose>
          <inertial>
@@ -1098,7 +1098,7 @@
                 <headingDrift>0.00</headingDrift>
                 <headingGaussianNoise>0.00</headingGaussianNoise>
         </plugin>
-
+<!--
       <link name='servo_link'>
       <pose>0.0718557 -0.433574 1 0 0 0</pose>
          <inertial>
@@ -1223,13 +1223,13 @@
         </limit>
       </axis>
     </joint>
--->
+
   <plugin name="ground_truth" filename="libgazebo_ros_p3d.so">
     <frameName>map</frameName>
     <bodyName>base_link</bodyName>
     <topicName>odometry/filtered</topicName>
     <updateRate>30.0</updateRate>
   </plugin>
-
+-->
   </model>
 </sdf>

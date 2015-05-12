@@ -6,10 +6,10 @@
 #include <tf/tf.h>
 #include <tf/transform_broadcaster.h>
 #include <geometry_msgs/Quaternion.h>
+#include <std_msgs/Bool.h>
 #include <std_msgs/Float32.h>
 #include <ros/time.h>
 #include <Servo.h>
-#include <TimerOne.h>
 
 
 ros::NodeHandle  nh;
@@ -21,15 +21,17 @@ const float ERROR_THRESHOLD = 5.0f;  // in degrees
 const int DELAY_INCREMENT = 50;  // in milliseconds
 const int SERVO_INCREMENT = 1;
 const int LED_PIN = 13;
-const long LOST_TIMER_LIMIT = 2500;
-long lost_count = 0; 
+const unsigned long LOST_TIMER_LIMIT = 3000000;   // in microseconds
+unsigned long time_seen_marker = millis();
+bool fresh_found_marker = true;
 
 float error_angle = 0;  // in degrees
 std_msgs::Float32 angle_message;
+std_msgs::Bool aruco_lost;
 ros::Publisher servo_pub("error_angle", &angle_message);
+ros::Publisher lost_pub("servo_camera_state", &aruco_lost);
 
-bool aruco_lost;
-
+IntervalTimer lost_timer;
 
 void transform_callback( const geometry_msgs::TransformStamped& t);
 ros::Subscriber<geometry_msgs::TransformStamped> transform_sub("/ar_single_board/transform", transform_callback );
@@ -54,10 +56,17 @@ void transform_callback( const geometry_msgs::TransformStamped& t){
     turn = -1;
   else
     turn = 0;
-  
-  // reset lost timer (we are not lost anymore)
 
-  aruco_lost = false;
+  // if we thought we were lost (just found a marker after we thought we were lost),
+  if (aruco_lost.data) {
+    // publish that we're not lost
+    aruco_lost.data = false;
+    lost_pub.publish(&aruco_lost);
+  }
+
+  // reset lost timer (we are not lost anymore)
+  aruco_lost.data = false;
+  lost_timer.begin(lost_callback, LOST_TIMER_LIMIT);
 }
 
 void broadcast_tf()
@@ -78,16 +87,13 @@ void broadcast_tf()
     nh.spinOnce();
 }
 
-// called whenever we haven't seen aruco in a while
 void lost_callback(void)
 {
-  if (lost_count > LOST_TIMER_LIMIT) {
-    aruco_lost = true;
-//    digitalWrite(LED_PIN, HIGH-digitalRead(LED_PIN));   // blink the led
-    lost_count = 0;
-  } else {
-    lost_count++;
-//    turn = 0;
+  // if aruco_lost is false, set it to true
+  if (!aruco_lost.data) {
+    aruco_lost.data = true;
+    // publish that we're lost
+    lost_pub.publish(&aruco_lost);
   }
 }
 
@@ -97,29 +103,26 @@ void setup()
   myservo.attach(9);        // attaches the servo on pin 9 to the servo object 
   nh.initNode();            // initializes ROS node
   nh.advertise(servo_pub);
+  nh.advertise(lost_pub);
   nh.subscribe(transform_sub);
   broadcaster.init(nh);     // initializes tf broadcaster
-    pos = 90;                // reference configuration
-    t.header.frame_id = parent;
-    t.child_frame_id = child;
+  pos = 90;                // reference configuration
+  t.header.frame_id = parent;
+  t.child_frame_id = child;
     
   // set aruco_lost to true (start off being lost)
-  aruco_lost = true;
+  aruco_lost.data = true;
 
   // initialize lost timer and callback
-  Timer1.initialize(LOST_TIMER_LIMIT);
-  Timer1.attachInterrupt(lost_callback); // blinkLED to run every 0.15 seconds
-  
-//  FlexiTimer2::set(500, 1.0/1000, lost_callback);
+  lost_timer.begin(lost_callback, LOST_TIMER_LIMIT);
 }
 
 void loop()
 {
 
-
   // no need to disable interrupts when reading aruco_lost since it's a boolean
   // sweep infinitely until we find aruco
-  while (aruco_lost) {
+  while (aruco_lost.data) {
   
   // uses a no-delay timer (cannot use delay() because TIMER1 is already in use)
   unsigned long current_millis = millis();
@@ -137,12 +140,11 @@ void loop()
   
       myservo.write(pos);              // move servo to position
       broadcast_tf();
-      digitalWrite(LED_PIN, HIGH-digitalRead(LED_PIN));   // blink the led
-      
       if (pos <= 0) turn = -1;
       else if (pos >= 180) turn = 1;
   
     }
+    digitalWrite(LED_PIN, aruco_lost.data);
   }
   // we finally found the aruco!!!
 
@@ -153,7 +155,6 @@ void loop()
   if(current_millis - previous_millis > DELAY_INCREMENT) {
     previous_millis = current_millis;   
       
-    digitalWrite(LED_PIN, HIGH);   // turn LED on to indicate found aruco
     // turn towards the aruco board
     // counter-clockwise
     if (turn < 0 && pos < 180) {
@@ -168,5 +169,7 @@ void loop()
   //  delay(DELAY_INCREMENT);
     
   }
-      
+  
+  digitalWrite(LED_PIN, aruco_lost.data);
+
 }

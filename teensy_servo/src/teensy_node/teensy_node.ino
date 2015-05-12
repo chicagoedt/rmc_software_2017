@@ -21,9 +21,10 @@ const float ERROR_THRESHOLD = 5.0f;  // in degrees
 const int DELAY_INCREMENT = 50;  // in milliseconds
 const int SERVO_INCREMENT = 1;
 const int LED_PIN = 13;
+const unsigned long SWEEP_TIMER_LIMIT = 1000000;     // in microseconds
 const unsigned long LOST_TIMER_LIMIT = 3000000;   // in microseconds
 unsigned long time_seen_marker = millis();
-bool fresh_found_marker = true;
+bool sweeping = true;
 
 float error_angle = 0;  // in degrees
 std_msgs::Float32 angle_message;
@@ -32,6 +33,7 @@ ros::Publisher servo_pub("error_angle", &angle_message);
 ros::Publisher lost_pub("servo_camera_state", &aruco_lost);
 
 IntervalTimer lost_timer;
+IntervalTimer sweep_timer;
 
 void transform_callback( const geometry_msgs::TransformStamped& t);
 ros::Subscriber<geometry_msgs::TransformStamped> transform_sub("/ar_single_board/transform", transform_callback );
@@ -65,6 +67,8 @@ void transform_callback( const geometry_msgs::TransformStamped& t){
   }
 
   // reset lost timer (we are not lost anymore)
+  sweeping = false;
+  sweep_timer.begin(sweep_callback, SWEEP_TIMER_LIMIT);
   aruco_lost.data = false;
   lost_timer.begin(lost_callback, LOST_TIMER_LIMIT);
 }
@@ -90,10 +94,18 @@ void broadcast_tf()
 void lost_callback(void)
 {
   // if aruco_lost is false, set it to true
-  if (!aruco_lost.data) {
+  if (!aruco_lost.data && sweeping) {
     aruco_lost.data = true;
     // publish that we're lost
     lost_pub.publish(&aruco_lost);
+  }
+}
+
+void sweep_callback(void)
+{
+  // if sweeping is false, set it to true
+  if (!sweeping) {
+    sweeping = true;
   }
 }
 
@@ -115,16 +127,17 @@ void setup()
 
   // initialize lost timer and callback
   lost_timer.begin(lost_callback, LOST_TIMER_LIMIT);
+  sweep_timer.begin(sweep_callback, SWEEP_TIMER_LIMIT);
+
 }
 
 void loop()
 {
 
-  // no need to disable interrupts when reading aruco_lost since it's a boolean
   // sweep infinitely until we find aruco
-  while (aruco_lost.data) {
+  while (sweeping) {
   
-  // uses a no-delay timer (cannot use delay() because TIMER1 is already in use)
+  // uses a no-delay timer
   unsigned long current_millis = millis();
  
     if(current_millis - previous_millis > DELAY_INCREMENT) {

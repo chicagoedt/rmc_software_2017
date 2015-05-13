@@ -1,63 +1,69 @@
 /*
  * rosserial node that sweeps the servo and publishes its position as int
  */
-//#define USE_USBCON
 #include <ros.h>
 #include <tf/tf.h>
 #include <tf/transform_broadcaster.h>
-#include <geometry_msgs/Quaternion.h>
 #include <std_msgs/Bool.h>
 #include <std_msgs/Float32.h>
 #include <ros/time.h>
 #include <Servo.h>
 
+Servo servo;            // create servo object to control a servo
+int servo_position;     // variable to store the servo position
 
-ros::NodeHandle  nh;
-Servo myservo;  // create servo object to control a servo 
-int pos;    // variable to store the servo position 
-int turn = 1;  // direction to turn. 1 is clockwise, -1 is counter-clockwise, 0 is neither (don't turn).
-unsigned long previous_millis = 0;
-const float ERROR_THRESHOLD = 5.0f;  // in degrees
-const int DELAY_INCREMENT = 50;  // in milliseconds
-const int SERVO_INCREMENT = 1;
-const int LED_PIN = 13;
-const unsigned long SWEEP_TIMER_LIMIT = 1000000;     // in microseconds
-const unsigned long LOST_TIMER_LIMIT = 3000000;   // in microseconds
-unsigned long time_seen_marker = millis();
-bool sweeping = true;
+enum turn_direction{
+  CLOCKWISE,
+  COUNTER_CLOCKWISE,
+  NONE
+};
+turn_direction turn = CLOCKWISE;  // direction to turn.
 
-float error_angle = 0;  // in degrees
-std_msgs::Float32 angle_message;
+unsigned long previous_millis = 0;           // stores time when last loop() called
+unsigned long time_seen_marker = millis();   // stores time since last seen marker
+bool sweeping = true;                        // variable to store whether sweeping (start off sweeping)
+
+// constants
+const float ERROR_THRESHOLD = 5.0f;        // in degrees
+const int SERVO_DELAY_INCREMENT = 50;      // how long to wait before moving the servo one step (in milliseconds)
+const int SERVO_INCREMENT = 1;             // step angle to rotate servo by every loop (in degrees-ish)
+const int LED_PIN = 13;                    // LED pin number
+const unsigned long SWEEP_TIMER_LIMIT = 1000000;     // in microseconds (1 second)
+const unsigned long LOST_TIMER_LIMIT = 10000000;   // in microseconds (10 seconds)
+
+// ROS node handle
+ros::NodeHandle nh;
+
+// ROS message types and objects
 std_msgs::Bool aruco_lost;
-ros::Publisher servo_pub("error_angle", &angle_message);
-ros::Publisher lost_pub("servo_camera_state", &aruco_lost);
+geometry_msgs::TransformStamped transform_message;
+tf::TransformBroadcaster broadcaster;
 
+// publishers and subscribers
+ros::Publisher lost_pub("servo_camera_state", &aruco_lost);
+void transform_callback(const geometry_msgs::TransformStamped& t);  // need to define
+ros::Subscriber<geometry_msgs::TransformStamped> transform_sub("/ar_single_board/transform", transform_callback );
+
+// timers for interrupts that trigger callbacks
 IntervalTimer lost_timer;
 IntervalTimer sweep_timer;
 
-void transform_callback( const geometry_msgs::TransformStamped& t);
-ros::Subscriber<geometry_msgs::TransformStamped> transform_sub("/ar_single_board/transform", transform_callback );
-
-
-geometry_msgs::TransformStamped t;
-tf::TransformBroadcaster broadcaster;
-geometry_msgs::Quaternion q;
-
-
+// tf child and parent frames
 const char parent[] = "/servo_mount";
 const char child[] = "/camera";
 
+// called when we receive a transform from ar_sys
+// calculates the error_angle (yaw) from the aruco marker and decides if to turn in a certain direction.
+// also resets lost and sweeping timers after publishing that we're not lost
+void transform_callback(const geometry_msgs::TransformStamped& t) {
+  float error_angle = atan(t.transform.translation.x / t.transform.translation.z);  // in radians
 
-void transform_callback( const geometry_msgs::TransformStamped& t){
-  error_angle = atan(t.transform.translation.x / t.transform.translation.z) * 180 / 3.14159;  // in degrees
-  
-  
   if (error_angle > ERROR_THRESHOLD)
-    turn = 1;
+    turn = CLOCKWISE;
   else if (error_angle < - ERROR_THRESHOLD)
-    turn = -1;
+    turn = COUNTER_CLOCKWISE;
   else
-    turn = 0;
+    turn = NONE;
 
   // if we thought we were lost (just found a marker after we thought we were lost),
   if (aruco_lost.data) {
@@ -73,24 +79,20 @@ void transform_callback( const geometry_msgs::TransformStamped& t){
   lost_timer.begin(lost_callback, LOST_TIMER_LIMIT);
 }
 
+// broadcasts the tf between camera and servo_mount to ROS
 void broadcast_tf()
-{    
-    double angle = map(pos, 0, 180, -90, 90);
+{
+  // instead of 0 to 180, make the values from -90 to 90 (where 0 is in the middle pointing forward)
+  double angle = map(servo_position, 0, 180, -90, 90);
 
-    // update quaternion q based on position of servo
-    q = tf::createQuaternionFromYaw(angle * 3.14159 / 180);
-    
-    // broadcast tf
-    t.transform.rotation = q;
-    t.header.stamp = nh.now();
-    broadcaster.sendTransform(t);
-    
-    // FOR DEBUGGING ONLY
-    angle_message.data = error_angle;
-    servo_pub.publish(&angle_message);
-    nh.spinOnce();
+  // broadcast tf
+  transform_message.transform.rotation = tf::createQuaternionFromYaw(angle * PI / 180);  // update rotation quaternion based on position of servo
+  transform_message.header.stamp = nh.now();
+  broadcaster.sendTransform(transform_message);
 }
 
+// fires when it's been LOST_TIMER_LIMIT microseconds since we received an ar_sys transform (since we've seen a marker)
+// publishes lost message the first time
 void lost_callback(void)
 {
   // if aruco_lost is false, set it to true
@@ -101,6 +103,7 @@ void lost_callback(void)
   }
 }
 
+// fires when it's been SWEEP_TIMER_LIMIT microseconds since we've seen an ar_sys marker
 void sweep_callback(void)
 {
   // if sweeping is false, set it to true
@@ -109,80 +112,78 @@ void sweep_callback(void)
   }
 }
 
+// start up code
 void setup()
 {
   pinMode(LED_PIN, OUTPUT);
-  myservo.attach(9);        // attaches the servo on pin 9 to the servo object 
+  servo.attach(9);        // attaches the servo on pin 9 to the servo object
   nh.initNode();            // initializes ROS node
-  nh.advertise(servo_pub);
   nh.advertise(lost_pub);
   nh.subscribe(transform_sub);
   broadcaster.init(nh);     // initializes tf broadcaster
-  pos = 90;                // reference configuration
-  t.header.frame_id = parent;
-  t.child_frame_id = child;
-    
+
+  servo_position = 90;                // reference configuration
+  transform_message.header.frame_id = parent;
+  transform_message.child_frame_id = child;
+
   // set aruco_lost to true (start off being lost)
   aruco_lost.data = true;
 
-  // initialize lost timer and callback
+  // initialize lost and sweeping timer and callback
   lost_timer.begin(lost_callback, LOST_TIMER_LIMIT);
   sweep_timer.begin(sweep_callback, SWEEP_TIMER_LIMIT);
-
 }
 
+// turn the servo the desired direction (if any) and broadcast our tf.
 void loop()
 {
-
-  // sweep infinitely until we find aruco
-  while (sweeping) {
-  
-  // uses a no-delay timer
   unsigned long current_millis = millis();
- 
-    if(current_millis - previous_millis > DELAY_INCREMENT) {
-      previous_millis = current_millis;   
-      
-      if (turn == 0) turn = 1;
-      
-      if (turn < 0) {
-        pos += SERVO_INCREMENT;
+  // if sweeping (we're lost), turn servo
+  if (sweeping) {
+    // uses a no-delay timer
+    if (current_millis - previous_millis > SERVO_DELAY_INCREMENT) {
+      previous_millis = current_millis;
+
+
+      // if we're not turning, have it turn in an arbitrarily chosen direction
+      if (turn == NONE) turn = CLOCKWISE;
+
+      // sweep pos of servo
+      if (turn == COUNTER_CLOCKWISE) {
+        servo_position += SERVO_INCREMENT;
       } else {
-        pos -= SERVO_INCREMENT;
+        servo_position -= SERVO_INCREMENT;
       }
-  
-      myservo.write(pos);              // move servo to position
+
+      servo.write(servo_position);              // move servo to position
+
       broadcast_tf();
-      if (pos <= 0) turn = -1;
-      else if (pos >= 180) turn = 1;
-  
-    }
-    digitalWrite(LED_PIN, aruco_lost.data);
-  }
-  // we finally found the aruco!!!
 
-  
-    // uses a no-delay timer (cannot use delay() because TIMER1 is already in use)
-  unsigned long current_millis = millis();
- 
-  if(current_millis - previous_millis > DELAY_INCREMENT) {
-    previous_millis = current_millis;   
-      
-    // turn towards the aruco board
-    // counter-clockwise
-    if (turn < 0 && pos < 180) {
-      pos += SERVO_INCREMENT;
-    // clockwise
-    } else if (turn > 0 && pos > 0) {
-      pos -= SERVO_INCREMENT;
-    }
-  
-    myservo.write(pos);
-    broadcast_tf();
-  //  delay(DELAY_INCREMENT);
-    
-  }
-  
-  digitalWrite(LED_PIN, aruco_lost.data);
+      // switch direction if we reached the limit
+      if (servo_position <= 0) turn = COUNTER_CLOCKWISE;
+      else if (servo_position >= 180) turn = CLOCKWISE;
 
+    }
+    // we're not sweeping
+  } else {
+    if (current_millis - previous_millis > SERVO_DELAY_INCREMENT) {
+      previous_millis = current_millis;
+
+      // turn towards the aruco board
+      // counter-clockwise
+      if (turn == COUNTER_CLOCKWISE && servo_position < 180) {
+        servo_position += SERVO_INCREMENT;
+        // clockwise
+      } else if (turn == CLOCKWISE && servo_position > 0) {
+        servo_position -= SERVO_INCREMENT;
+      }
+
+      servo.write(servo_position);
+      broadcast_tf();
+
+    }
+  }
+
+  digitalWrite(LED_PIN, aruco_lost.data);  // turn LED on or off based on whether we're lost or not
+  nh.spinOnce();
 }

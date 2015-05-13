@@ -1,5 +1,30 @@
 /*
- * rosserial node that sweeps the servo and publishes its position as int
+ * rosserial node that subscribes to aruco transform node and turns servo towards it, while
+ * constantly broadcasting its tf (between servo_mount and camera on the servo).
+ *
+ * The setup:
+ * A teensy is connected to a Linux-box running ROS over USB cable, and three wires going to a servo.
+ * The servo is fixed to the robot, and a camera is mounted on the servo (the rotating part). The camera
+ * sends camera data to the Linux-box, which uses ar_sys to detect aruco markers, and then it publishes
+ * a transform message (indicating relative pose from camera to marker). This node uses that transform to
+ * calculate how far off the marker is from the camera (yaw angle only), and decides to turn in the direction
+ * of the marker. This teensy node is programmed in Arduino (for Teensy 3.1) and interfaces with ROS using
+ * the rosserial_python serial_node.
+ *
+ * If this teensy node fails to see the marker for a short period (SWEEP_TIMER_LIMIT), it starts sweeping the servo
+ * back and forth. If the marker is still not seen for a longer period (LOST_TIMER_LIMIT), the node declares itself
+ * lost and publishes a true value on the lost topic once. Whenever the node sees a marker again, it resets both timers
+ * and publishes a false value on the lost topic once. As long as the node is not sweeping or lost, it will turn towards
+ * the aruco marker.
+ *
+ * Published Topics:
+ * /tf (broadcasts tf from camera to servo_mount)
+ * /servo_camera_state (boolean true if lost and false if not lost)
+ * 
+ *
+ * Subscribed Topics:
+ * /ar_single_board/transform (transform with pose of marker relative to camera)
+ * 
  */
 #include <ros.h>
 #include <tf/tf.h>

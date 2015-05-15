@@ -965,7 +965,7 @@
             <rearLeftJoint>left_back_wheel_joint</rearLeftJoint>
             <rearRightJoint>right_back_wheel_joint</rearRightJoint>
     </plugin>
-<!--
+
     <joint name="blackfly_mount_joint" type="revolute">
       <parent>base_link</parent>
       <child>blackfly_mount_link</child>
@@ -1057,7 +1057,6 @@
         </plugin>
     </sensor>
    </link>
--->
 
       <link name='imu_link'>
       <pose>0.0718557 -0.433574 0.217656 0 0 0</pose>

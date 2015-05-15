@@ -10,6 +10,7 @@
     <rosparam file="$(find rmc_2dnav)/costmap_common_params.yaml" command="load" ns="local_costmap" />
     <rosparam file="$(find rmc_2dnav)/local_costmap_params.yaml" command="load" />
     <rosparam file="$(find rmc_2dnav)/global_costmap_params.yaml" command="load" />
-    <rosparam file="$(find rmc_2dnav)/base_local_planner_params.yaml" command="load" />
+#    <rosparam file="$(find rmc_2dnav)/base_local_planner_params.yaml" command="load" />
+    <rosparam file="$(find rmc_2dnav)/pose_follower_params.yaml" command="load" />
   </node>
 </launch>

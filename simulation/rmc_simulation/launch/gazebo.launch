@@ -8,6 +8,10 @@
 
   <node name="robot_tf_publisher" pkg="robot_setup_tf" type="robot_tf_publisher"/>
 
+
+  <node pkg="tf" type="static_transform_publisher" name="base_footprint_broadcaster" args="0 0 0 0 0 0 base_footprint base_link  50" />
+  <node pkg="tf" type="static_transform_publisher" name="blackfly_broadcaster" args="0.0718557 -0.90 0.525 0 0 -1.57 base_link blackfly_mount_link 50" />
+
   <param name="robot_description" textfile="$(find rmc_simulation)/rmc_simulation.sdf" />
   <node
     name="spawn_model"
@@ -18,7 +22,7 @@
   </node>
 <!--
   <include file="$(find gazebo_config)/gazeboekfrmc.launch"/>
- 
+--> 
  <include file="$(find gazebo_config)/aruco_markers/multi/multi-boards.launch"/>
--->
+
 </launch>

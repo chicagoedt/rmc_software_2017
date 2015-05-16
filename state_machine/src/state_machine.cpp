@@ -2,7 +2,7 @@
 
 StateMachineBase::StateMachineBase(void):
 	_moveBaseAC("move_base", true), _nh("state_machine"),
-   MAX_GOAL_POINTS(12)
+   MAX_GOAL_POINTS(12), _robotState(eInitializing)
 {
 
 }
@@ -44,9 +44,35 @@ bool StateMachineBase::Initialize()
     }
   }
 
+  _servoSub = _nh.subscribe<std_msgs::Bool> ("servo_camera_state", 1, &StateMachineBase::servoCameraState, this);
+
   return true;
 }
 
+void StateMachineBase::servoCameraState(const std_msgs::Bool::ConstPtr& servoStateOK)
+{
+	// if servoState = true meaning the aruco marker is found
+	if( servoStateOK->data )
+	{
+				
+	}
+	else // marker is not found
+	{
+		_stateStack.push(_robotState); 
+
+		// Stack current goal, drive backward 0.5 meters, if we stil dont get it,
+		// then just rely on imu		
+		if( _robotState	== StateMachineBase::eRelocalize)
+		{
+							
+		}
+	}		
+}
+
+void StateMachineBase::moveToGoalPoint()
+{
+	
+}
 
 void StateMachineBase::run()
 {
@@ -63,7 +89,7 @@ void StateMachineBase::run()
     _moveBaseGoal.target_pose.header.stamp      = ros::Time::now();
 
     _moveBaseGoal.target_pose.pose.position     = _goalPointsQueue.front().position;
-    _moveBaseGoal.target_pose.pose.orientation  = tf::createQuaternionMsgFromYaw(0.0);
+    _moveBaseGoal.target_pose.pose.orientation  = tf::createQuaternionMsgFromYaw(0.01);
 
     ROS_INFO_STREAM("Sending goal(X, Y):" << "[ " << _moveBaseGoal.target_pose.pose.position.x << " , "
                                                   << _moveBaseGoal.target_pose.pose.position.y << " ]");

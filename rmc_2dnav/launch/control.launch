@@ -1,0 +1,6 @@
+<launch>
+  <rosparam command="load" file="$(find rmc_2dnav)/config/control.yaml" />
+  
+  <node pkg="robot_localization" type="ekf_localization_node" name="ekf_localization" /> 
+
+</launch>

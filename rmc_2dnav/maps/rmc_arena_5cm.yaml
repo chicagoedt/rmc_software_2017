@@ -1,0 +1,7 @@
+image: rmc_arena_5cm.png
+resolution: 0.05
+origin: [-1.89,-0.5, -1.57]
+occupied_thresh: 0.65
+free_thresh: 0.196 # Taken from the Willow Garage map in the turtlebot_navigation package
+negate: 0
+

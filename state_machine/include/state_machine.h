@@ -6,10 +6,12 @@
 #include <actionlib/client/simple_action_client.h>
 #include <geometry_msgs/Pose.h>
 #include <tf/transform_datatypes.h>
+#include <std_msgs/Bool.h>
 
 #include <vector>
 #include <queue>
 #include <sstream>
+#include <stack>
 
 typedef actionlib::SimpleActionClient<move_base_msgs::MoveBaseAction> MoveBaseClient;
 
@@ -31,12 +33,15 @@ class StateMachineBase
 
 		ros::NodeHandle					_nh;
 
+        ros::Subscriber                 _servoSub; 
+
 		MoveBaseClient 					_moveBaseAC;
 		move_base_msgs::MoveBaseGoal 	_moveBaseGoal;
 
 		bool startConnectionAC;
 		bool sendGoalToAC(geometry_msgs::Pose goalPose);
-
+        void servoCameraState(const std_msgs::Bool::ConstPtr& servoState); 
+        void moveToGoalPoint();
 
 		/*
 		 * @brief 
@@ -54,6 +59,20 @@ class StateMachineBase
 		 *						 --> Point 4 --> Point 5 --> Point 0
 		 */
 		std::queue<geometry_msgs::Pose> _goalPointsQueue;
+
+        enum eState
+        {
+            eInitializing,
+            eRelocalize,
+            eDriveToDig,
+            eDigging,
+            eDriveToDump,
+            eDumping
+        };
+
+        eState _robotState;
+
+        std::stack<eState> _stateStack;
 
 };
 

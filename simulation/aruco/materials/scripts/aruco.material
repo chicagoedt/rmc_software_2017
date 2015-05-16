@@ -1,0 +1,13 @@
+material aruco/markers
+{
+  technique
+  {
+    pass
+    {
+      texture_unit
+      {
+        texture board781.png
+      }
+    }
+  }
+}

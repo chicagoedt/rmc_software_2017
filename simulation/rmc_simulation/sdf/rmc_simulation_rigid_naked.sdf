@@ -1,0 +1,490 @@
+<?xml version='1.0'?>
+<sdf version='1.4'>
+  <model name='rmc_simulation_rigid'>
+      <static>false</static>
+      <pose>0.5 1 4 0 0 3.14</pose>
+    <link name='base_link'>
+      <inertial>
+        <pose>0.0719192 -0.529514 0.258355 0 -0 0</pose>
+        <mass>5.21776</mass>
+        <inertia>
+          <ixx>0.389998</ixx>
+          <ixy>9.71317e-06</ixy>
+          <ixz>-0.000223596</ixz>
+          <iyy>0.310798</iyy>
+          <iyz>-0.0567354</iyz>
+          <izz>0.538174</izz>
+        </inertia>
+      </inertial>
+      <collision name='base_link_collision'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://rmc_simulation_rigid/meshes/base_link.STL</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name='base_link_visual'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://rmc_simulation_rigid/meshes/base_link.STL</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <velocity_decay>
+        <linear>0</linear>
+        <angular>0</angular>
+      </velocity_decay>
+    </link>
+    <link name='bl_wheel_link'>
+      <pose>-0.180876 -0.770124 0.0791455 -1.5708 1.56584 -3.14159</pose>
+      <inertial>
+        <pose>-7.71939e-12 -0.070792 -1.95887e-07 0 -0 0</pose>
+        <mass>0.687646</mass>
+        <inertia>
+          <ixx>0.00410397</ixx>
+          <ixy>2.09611e-13</ixy>
+          <ixz>1.05896e-14</ixz>
+          <iyy>0.00552463</iyy>
+          <iyz>5.39171e-09</iyz>
+          <izz>0.00410397</izz>
+        </inertia>
+      </inertial>
+      <collision name='bl_wheel_link_collision'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://rmc_simulation_rigid/meshes/bl_wheel_link.STL</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name='bl_wheel_link_visual'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://rmc_simulation_rigid/meshes/bl_wheel_link.STL</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <velocity_decay>
+        <linear>0</linear>
+        <angular>0</angular>
+      </velocity_decay>
+    </link>
+    <joint name='bl_wheel_joint' type='revolute'>
+      <child>bl_wheel_link</child>
+      <parent>base_link</parent>
+      <axis>
+        <xyz>-0.999988 3.33067e-15 0.00495688</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+        <dynamics/>
+      </axis>
+    </joint>
+    <link name='br_wheel_link'>
+      <pose>0.323202 -0.770124 0.0766469 3.13028 -1.11702 -1.56063</pose>
+      <inertial>
+        <pose>-2.56872e-12 -0.070792 -1.95886e-07 0 -0 0</pose>
+        <mass>0.687646</mass>
+        <inertia>
+          <ixx>0.00410397</ixx>
+          <ixy>7.41448e-14</ixy>
+          <ixz>7.32617e-15</ixz>
+          <iyy>0.00552463</iyy>
+          <iyz>5.3917e-09</iyz>
+          <izz>0.00410397</izz>
+        </inertia>
+      </inertial>
+      <collision name='br_wheel_link_collision'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://rmc_simulation_rigid/meshes/br_wheel_link.STL</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name='br_wheel_link_visual'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://rmc_simulation_rigid/meshes/br_wheel_link.STL</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <velocity_decay>
+        <linear>0</linear>
+        <angular>0</angular>
+      </velocity_decay>
+    </link>
+    <joint name='br_wheel_joint' type='revolute'>
+      <child>br_wheel_link</child>
+      <parent>base_link</parent>
+      <axis>
+        <xyz>-0.999988 -7.24421e-15 0.00495688</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+        <dynamics/>
+      </axis>
+    </joint>
+    <link name='fl_wheel_link'>
+      <pose>-0.179282 -0.077974 0.077831 1.55541 1.57079 -0.0153827</pose>
+      <inertial>
+        <pose>-7.30699e-12 -0.0707952 -1.95886e-07 0 -0 0</pose>
+        <mass>0.687646</mass>
+        <inertia>
+          <ixx>0.00410397</ixx>
+          <ixy>1.97154e-13</ixy>
+          <ixz>1.06921e-14</ixz>
+          <iyy>0.00552463</iyy>
+          <iyz>5.39169e-09</iyz>
+          <izz>0.00410397</izz>
+        </inertia>
+      </inertial>
+      <collision name='fl_wheel_link_collision'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://rmc_simulation_rigid/meshes/fl_wheel_link.STL</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name='fl_wheel_link_visual'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://rmc_simulation_rigid/meshes/fl_wheel_link.STL</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <velocity_decay>
+        <linear>0</linear>
+        <angular>0</angular>
+      </velocity_decay>
+    </link>
+    <joint name='fl_wheel_joint' type='revolute'>
+      <child>fl_wheel_link</child>
+      <parent>base_link</parent>
+      <axis>
+        <xyz>-1 3.60822e-15 3.60822e-15</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+        <dynamics/>
+      </axis>
+    </joint>
+    <link name='fr_wheel_link'>
+      <pose>0.322993 -0.0779328 0.0778553 3.14159 -1.56863 -1.5708</pose>
+      <inertial>
+        <pose>-7.1915e-12 -0.0707952 -1.95886e-07 0 -0 0</pose>
+        <mass>0.687646</mass>
+        <inertia>
+          <ixx>0.00410397</ixx>
+          <ixy>1.94069e-13</ixy>
+          <ixz>1.05933e-14</ixz>
+          <iyy>0.00552463</iyy>
+          <iyz>5.39169e-09</iyz>
+          <izz>0.00410397</izz>
+        </inertia>
+      </inertial>
+      <collision name='fr_wheel_link_collision'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://rmc_simulation_rigid/meshes/fr_wheel_link.STL</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name='fr_wheel_link_visual'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://rmc_simulation_rigid/meshes/fr_wheel_link.STL</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <velocity_decay>
+        <linear>0</linear>
+        <angular>0</angular>
+      </velocity_decay>
+    </link>
+    <joint name='fr_wheel_joint' type='revolute'>
+      <child>fr_wheel_link</child>
+      <parent>base_link</parent>
+      <axis>
+        <xyz>-1 6.77236e-15 1.38778e-16</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+        <dynamics/>
+      </axis>
+    </joint>
+    <link name='ml_wheel_link'>
+      <pose>-0.179282 -0.433574 0.077831 1.55541 1.57079 -0.0153827</pose>
+      <inertial>
+        <pose>-7.30702e-12 -0.0707952 -1.95886e-07 0 -0 0</pose>
+        <mass>0.687646</mass>
+        <inertia>
+          <ixx>0.00410397</ixx>
+          <ixy>1.97154e-13</ixy>
+          <ixz>1.06918e-14</ixz>
+          <iyy>0.00552463</iyy>
+          <iyz>5.39169e-09</iyz>
+          <izz>0.00410397</izz>
+        </inertia>
+      </inertial>
+      <collision name='ml_wheel_link_collision'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://rmc_simulation_rigid/meshes/ml_wheel_link.STL</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name='ml_wheel_link_visual'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://rmc_simulation_rigid/meshes/ml_wheel_link.STL</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <velocity_decay>
+        <linear>0</linear>
+        <angular>0</angular>
+      </velocity_decay>
+    </link>
+    <joint name='ml_wheel_joint' type='revolute'>
+      <child>ml_wheel_link</child>
+      <parent>base_link</parent>
+      <axis>
+        <xyz>-1 3.60822e-15 3.60822e-15</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+        <dynamics/>
+      </axis>
+    </joint>
+    <link name='mr_wheel_link'>
+      <pose>0.322993 -0.433642 0.0778067 1.55541 -1.57079 0.0153827</pose>
+      <inertial>
+        <pose>-7.30707e-12 -0.0707952 -1.95886e-07 0 -0 0</pose>
+        <mass>0.687646</mass>
+        <inertia>
+          <ixx>0.00410397</ixx>
+          <ixy>1.9715e-13</ixy>
+          <ixz>1.06925e-14</ixz>
+          <iyy>0.00552463</iyy>
+          <iyz>5.39169e-09</iyz>
+          <izz>0.00410397</izz>
+        </inertia>
+      </inertial>
+      <collision name='mr_wheel_link_collision'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://rmc_simulation_rigid/meshes/mr_wheel_link.STL</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name='mr_wheel_link_visual'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://rmc_simulation_rigid/meshes/mr_wheel_link.STL</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <velocity_decay>
+        <linear>0</linear>
+        <angular>0</angular>
+      </velocity_decay>
+    </link>
+    <joint name='mr_wheel_joint' type='revolute'>
+      <child>mr_wheel_link</child>
+      <parent>base_link</parent>
+      <axis>
+        <xyz>-1 -3.60822e-15 -3.60822e-15</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+        <dynamics/>
+      </axis>
+    </joint>
+
+
+    <plugin name="hector_6w_diff_controller" filename="libdiffdrive_plugin_6w.so">
+            <alwaysOn>1</alwaysOn>
+            <updateRate>10.0</updateRate>
+            <wheelSeparation>0.5116</wheelSeparation>
+            <wheelDiameter>0.2191</wheelDiameter>
+            <torque>1</torque>
+            <frontLeftJoint>fl_wheel_joint</frontLeftJoint>
+            <frontRightJoint>fr_wheel_joint</frontRightJoint>
+            <midLeftJoint>ml_wheel_joint</midLeftJoint>
+            <midRightJoint>mr_wheel_joint</midRightJoint>
+            <rearLeftJoint>bl_wheel_joint</rearLeftJoint>
+            <rearRightJoint>br_wheel_joint</rearRightJoint>
+    </plugin>
+
+    <joint name="blackfly_mount_joint" type="revolute">
+      <parent>base_link</parent>
+      <child>blackfly_mount_link</child>
+      <pose>0 0 0 0 0 0</pose>
+      <axis>
+        <xyz>-1 0 0</xyz>
+        <limit>
+          <lower>0</lower>
+          <upper>0</upper>
+        </limit>
+      </axis>
+    </joint>
+
+    <link name='blackfly_mount_link'>
+      <pose>0.0718557 -0.90 0.525 0 0 -1.57</pose>
+      <inertial>
+        <mass>1e-5</mass>
+        <inertia>
+          <ixx>1e-6</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>1e-6</iyy>
+          <iyz>0.0</iyz>
+          <izz>1e-6</izz>
+        </inertia>
+      </inertial>
+      <collision name='blackfly_mount_link_collision'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+           <box>
+             <size> 0.05 0.05 0.05 </size>
+           </box>
+        </geometry>
+      </collision>
+      <visual name='blackfly_mount_link_visual'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+           <box>
+             <size> 0.05 0.05 0.05 </size>
+           </box>
+        </geometry>
+        <material>
+          <script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/Red</name>
+          </script>
+        </material>
+      </visual>
+      <gravity>1</gravity>
+      <velocity_decay>
+         <linear>0</linear>
+         <angular>0</angular>
+      </velocity_decay>
+      <self_collide>0</self_collide>
+
+    <sensor name='blackfly_camera' type='camera'>
+      <update_rate>20</update_rate>
+      <camera name="head">
+        <horizontal_fov>2.09</horizontal_fov>
+        <image>
+          <width>1280</width>
+          <height>960</height>
+          <format>R8G8B8</format>
+        </image>
+        <clip>
+          <near>0.02</near>
+          <far>300</far>
+        </clip>
+        <noise>
+          <type>gaussian</type>
+          <!-- Noise is sampled independently per pixel on each frame.
+               That pixel's noise value is added to each of its color
+               channels, which at that point lie in the range [0,1]. -->
+          <mean>0.0</mean>
+          <stddev>0.007</stddev>
+         </noise>
+        </camera>
+        <pose>0 0 0 0 0 0</pose>
+        <plugin name="camera_controller" filename="libgazebo_ros_camera.so">
+          <alwaysOn>true</alwaysOn>
+          <updateRate>0.0</updateRate>
+          <cameraName>camera1</cameraName>
+          <imageTopicName>image_raw</imageTopicName>
+          <cameraInfoTopicName>camera_info</cameraInfoTopicName>
+          <frameName>blackfly_mount_link</frameName>
+          <hackBaseline>0.07</hackBaseline>
+          <distortionK1>0.0</distortionK1>
+          <distortionK2>0.0</distortionK2>
+          <distortionK3>0.0</distortionK3>
+          <distortionT1>0.0</distortionT1>
+          <distortionT2>0.0</distortionT2>
+        </plugin>
+    </sensor>
+   </link>
+
+      <link name='imu_link'>
+      <pose>0.0718557 -0.433574 0.217656 0 0 0</pose>
+         <inertial>
+            <pose>0 0 0 0 0 0</pose>
+            <mass>0.001</mass>
+            <inertia>
+                <ixx>1e-09</ixx>
+                <ixy>0</ixy>
+                <ixz>0</ixz>
+                <iyy>1e-09</iyy>
+                <iyz>0</iyz>
+                <izz>1e-09</izz>
+            </inertia>
+          </inertial>
+      </link>
+      <joint name='imu_joint' type='revolute'>
+          <child>imu_link</child>
+          <parent>base_link</parent>
+          <axis>
+              <xyz>0 0 1</xyz>
+              <limit>
+                 <lower>0</lower>
+                 <upper>0</upper>
+              </limit>
+          </axis>
+      </joint>
+
+
+        <plugin name="imu_controller" filename="libhector_gazebo_ros_imu.so">
+                <robotNamespace>/</robotNamespace>
+                <updateRate>50.0</updateRate>
+                <bodyName>base_link</bodyName>
+                <topicName>imu/data</topicName>
+                <accelDrift>0.00 0.00 0.00</accelDrift>
+                <accelGaussianNoise>0.00 0.00 0.00</accelGaussianNoise>
+                <rateDrift>0.00 0.00 0.00</rateDrift>
+                <rateGaussianNoise>0.00 0.00 0.00 </rateGaussianNoise>
+                <headingDrift>0.00</headingDrift>
+                <headingGaussianNoise>0.00</headingGaussianNoise>
+        </plugin>
+
+
+  </model>
+</sdf>

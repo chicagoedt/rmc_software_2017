@@ -1,0 +1,15 @@
+material LunArena2/Diffuse
+{
+  receive_shadows off
+  technique
+  {
+    pass
+    {
+      texture_unit
+      {
+        texture 0_surface.png
+      }
+    }
+  }
+}
+

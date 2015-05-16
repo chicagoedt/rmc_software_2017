@@ -1,0 +1,202 @@
+<robot
+  name="LunArena2">
+  <link
+    name="arena_base_link">
+    <inertial>
+      <origin
+        xyz="3.46639361537909 -5.5088180149753 3.29739562989736"
+        rpy="0 0 0" />
+      <mass
+        value="39247.099760131" />
+      <inertia
+        ixx="181480.084095213"
+        ixy="29643.271899406"
+        ixz="4652.60341262927"
+        iyy="120193.989349595"
+        iyz="5803.15463514684"
+        izz="291998.266495554" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://LunArena2/meshes/arena_base_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://LunArena2/meshes/arena_base_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <link
+    name="soil_link">
+    <inertial>
+      <origin
+        xyz="1.94251768264888 0.146302413905263 -3.72363339128652"
+        rpy="0 0 0" />
+      <mass
+        value="8169.87013139625" />
+      <inertia
+        ixx="37142.127264176"
+        ixy="20.7931473652674"
+        ixz="-13.9598557059753"
+        iyy="47091.7884279998"
+        iyz="-48.1404990963264"
+        izz="10075.9360831001" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://LunArena2/meshes/soil_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://LunArena2/meshes/soil_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="soil_base_joint"
+    type="fixed">
+    <origin
+      xyz="0.54557 -9.5554 3.6118"
+      rpy="1.5708 0 0" />
+    <parent
+      link="arena_base_link" />
+    <child
+      link="soil_link" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="dumping_bin_link">
+    <inertial>
+      <origin
+        xyz="0.00557115613302539 -0.107505296795415 0.0061694348514072"
+        rpy="0 0 0" />
+      <mass
+        value="7.84869557962063" />
+      <inertia
+        ixx="0.385025151280072"
+        ixy="9.07020986096185E-13"
+        ixz="2.62640708509916E-13"
+        iyy="1.81550980570861"
+        iyz="-3.04281260300178E-13"
+        izz="1.94591514454499" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://LunArena2/meshes/dumping_bin_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://LunArena2/meshes/dumping_bin_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="dumping_bin_base_joint"
+    type="fixed">
+    <origin
+      xyz="2.4638 -1.9118 4.2032"
+      rpy="1.5708 0 0" />
+    <parent
+      link="arena_base_link" />
+    <child
+      link="dumping_bin_link" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="marker_link">
+    <inertial>
+      <origin
+        xyz="0.0184891466277333 -0.00243656724757191 0.00317500000000059"
+        rpy="0 0 0" />
+      <mass
+        value="0.258125826399078" />
+      <inertia
+        ixx="0.00147062051811314"
+        ixy="-0.000185305563296723"
+        ixz="1.81390546209665E-18"
+        iyy="0.0515935080648294"
+        iyz="5.07773065631002E-20"
+        izz="0.0530623938698368" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://LunArena2/meshes/marker_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.843137254901961 0.815686274509804 0.752941176470588 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://LunArena2/meshes/marker_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="marker_base_joint"
+    type="fixed">
+    <origin
+      xyz="2.4695 -2.157 4.2368"
+      rpy="1.5708 0 0" />
+    <parent
+      link="arena_base_link" />
+    <child
+      link="marker_link" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+</robot>

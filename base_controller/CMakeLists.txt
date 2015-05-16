@@ -1,6 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(base_controller)
-
 find_package(catkin REQUIRED COMPONENTS roscpp rospy std_msgs message_generation)
 
 add_message_files(
@@ -25,5 +24,6 @@ target_link_libraries(joystick_teleop ${catkin_LIBRARIES})
 set_target_properties(joystick_teleop PROPERTIES COMPILE_FLAGS -g)
 
 add_dependencies(joystick_teleop ${catkin_EXPORTED_TARGETS})
+add_dependencies(joystick_teleop base_controller_generate_messages_cpp)
 
 

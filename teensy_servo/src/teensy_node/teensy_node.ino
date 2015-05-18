@@ -55,7 +55,7 @@ const int SERVO_INCREMENT = 1;             // step angle to rotate servo by ever
 const int LED_PIN = 13;                    // LED pin number
 const unsigned long SWEEP_TIMER_LIMIT = 1000000;     // in microseconds (1 second)
 const unsigned long LOST_TIMER_LIMIT = 10000000;   // in microseconds (10 seconds)
-
+const unsigned int SERVO_PIN = 9;
 // ROS node handle
 ros::NodeHandle nh;
 
@@ -141,7 +141,7 @@ void sweep_callback(void)
 void setup()
 {
   pinMode(LED_PIN, OUTPUT);
-  servo.attach(9);        // attaches the servo on pin 9 to the servo object
+  servo.attach(SERVO_PIN);        // attaches the servo on pin 9 to the servo object
   nh.initNode();            // initializes ROS node
   nh.advertise(lost_pub);
   nh.subscribe(transform_sub);

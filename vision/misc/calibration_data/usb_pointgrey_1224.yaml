@@ -1,0 +1,20 @@
+image_width: 1624
+image_height: 1224
+camera_name: usb_pointgrey
+camera_matrix:
+  rows: 3
+  cols: 3
+  data: [1445.672199094337, 0, 831.6689235207464, 0, 1444.05527212126, 607.3052077339182, 0, 0, 1]
+distortion_model: plumb_bob
+distortion_coefficients:
+  rows: 1
+  cols: 5
+  data: [-0.1775553675532247, 0.1177264485455344, 0.001368338107686154, 0.001352014345673598, 0]
+rectification_matrix:
+  rows: 3
+  cols: 3
+  data: [1, 0, 0, 0, 1, 0, 0, 0, 1]
+projection_matrix:
+  rows: 3
+  cols: 4
+  data: [1352.329223632812, 0, 834.5048731123316, 0, 0, 1348.7294921875, 608.7554118464759, 0, 0, 0, 1, 0]

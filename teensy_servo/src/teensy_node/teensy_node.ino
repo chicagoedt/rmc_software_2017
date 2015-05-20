@@ -35,7 +35,7 @@
 #include <Servo.h>
 
 Servo servo;            // create servo object to control a servo
-int servo_position;     // variable to store the servo position
+float servo_position;     // variable to store the servo position
 
 enum turn_direction{
   CLOCKWISE,
@@ -43,6 +43,7 @@ enum turn_direction{
   NONE
 };
 turn_direction turn = CLOCKWISE;  // direction to turn.
+turn_direction last_turn = turn;
 
 unsigned long previous_millis = 0;           // stores time when last loop() called
 unsigned long time_seen_marker = millis();   // stores time since last seen marker
@@ -50,8 +51,8 @@ bool sweeping = true;                        // variable to store whether sweepi
 
 // constants
 const float ERROR_THRESHOLD = 5.0f;        // in degrees
-const int SERVO_DELAY_INCREMENT = 50;      // how long to wait before moving the servo one step (in milliseconds)
-const int SERVO_INCREMENT = 1;             // step angle to rotate servo by every loop (in degrees-ish)
+const int SERVO_DELAY_INCREMENT = 700;      // how long to wait before moving the servo one step (in milliseconds)
+const float SERVO_INCREMENT = 8.0f;             // step angle to rotate servo by every loop (in degrees-ish)
 const int LED_PIN = 13;                    // LED pin number
 const unsigned long SWEEP_TIMER_LIMIT = 1000000;     // in microseconds (1 second)
 const unsigned long LOST_TIMER_LIMIT = 10000000;   // in microseconds (10 seconds)
@@ -81,7 +82,9 @@ const char child[] = "/camera";
 // calculates the error_angle (yaw) from the aruco marker and decides if to turn in a certain direction.
 // also resets lost and sweeping timers after publishing that we're not lost
 void transform_callback(const geometry_msgs::TransformStamped& t) {
-  float error_angle = atan(t.transform.translation.x / t.transform.translation.z);  // in radians
+  float error_angle = atan(t.transform.translation.x / t.transform.translation.z)  * 180 / PI;  // in degrees
+
+  last_turn = turn;
 
   if (error_angle > ERROR_THRESHOLD)
     turn = CLOCKWISE;
@@ -89,6 +92,8 @@ void transform_callback(const geometry_msgs::TransformStamped& t) {
     turn = COUNTER_CLOCKWISE;
   else
     turn = NONE;
+    
+
 
   // if we thought we were lost (just found a marker after we thought we were lost),
   if (aruco_lost.data) {
@@ -147,7 +152,7 @@ void setup()
   nh.subscribe(transform_sub);
   broadcaster.init(nh);     // initializes tf broadcaster
 
-  servo_position = 90;                // reference configuration
+  servo_position = 90.0f;                // reference configuration
   transform_message.header.frame_id = parent;
   transform_message.child_frame_id = child;
 
@@ -171,7 +176,7 @@ void loop()
 
 
       // if we're not turning, have it turn in an arbitrarily chosen direction
-      if (turn == NONE) turn = CLOCKWISE;
+      if (turn == NONE) turn = last_turn;
 
       // sweep pos of servo
       if (turn == COUNTER_CLOCKWISE) {
@@ -185,8 +190,13 @@ void loop()
       broadcast_tf();
 
       // switch direction if we reached the limit
-      if (servo_position <= 0) turn = COUNTER_CLOCKWISE;
-      else if (servo_position >= 180) turn = CLOCKWISE;
+      if (servo_position <= 0) {
+        last_turn = turn;
+        turn = COUNTER_CLOCKWISE;
+      } else if (servo_position >= 180) {
+        last_turn = turn;
+        turn = CLOCKWISE;
+      }
 
     }
     // we're not sweeping

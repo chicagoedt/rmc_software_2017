@@ -1,0 +1,5 @@
+<launch>
+    <node pkg="rosserial_python" type="serial_node.py" name="rosserial" output="screen">
+        <param name="port" value="/dev/serial/by-id/usb-Teensyduino_USB_Serial_840430-if00" />
+  </node>
+</launch>

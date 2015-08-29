@@ -1,0 +1,8 @@
+%YAML:1.0
+ar_map_boards:
+   - { name:"/board1", type:"fixed", pose:[ [ 0.1, 0.1, 0 ], [ 0, 0, 0 ] ] }
+   - { name:"/board2", type:"relative", relativeName:"/Peg", pose:[ [ 0, 0, 0.3 ], [ 0, 0, 0 ] ] }
+   - { name:"/board3", type:"floating" }
+ar_map_cameras:
+   - { name:"/camera1", type:"floating" }
+   - { name:"/camera2", type:"fixed", pose:[ [ 0, 0, 0.5 ], [ 0, 1.570796327, 0 ] ] }

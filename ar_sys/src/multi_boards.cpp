@@ -21,6 +21,7 @@
 #include <ar_sys/utils.h>
 #include <tf/transform_broadcaster.h>
 #include <tf/transform_listener.h>
+//#include <tf2_ros/transform_listener.h>
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
 
 using namespace aruco;
@@ -63,6 +64,12 @@ class ArSysMultiBoards
 
 		tf::TransformBroadcaster broadcaster;
 		tf::TransformListener _tfListener;
+
+		//tf2_ros::Buffer tfBuffer;
+		//tf2_ros::TransformListener tfListener;
+
+		//geometry_msgs::TransformStamped imOffsetTransform;
+		tf::StampedTransform imOffsetTransform;
 
 	public:
 		ArSysMultiBoards()
@@ -150,49 +157,79 @@ class ArSysMultiBoards
 					if (min_size > boards[board_index].marker_size) min_size = boards[board_index].marker_size;
 				mDetector.detect(inImage, markers, camParam, min_size, false);
 
-				for (int board_index = 0; board_index < boards.size(); board_index++)
+
+				try
 				{
-					Board board_detected;
+					//_tfListener.waitForTransform("base_link", "blackfly_optical_link", ros::Time(0), ros::Duration(1.0));
+					//imOffsetTransform = tfBuffer.lookupTransform("blackfly_optical_link", "base_link", ros::Time(0));
+					_tfListener.lookupTransform("base_link", "blackfly_optical_link", ros::Time(0), imOffsetTransform);
 
-					//Detection of the board
-					float probDetect = the_board_detector.detect(markers, boards[board_index].config, board_detected, camParam, boards[board_index].marker_size);
-					if (probDetect > 0.0)
+					for (int board_index = 0; board_index < boards.size(); board_index++)
 					{
+						Board board_detected;
 
-						tf::Transform transform = ar_sys::getTf(board_detected.Rvec, board_detected.Tvec);
+						//Detection of the board
+						float probDetect = the_board_detector.detect(markers, boards[board_index].config, board_detected, camParam, boards[board_index].marker_size);
+						if (probDetect > 0.0 && board_index == 2)
+						{ 
 
-						//tf::StampedTransform stampedTransform(transform, msg->header.stamp, msg->header.frame_id, boards[board_index].name);
-						tf::StampedTransform stampedTransform(transform, ros::Time::now(), msg->header.frame_id, boards[board_index].name);
+							tf::Transform transform = ar_sys::getTf(board_detected.Rvec, board_detected.Tvec);
 
-						geometry_msgs::PoseWithCovarianceStamped poseMsg;
-						tf::poseTFToMsg(transform, poseMsg.pose.pose);
-						poseMsg.pose.covariance[0] = 0.01;
-						poseMsg.pose.covariance[7] = 0.01;
-						poseMsg.pose.covariance[14] = 0.01;
-						poseMsg.pose.covariance[21] = 0.02;
-						poseMsg.pose.covariance[28] = 0.02;
-						poseMsg.pose.covariance[35] = 0.02;
-						poseMsg.header.frame_id = msg->header.frame_id;
-						poseMsg.header.stamp = msg->header.stamp;
-						pose_pub.publish(poseMsg);
+							transform = transform.inverse();
 
-						broadcaster.sendTransform(stampedTransform);
+							tf::Vector3 newVector(transform.getOrigin().getY() + imOffsetTransform.getOrigin().getX(),
+													transform.getOrigin().getZ() + imOffsetTransform.getOrigin().getY(),
+													transform.getOrigin().getX() + imOffsetTransform.getOrigin().getZ());
 
-						geometry_msgs::TransformStamped transformMsg;
-						tf::transformStampedTFToMsg(stampedTransform, transformMsg);
-						transform_pub.publish(transformMsg);
 
-						geometry_msgs::Vector3Stamped positionMsg;
-						positionMsg.header = transformMsg.header;
-						positionMsg.vector = transformMsg.transform.translation;
-						position_pub.publish(positionMsg);
 
-						if(camParam.isValid())
-						{
-							//draw board axis
-							CvDrawingUtils::draw3dAxis(resultImg, board_detected, camParam);
+							transform.setOrigin(newVector);
+
+
+							// boards[2].name should possibly be switched to "map"
+							//tf::StampedTransform stampedTransform(transform, msg->header.stamp, msg->header.frame_id, boards[board_index].name);
+							tf::StampedTransform stampedTransform(transform, ros::Time::now(), "board_marker", "base_link");
+
+							geometry_msgs::PoseWithCovarianceStamped poseMsg;
+							tf::poseTFToMsg(transform, poseMsg.pose.pose);
+
+							// poseMsg.pose.pose.position.x += imOffsetTransform.transform.translation.x;
+							// poseMsg.pose.pose.position.y += imOffsetTransform.transform.translation.y;
+							// poseMsg.pose.pose.position.z += imOffsetTransform.transform.translation.z;
+
+							poseMsg.pose.covariance[0] = 0.005;
+							poseMsg.pose.covariance[7] = 0.005;
+							poseMsg.pose.covariance[14] = 0.005;
+							poseMsg.pose.covariance[21] = 0.006;
+							poseMsg.pose.covariance[28] = 0.006;
+							poseMsg.pose.covariance[35] = 0.006;
+							//poseMsg.header.frame_id = msg->header.frame_id;
+							poseMsg.header.frame_id = "board_marker";
+							poseMsg.header.stamp = msg->header.stamp;
+							pose_pub.publish(poseMsg);
+
+							//broadcaster.sendTransform(stampedTransform);
+
+							geometry_msgs::TransformStamped transformMsg;
+							tf::transformStampedTFToMsg(stampedTransform, transformMsg);
+							transform_pub.publish(transformMsg);
+
+							geometry_msgs::Vector3Stamped positionMsg;
+							positionMsg.header = transformMsg.header;
+							positionMsg.vector = transformMsg.transform.translation;
+							position_pub.publish(positionMsg);
+
+							if(camParam.isValid())
+							{
+								//draw board axis
+								CvDrawingUtils::draw3dAxis(resultImg, board_detected, camParam);
+							}
 						}
 					}
+				}
+				catch (tf2::TransformException &ex) 
+				{
+					ROS_ERROR("%s",ex.what());
 				}
 
 				//for each marker, draw info and its boundaries in the image

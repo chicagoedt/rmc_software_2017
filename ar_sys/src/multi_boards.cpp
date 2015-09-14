@@ -70,6 +70,8 @@ class ArSysMultiBoards
 
 		//geometry_msgs::TransformStamped imOffsetTransform;
 		tf::StampedTransform imOffsetTransform;
+		tf::StampedTransform rotateAruco;
+		//tf::Stamped<geometry_msgs::Pose> imOffsetTransform;
 
 	public:
 		ArSysMultiBoards()
@@ -162,7 +164,8 @@ class ArSysMultiBoards
 				{
 					//_tfListener.waitForTransform("base_link", "blackfly_optical_link", ros::Time(0), ros::Duration(1.0));
 					//imOffsetTransform = tfBuffer.lookupTransform("blackfly_optical_link", "base_link", ros::Time(0));
-					_tfListener.lookupTransform("base_link", "blackfly_optical_link", ros::Time(0), imOffsetTransform);
+					_tfListener.lookupTransform("base_link", "blackfly_mount_link", ros::Time(0), imOffsetTransform);
+					//_tfListener.lookupTransform("board_frame", "map", ros::Time(0), rotateAruco);
 
 					for (int board_index = 0; board_index < boards.size(); board_index++)
 					{
@@ -175,27 +178,25 @@ class ArSysMultiBoards
 
 							tf::Transform transform = ar_sys::getTf(board_detected.Rvec, board_detected.Tvec);
 
-							transform = transform.inverse();
-
-							tf::Vector3 newVector(transform.getOrigin().getY() + imOffsetTransform.getOrigin().getX(),
-													transform.getOrigin().getZ() + imOffsetTransform.getOrigin().getY(),
-													transform.getOrigin().getX() + imOffsetTransform.getOrigin().getZ());
 
 
+							transform *= imOffsetTransform.inverse();
 
-							transform.setOrigin(newVector);
-
-
-							// boards[2].name should possibly be switched to "map"
-							//tf::StampedTransform stampedTransform(transform, msg->header.stamp, msg->header.frame_id, boards[board_index].name);
 							tf::StampedTransform stampedTransform(transform, ros::Time::now(), "board_marker", "base_link");
 
-							geometry_msgs::PoseWithCovarianceStamped poseMsg;
-							tf::poseTFToMsg(transform, poseMsg.pose.pose);
 
-							// poseMsg.pose.pose.position.x += imOffsetTransform.transform.translation.x;
-							// poseMsg.pose.pose.position.y += imOffsetTransform.transform.translation.y;
-							// poseMsg.pose.pose.position.z += imOffsetTransform.transform.translation.z;
+							geometry_msgs::PoseStamped rawPoseMsg;
+							rawPoseMsg.header.frame_id = "board_marker";
+							rawPoseMsg.header.stamp = msg->header.stamp;
+
+							geometry_msgs::PoseStamped newPoseMsg;
+							geometry_msgs::PoseWithCovarianceStamped poseMsg;
+
+							tf::poseTFToMsg(transform, rawPoseMsg.pose);
+
+							_tfListener.transformPose("map", rawPoseMsg, newPoseMsg);
+
+							poseMsg.pose.pose = newPoseMsg.pose;
 
 							poseMsg.pose.covariance[0] = 0.005;
 							poseMsg.pose.covariance[7] = 0.005;
@@ -203,8 +204,7 @@ class ArSysMultiBoards
 							poseMsg.pose.covariance[21] = 0.006;
 							poseMsg.pose.covariance[28] = 0.006;
 							poseMsg.pose.covariance[35] = 0.006;
-							//poseMsg.header.frame_id = msg->header.frame_id;
-							poseMsg.header.frame_id = "board_marker";
+							poseMsg.header.frame_id = "map";
 							poseMsg.header.stamp = msg->header.stamp;
 							pose_pub.publish(poseMsg);
 

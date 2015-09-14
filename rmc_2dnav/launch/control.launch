@@ -1,6 +1,28 @@
+<?xml version="1.0"?>
 <launch>
-  <rosparam command="load" file="$(find rmc_2dnav)/config/control.yaml" />
-  
-  <node pkg="robot_localization" type="ekf_localization_node" name="ekf_localization" /> 
+
+
+	<!-- tf2 args:  <x y z YAW PITCH ROLL>  Different from original tf!!! -->
+    <node 
+      pkg="tf" 
+      type="static_transform_publisher" 
+      name="baselink_to_blackfly_mount" 
+      args="-0.45 0.0 0.47 3.14195 0 0 base_link blackfly_mount_link 25" >
+    </node>
+<!--     <node
+      pkg="tf" 
+      type="static_transform_publisher" 
+      name="blackfly_mount_to_optical" 
+      args="0.1 0 0 -1.57 0 -1.57 blackfly_mount_link blackfly_optical_link 25">
+    </node> -->
+    <node
+      pkg="tf" 
+      type="static_transform_publisher" 
+      name="arsys_to_map" 
+      args="0 0 0.5 0 1.57 0 map board_marker 25">
+    </node>
+
+    <include file="$(find rmc_2dnav)/launch/ekf_localization_1.launch"/> <!-- Only IMU -->
+    <include file="$(find rmc_2dnav)/launch/ekf_localization_2.launch"/> <!-- EKF_1 output and ar pose -->
 
 </launch>

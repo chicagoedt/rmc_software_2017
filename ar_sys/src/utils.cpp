@@ -57,28 +57,28 @@ tf::Transform ar_sys::getTf(const cv::Mat &Rvec, const cv::Mat &Tvec)
 	//	1	0	0
 	//	0	-1	0
 	//	0	0	-1
-	// rotate_to_sys.at<float>(0,0) = 1.0;
-	// rotate_to_sys.at<float>(0,1) = 0.0;
-	// rotate_to_sys.at<float>(0,2) = 0.0;
-	// rotate_to_sys.at<float>(1,0) = 0.0;
-	// rotate_to_sys.at<float>(1,1) = -1.0;
-	// rotate_to_sys.at<float>(1,2) = 0.0;
-	// rotate_to_sys.at<float>(2,0) = 0.0;
-	// rotate_to_sys.at<float>(2,1) = 0.0;
-	// rotate_to_sys.at<float>(2,2) = -1.0;
-
-	//	1	0	0
-	//	0	0	-1
-	//	0	1	0
 	rotate_to_sys.at<float>(0,0) = 1.0;
 	rotate_to_sys.at<float>(0,1) = 0.0;
 	rotate_to_sys.at<float>(0,2) = 0.0;
 	rotate_to_sys.at<float>(1,0) = 0.0;
-	rotate_to_sys.at<float>(1,1) = 0.0;
-	rotate_to_sys.at<float>(1,2) = -1.0;
+	rotate_to_sys.at<float>(1,1) = -1.0;
+	rotate_to_sys.at<float>(1,2) = 0.0;
 	rotate_to_sys.at<float>(2,0) = 0.0;
-	rotate_to_sys.at<float>(2,1) = 1.0;
-	rotate_to_sys.at<float>(2,2) = 0.0;
+	rotate_to_sys.at<float>(2,1) = 0.0;
+	rotate_to_sys.at<float>(2,2) = -1.0;
+
+	//	1	0	0
+	//	0	0	-1
+	//	0	1	0
+	// rotate_to_sys.at<float>(0,0) = 1.0;
+	// rotate_to_sys.at<float>(0,1) = 0.0;
+	// rotate_to_sys.at<float>(0,2) = 0.0;
+	// rotate_to_sys.at<float>(1,0) = 0.0;
+	// rotate_to_sys.at<float>(1,1) = 0.0;
+	// rotate_to_sys.at<float>(1,2) = -1.0;
+	// rotate_to_sys.at<float>(2,0) = 0.0;
+	// rotate_to_sys.at<float>(2,1) = 1.0;
+	// rotate_to_sys.at<float>(2,2) = 0.0;
 	rot = rot*rotate_to_sys.t();
 
 	tf::Matrix3x3 tf_rot(rot.at<float>(0,0), rot.at<float>(0,1), rot.at<float>(0,2),

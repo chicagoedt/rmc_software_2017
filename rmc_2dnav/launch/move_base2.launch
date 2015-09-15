@@ -3,7 +3,9 @@
 
   <node name="map_server" pkg="map_server" type="map_server" args="$(find rmc_2dnav)/maps/rmc_arena_5cm.yaml"/>  
 
+<!--
   <node pkg="tf" type="static_transform_publisher" name="map_broadcaster" args="0 0 0 0 0 0 map odom 30" />
+-->
 
   <node ns="local_costmap" name="voxel_grid_throttle" pkg="topic_tools" type="throttle" args="messages voxel_grid 3.0 voxel_grid_throttled" />
   <node pkg="move_base" type="move_base" respawn="true" name="move_base" output="screen">

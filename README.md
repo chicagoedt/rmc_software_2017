@@ -16,3 +16,13 @@ Instructions
 5) Your RMC workspace is now setup along with anything else you will need to develop for RMC. 
 
 6) roslaunch rmc_simulation gazebo.launch       <--- Try this to get gazebo up and running with RMC model
+
+
+==========
+launch files to run all the system:
+1. radxa-1:
+    * rmc_2dnav control.launch
+2. radxa-2:
+    * teensy launch file thingie
+3. jetson-3:
+    * vision pointgrey

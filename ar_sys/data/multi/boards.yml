@@ -1,0 +1,4 @@
+%YAML:1.0
+ar_sys_boards:
+   - { name:"/board1", path:"board1.yml", marker_size:0.03 }
+   - { name:"/board2", path:"board2.yml", marker_size:0.03 }

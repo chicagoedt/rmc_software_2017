@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<launch>
+	<arg name="map_path" default="$(find ar_sys)/data/viewer/map.yml" />
+	<arg name="digital_filter_change_rate" default="0.5" />
+	<arg name="rviz_config_path" default="$(find ar_sys)/data/viewer/viewer.rviz" />
+
+	<node pkg="topic_tools" type="relay" name="relay1" args="/arsys_single_board/transform /ar_sys_boards/transform" />
+	<node pkg="topic_tools" type="relay" name="relay2" args="/arsys_multi_boards/transform /ar_sys_boards/transform" />
+
+	<node pkg="ar_sys" type="system_viewer" name="ar_system_viewer" output="screen">
+		<remap from="/transform" to="/ar_sys_boards/transform" />
+
+		<param name="map_path" type="string" value="$(arg map_path)"/>
+		<param name="digital_filter_change_rate" type="double" value="$(arg digital_filter_change_rate)"/>
+	</node>
+
+	<node pkg="rviz" type="rviz" name="rviz" args="-d $(arg rviz_config_path)"/>
+
+</launch>
+

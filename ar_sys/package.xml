@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<package>
+	<name>ar_sys</name>
+	<version>1.0.5</version>
+	<description>3D pose estimation ROS package using ArUco marker boards.</description>
+	<maintainer email="sahloul@race.u-tokyo.ac.jp">Hamdi Sahloul</maintainer>
+	<license>BSD</license>
+	<url type="website">http://wiki.ros.org/ar_sys</url>
+	<author email="sahloul@race.u-tokyo.ac.jp">Hamdi Sahloul</author>
+	<author email="rmsalinas@uco.es">Rafael Muñoz Salinas</author>
+	<author email="bence.magyar@pal-robotics.com">Bence Magyar</author>
+
+	<buildtool_depend>catkin</buildtool_depend>
+	<build_depend>cv_bridge</build_depend>
+	<build_depend>dynamic_reconfigure</build_depend>
+	<build_depend>geometry_msgs</build_depend>
+	<build_depend>image_transport</build_depend>
+	<build_depend>roscpp</build_depend>
+	<build_depend>tf</build_depend>
+	<build_depend>visualization_msgs</build_depend>
+	<run_depend>cv_bridge</run_depend>
+	<run_depend>dynamic_reconfigure</run_depend>
+	<run_depend>geometry_msgs</run_depend>
+	<run_depend>image_transport</run_depend>
+	<run_depend>roscpp</run_depend>
+	<run_depend>tf</run_depend>
+	<run_depend>visualization_msgs</run_depend>
+</package>

@@ -23,3 +23,13 @@ launch files to run all the system:
     * teensy launch file thingie
 3. jetson-3:
     * vision pointgrey
+
+Qt Mission Control 
+------------------
+1) In order to build Mission Control Qt application please go to
+    http://www.qt.io/download-open-source/ and download Qt 5.5 or later
+
+2. After starting QT Creator open mission_control.pro project file.
+    This will create mission_control.pro.user file. DO not chekc this file.
+    This file is your local machine settings.
+

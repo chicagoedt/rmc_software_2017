@@ -5,7 +5,7 @@
 	<arg name="camera_device" default="/dev/video0"/>
 	<arg name="camera_info" default="file://$(find ar_sys)/camera_info/camera_calibration.yaml"/>
 	<arg name="camera_frame_id" default="camera1"/>
-	<arg name="camera_width" default="1280"/>
+	<arg name="camera_width" default="1280"/> <!--640 x480-->
 	<arg name="camera_height" default="1024" />
 	<arg name="camera_fps"  default="30"/>
 

@@ -21,6 +21,7 @@
 #include <ar_sys/utils.h>
 #include <tf/transform_broadcaster.h>
 #include <tf/transform_listener.h>
+#include <geometry_msgs/PoseWithCovarianceStamped.h>
 
 using namespace aruco;
 
@@ -56,6 +57,8 @@ class ArSysSingleBoard
 
 		tf::TransformListener _tfListener;
 
+		tf::StampedTransform imOffsetTransform;
+
 	public:
 		ArSysSingleBoard()
 			: cam_info_received(false),
@@ -67,7 +70,7 @@ class ArSysSingleBoard
 
 			image_pub = it.advertise("result", 1);
 			debug_pub = it.advertise("debug", 1);
-			pose_pub = nh.advertise<geometry_msgs::PoseStamped>("pose", 100);
+			pose_pub = nh.advertise<geometry_msgs::PoseWithCovarianceStamped>("pose", 100);
 			transform_pub = nh.advertise<geometry_msgs::TransformStamped>("transform", 100);
 			position_pub = nh.advertise<geometry_msgs::Vector3Stamped>("position", 100);
 
@@ -104,20 +107,47 @@ class ArSysSingleBoard
 				float probDetect=the_board_detector.detect(markers, the_board_config, the_board_detected, camParam, marker_size);
 				if (probDetect > 0.0)
 				{
+					_tfListener.lookupTransform("base_link", "blackfly_mount_link", ros::Time(0), imOffsetTransform);
+
 					tf::Transform transform = ar_sys::getTf(the_board_detected.Rvec, the_board_detected.Tvec);
+
+					transform *= imOffsetTransform.inverse();
 
 					tf::StampedTransform stampedTransform(transform, msg->header.stamp, msg->header.frame_id, board_frame);
 
-					geometry_msgs::PoseStamped poseMsg;
-					tf::poseTFToMsg(transform, poseMsg.pose);
-					poseMsg.header.frame_id = msg->header.frame_id;
-					poseMsg.header.stamp = msg->header.stamp;
-					pose_pub.publish(poseMsg);
+					geometry_msgs::PoseStamped newPoseMsg;
 
+					geometry_msgs::PoseStamped rawPoseMsg;
+					rawPoseMsg.header.frame_id = "board_marker";
+					rawPoseMsg.header.stamp = msg->header.stamp;
+					
+					geometry_msgs::PoseWithCovarianceStamped poseMsg;
+
+					tf::poseTFToMsg(transform, rawPoseMsg.pose);
+
+					_tfListener.transformPose("map", rawPoseMsg, newPoseMsg);
+
+					poseMsg.pose.pose = newPoseMsg.pose;
+					rawPoseMsg.header.frame_id = msg->header.frame_id;
+					rawPoseMsg.header.stamp = msg->header.stamp;
+					//pose_pub.publish(poseMsg);
+					
+					
+					
+					poseMsg.pose.covariance[0] = 0.005;
+					poseMsg.pose.covariance[7] = 0.005;
+					poseMsg.pose.covariance[14] = 0.005;
+					poseMsg.pose.covariance[21] = 0.006;
+					poseMsg.pose.covariance[28] = 0.006;
+					poseMsg.pose.covariance[35] = 0.006;
+					poseMsg.header.frame_id = "map";
+					poseMsg.header.stamp = msg->header.stamp;
+
+					pose_pub.publish(newPoseMsg);
 					geometry_msgs::TransformStamped transformMsg;
 					tf::transformStampedTFToMsg(stampedTransform, transformMsg);
 					transform_pub.publish(transformMsg);
-
+	
 					geometry_msgs::Vector3Stamped positionMsg;
 					positionMsg.header = transformMsg.header;
 					positionMsg.vector = transformMsg.transform.translation;

@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+<launch>
+
+        <!-- tf2 args:  <x y z YAW PITCH ROLL>  Different from original tf!!! -->
+<!--
+    <node 
+      pkg="tf" 
+      type="static_transform_publisher" 
+      name="baselink_to_blackfly_mount" 
+      args="-0.45 0.0 0.47 3.14195 0 0 base_link blackfly_mount_link 25" >
+    </node>
+    <node 
+      pkg="tf" 
+      type="static_transform_publisher" 
+      name="baselink_to_imu" 
+      args="0 0 0 0 0 0 base_link imu 25" >
+    </node>
+    <node
+      pkg="tf" 
+      type="static_transform_publisher" 
+      name="arsys_to_map" 
+      args="0 0 0.5 0 1.57 0 map board_marker 25">
+    </node>
+-->
+
+    <node 
+      pkg="tf" 
+      type="static_transform_publisher" 
+      name="baselink_to_blackfly_mount" 
+      args="0 0 0 0 0 0 base_link blackfly_mount_link 25" >
+    </node>
+    <node 
+      pkg="tf" 
+      type="static_transform_publisher" 
+      name="baselink_to_imu" 
+      args="0 0 0 3.14159 0 0 base_link imu 10" >
+    </node>
+    <node
+      pkg="tf" 
+      type="static_transform_publisher" 
+      name="arsys_rotate_z_to_x" 
+      args="0 0 0 0 0 1.57 marker board_marker 25">
+    </node>
+    <node
+      pkg="tf" 
+      type="static_transform_publisher" 
+      name="marker_to_map" 
+      args="0 0 0 1.57 0 0 map marker 25">
+    </node>
+
+    	<include file="$(find rmc_2dnav)/launch/control.launch"/> <!-- launch ekf 1 and 2 -->
+	<include file="$(find rmc_2dnav)/launch/sensors.launch"/> <!-- launch sensors -->
+
+	<node name="rviz" pkg="rviz" type="rviz"/>
+
+</launch>

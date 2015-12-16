@@ -69,7 +69,7 @@
            parameters obviously have no default values, and must be specified. -->
 
       <param name="odom0" value="odometry/filteredIMU"/>
-      <param name="pose0" value="ar_multi_boards/pose"/>
+      <param name="pose0" value="ar_single_board/pose"/>
 
 
       <!-- Each sensor reading updates some or all of the filter's state. These options give you greater control over

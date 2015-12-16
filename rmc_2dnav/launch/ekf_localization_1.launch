@@ -2,7 +2,7 @@
 
 <launch>
 
-    <node pkg="robot_localization" type="ekf_localization_node" name="ekf_localization_1" clear_params="true">
+    <node pkg="robot_localization" type="ekf_localization_node" name="ekf_localization_1" clear_params="true" output="screen">
 
     <param name="frequency" value="50"/>
 
@@ -23,12 +23,12 @@
     <param name="imu0" value="imu/data"/>
 
     <rosparam param="imu0_config">[false, false, false,
-                                   false, false, false,
-                                   false,  false, false,
-                                   false,  false,  true,
-                                   true, false, false]</rosparam>
+                                   true, true, true,
+                                   true,  false, false,
+                                   true,  true, true,
+                                   false, false, false]</rosparam>
 
-    <param name="imu0_differential" value="false"/>
+    <param name="imu0_differential" value="true"/>
 
     <param name="imu0_relative" value="false"/>
 
@@ -36,7 +36,7 @@
 
     <param name="print_diagnostics" value="true"/>
 
-    <param name="imu0_queue_size" value="10"/>
+    <param name="imu0_queue_size" value="1"/>
 
     <param name="debug"           value="false"/>
     <param name="debug_out_file"  value="debug_ekf_localization.txt"/>

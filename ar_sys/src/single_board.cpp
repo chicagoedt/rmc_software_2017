@@ -111,7 +111,7 @@ class ArSysSingleBoard
 
 					tf::Transform transform = ar_sys::getTf(the_board_detected.Rvec, the_board_detected.Tvec);
 
-					transform *= imOffsetTransform.inverse();
+					//transform *= imOffsetTransform.inverse();
 
 					tf::StampedTransform stampedTransform(transform, msg->header.stamp, msg->header.frame_id, board_frame);
 
@@ -134,16 +134,16 @@ class ArSysSingleBoard
 					
 					
 					
-					poseMsg.pose.covariance[0] = 0.005;
-					poseMsg.pose.covariance[7] = 0.005;
+					poseMsg.pose.covariance[0] = 0.08;
+					poseMsg.pose.covariance[7] = 0.08;
 					poseMsg.pose.covariance[14] = 0.005;
 					poseMsg.pose.covariance[21] = 0.006;
 					poseMsg.pose.covariance[28] = 0.006;
-					poseMsg.pose.covariance[35] = 0.006;
+					poseMsg.pose.covariance[35] = 0.01;
 					poseMsg.header.frame_id = "map";
 					poseMsg.header.stamp = msg->header.stamp;
 
-					pose_pub.publish(newPoseMsg);
+					pose_pub.publish(poseMsg);
 					geometry_msgs::TransformStamped transformMsg;
 					tf::transformStampedTFToMsg(stampedTransform, transformMsg);
 					transform_pub.publish(transformMsg);

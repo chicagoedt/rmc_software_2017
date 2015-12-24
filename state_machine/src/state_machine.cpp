@@ -1,7 +1,7 @@
 #include "state_machine.h"
 
 StateMachineBase::StateMachineBase(void):
-	_moveBaseAC("move_base", true), _nh("state_machine"),
+	_moveBaseAC("move_base", true), _nhLocal("~"),
    MAX_GOAL_POINTS(12), _robotState(eInitializing)
 {
 
@@ -22,13 +22,13 @@ bool StateMachineBase::Initialize()
 
     ROS_DEBUG_STREAM("Loaded param: " << gp.str());
 
-    if (_nh.hasParam(gp.str()))
+    if (_nhLocal.hasParam(gp.str()))
     {
       std::vector<double>   goalXY;
 
       geometry_msgs::Pose   tmpPose;
 
-      _nh.getParam(gp.str(), goalXY);
+      _nhLocal.getParam(gp.str(), goalXY);
 
       tmpPose.position.x  = goalXY[0];
       tmpPose.position.y  = goalXY[1];
@@ -44,7 +44,7 @@ bool StateMachineBase::Initialize()
     }
   }
 
-  _servoSub = _nh.subscribe<std_msgs::Bool> ("servo_camera_state", 1, &StateMachineBase::servoCameraState, this);
+//  _servoSub = _nh.subscribe<std_msgs::Bool> ("servo_camera_state", 1, &StateMachineBase::servoCameraState, this);
 
   return true;
 }
@@ -78,44 +78,42 @@ void StateMachineBase::run()
 {
 	while(!_moveBaseAC.waitForServer(ros::Duration(2.0)))
 	{
-    ROS_INFO("Waiting for the move_base action server to come up");
+		ROS_INFO("Waiting for the move_base action server to come up");
 	}
 
 	ROS_INFO("Established Connection with move_base ActionServer.");
 
-  while(!_goalPointsQueue.empty())
-  {
-    _moveBaseGoal.target_pose.header.frame_id   = "odom";
-    _moveBaseGoal.target_pose.header.stamp      = ros::Time::now();
+  	while(!_goalPointsQueue.empty())
+  	{
+		move_base_msgs::MoveBaseGoal moveBaseGoal;
+		
+    		moveBaseGoal.target_pose.header.frame_id   = "map";
+    		moveBaseGoal.target_pose.header.stamp      = ros::Time::now();
 
-    _moveBaseGoal.target_pose.pose.position     = _goalPointsQueue.front().position;
-    _moveBaseGoal.target_pose.pose.orientation  = tf::createQuaternionMsgFromYaw(0.01);
+    		moveBaseGoal.target_pose.pose.position     = _goalPointsQueue.front().position;
+    		moveBaseGoal.target_pose.pose.orientation  = tf::createQuaternionMsgFromYaw(0.01);
 
-    ROS_INFO_STREAM("Sending goal(X, Y):" << "[ " << _moveBaseGoal.target_pose.pose.position.x << " , "
-                                                  << _moveBaseGoal.target_pose.pose.position.y << " ]");
+    		ROS_INFO_STREAM("Sending goal(X, Y):" << "[ " << moveBaseGoal.target_pose.pose.position.x << " , "
+                                                  		<< moveBaseGoal.target_pose.pose.position.y << " ]");
 
-    _moveBaseAC.sendGoal(_moveBaseGoal);
+    		_moveBaseAC.sendGoal(moveBaseGoal);
 
-    _moveBaseAC.waitForResult();
+		ROS_INFO("Sent Goal...");
 
-    if(_moveBaseAC.getState() == actionlib::SimpleClientGoalState::SUCCEEDED)
-    {
-      _goalPointsQueue.pop();
+    		_moveBaseAC.waitForResult();
 
-      ROS_INFO("Succesfully moved to GoalPoint.");
-    }
-    else
-    {
-      ROS_INFO("Failed to move to GoalPoint.");
-    }
-  }
+		ROS_INFO("Got result...");
 
+    		if(_moveBaseAC.getState() == actionlib::SimpleClientGoalState::SUCCEEDED)
+    		{
+			ROS_INFO("Removing goal from queue...");
+      			_goalPointsQueue.pop();
 
-
-  //_moveBaseGoal.target_pose.pose.position.x = 7.0;
-  //_moveBaseGoal.target_pose.pose.orientation.w = 1.0;
-
-  //_moveBaseGoal.target_pose = _goalPoints.at(0);
-
-
+      			ROS_INFO("Succesfully moved to GoalPoint.");
+    		}
+    		else
+    		{
+      			ROS_WARN("Failed to move to GoalPoint.");
+    		}
+  	}
 }

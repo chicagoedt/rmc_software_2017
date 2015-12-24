@@ -101,9 +101,10 @@ namespace pose_follower {
     vel_pub_ = node.advertise<geometry_msgs::Twist>("pf/cmd_vel", 10);
 
     ROS_DEBUG("Initialized");
-  }
+}
 
-  void PoseFollower::odomCallback(const nav_msgs::Odometry::ConstPtr& msg){
+void PoseFollower::odomCallback(const nav_msgs::Odometry::ConstPtr& msg)
+{
     //we assume that the odometry is published in the frame of the base
     boost::mutex::scoped_lock lock(odom_lock_);
     base_odom_.twist.twist.linear.x = msg->twist.twist.linear.x;
@@ -111,10 +112,10 @@ namespace pose_follower {
     base_odom_.twist.twist.angular.z = msg->twist.twist.angular.z;
     ROS_DEBUG("In the odometry callback with velocity values: (%.2f, %.2f, %.2f)",
         base_odom_.twist.twist.linear.x, base_odom_.twist.twist.linear.y, base_odom_.twist.twist.angular.z);
-  }
+}
 
-  double PoseFollower::headingDiff(double x, double y, double pt_x, double pt_y, double heading)
-  {
+double PoseFollower::headingDiff(double x, double y, double pt_x, double pt_y, double heading)
+{
     double v1_x = x - pt_x;
     double v1_y = y - pt_y;
     double v2_x = cos(heading);
@@ -127,9 +128,10 @@ namespace pose_follower {
     double vector_angle = atan2(perp_dot, dot);
 
     return -1.0 * vector_angle;
-  }
+}
 
-  bool PoseFollower::stopped(){
+bool PoseFollower::stopped()
+{
     //copy over the odometry information
     nav_msgs::Odometry base_odom;
     {
@@ -140,9 +142,10 @@ namespace pose_follower {
     return fabs(base_odom.twist.twist.angular.z) <= rot_stopped_velocity_
       && fabs(base_odom.twist.twist.linear.x) <= trans_stopped_velocity_
       && fabs(base_odom.twist.twist.linear.y) <= trans_stopped_velocity_;
-  }
+}
 
-  bool PoseFollower::computeVelocityCommands(geometry_msgs::Twist& cmd_vel){
+bool PoseFollower::computeVelocityCommands(geometry_msgs::Twist& cmd_vel)
+{
     //get the current pose of the robot in the fixed frame
     tf::Stamped<tf::Pose> robot_pose;
     if(!costmap_ros_->getRobotPose(robot_pose)){
@@ -198,37 +201,46 @@ namespace pose_follower {
 
     bool in_goal_position = false;
     while(fabs(diff.linear.x) <= tolerance_trans_ &&
-          fabs(diff.linear.y) <= tolerance_trans_ &&
-	  fabs(diff.angular.z) <= tolerance_rot_)
+	      fabs(diff.linear.y) <= tolerance_trans_ &&
+	      fabs(diff.angular.z) <= tolerance_rot_)
     {
-      if(current_waypoint_ < global_plan_.size() - 1)
-      {
-        current_waypoint_++;
-        tf::poseStampedMsgToTF(global_plan_[current_waypoint_], target_pose);
-        diff = diff2D(target_pose, robot_pose);
-      }
-      else
-      {
-        ROS_INFO("Reached goal: %d", current_waypoint_);
-        in_goal_position = true;
-        break;
-      }
+  		if(current_waypoint_ < (global_plan_.size() - 1))
+  		{
+    		current_waypoint_++;
+    		tf::poseStampedMsgToTF(global_plan_[current_waypoint_], target_pose);
+    		diff = diff2D(target_pose, robot_pose);
+  		}
+  		else
+  		{
+    		ROS_INFO("Reached goal: %d", current_waypoint_);
+    		in_goal_position = true;
+  		}
+
+    	if(in_goal_position == true)
+    	{
+    		ROS_INFO("In Goal Position!");
+    		break;
+    	}
     }
+    ROS_INFO("out of loop...");
 
     //if we're not in the goal position, we need to update time
     if(!in_goal_position)
       goal_reached_time_ = ros::Time::now();
 
     //check if we've reached our goal for long enough to succeed
-    if(goal_reached_time_ + ros::Duration(tolerance_timeout_) < ros::Time::now()){
+    if(goal_reached_time_ + ros::Duration(tolerance_timeout_) < ros::Time::now())
+    {
       geometry_msgs::Twist empty_twist;
       cmd_vel = empty_twist;
     }
 
     return true;
-  }
+}
 
-  bool PoseFollower::setPlan(const std::vector<geometry_msgs::PoseStamped>& global_plan){
+bool PoseFollower::setPlan(const std::vector<geometry_msgs::PoseStamped>& global_plan)
+{
+	ROS_INFO("Setting plan...");
     current_waypoint_ = 0;
     goal_reached_time_ = ros::Time::now();
     if(!transformGlobalPlan(*tf_, global_plan, *costmap_ros_, costmap_ros_->getGlobalFrameID(), global_plan_)){
@@ -238,15 +250,17 @@ namespace pose_follower {
     return true;
   }
 
-  bool PoseFollower::isGoalReached(){
-    if(goal_reached_time_ + ros::Duration(tolerance_timeout_) < ros::Time::now() && stopped()){
+bool PoseFollower::isGoalReached()
+{
+    if(goal_reached_time_ + ros::Duration(tolerance_timeout_) < ros::Time::now() && stopped())
+    {
       return true;
     }
     return false;
-  }
+}
 
-  geometry_msgs::Twist PoseFollower::diff2D(const tf::Pose& pose1, const tf::Pose& pose2)
-  {
+geometry_msgs::Twist PoseFollower::diff2D(const tf::Pose& pose1, const tf::Pose& pose2)
+{
     geometry_msgs::Twist res;
     tf::Pose diff = pose2.inverse() * pose1;
     res.linear.x = diff.getOrigin().x();
@@ -287,11 +301,11 @@ namespace pose_follower {
     res.linear.y = diff.getOrigin().y();
     res.angular.z = tf::getYaw(diff.getRotation());
     return res;
-  }
+}
 
 
-  geometry_msgs::Twist PoseFollower::limitTwist(const geometry_msgs::Twist& twist)
-  {
+geometry_msgs::Twist PoseFollower::limitTwist(const geometry_msgs::Twist& twist)
+{
     geometry_msgs::Twist res = twist;
     res.linear.x *= K_trans_;
     if(!holonomic_)
@@ -337,11 +351,12 @@ namespace pose_follower {
 
     ROS_DEBUG("Angular command %f", res.angular.z);
     return res;
-  }
+}
 
-  bool PoseFollower::transformGlobalPlan(const tf::TransformListener& tf, const std::vector<geometry_msgs::PoseStamped>& global_plan, 
+bool PoseFollower::transformGlobalPlan(const tf::TransformListener& tf, const std::vector<geometry_msgs::PoseStamped>& global_plan, 
       const costmap_2d::Costmap2DROS& costmap, const std::string& global_frame,
-      std::vector<geometry_msgs::PoseStamped>& transformed_plan){
+      std::vector<geometry_msgs::PoseStamped>& transformed_plan)
+{
     const geometry_msgs::PoseStamped& plan_pose = global_plan[0];
 
     transformed_plan.clear();
@@ -389,5 +404,6 @@ namespace pose_follower {
     }
 
     return true;
-  }
+}
+
 };

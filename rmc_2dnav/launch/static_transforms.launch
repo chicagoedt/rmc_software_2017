@@ -90,7 +90,7 @@ remove THISSSS -->
       pkg="tf2_ros" 
       type="static_transform_publisher" 
       name="kinect_mount_link_to_camera" 
-      args="0 0 0 0 0 -1.97 camera_mount_link camera_link" >
+      args="0 0 0 0 0 -2.37 camera_mount_link camera_link" >
     </node>
 </launch>
 

@@ -31,17 +31,17 @@ class StateMachineBase
 
 	private:
 
-		ros::NodeHandle					_nh;
+		ros::NodeHandle	_nh;
+		ros::NodeHandle	_nhLocal;
 
-        ros::Subscriber                 _servoSub; 
+        	ros::Subscriber _servoSub; 
 
-		MoveBaseClient 					_moveBaseAC;
-		move_base_msgs::MoveBaseGoal 	_moveBaseGoal;
+		MoveBaseClient 	_moveBaseAC;
 
 		bool startConnectionAC;
 		bool sendGoalToAC(geometry_msgs::Pose goalPose);
-        void servoCameraState(const std_msgs::Bool::ConstPtr& servoState); 
-        void moveToGoalPoint();
+        	void servoCameraState(const std_msgs::Bool::ConstPtr& servoState); 
+        	void moveToGoalPoint();
 
 		/*
 		 * @brief 

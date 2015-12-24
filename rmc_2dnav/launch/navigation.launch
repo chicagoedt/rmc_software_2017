@@ -5,7 +5,7 @@
   <arg name="odom_topic" default="/odometry/ground_truth" />
 
 
-  <node name="map_server" pkg="map_server" type="map_server" args="$(find rmc_2dnav)/maps/rmc_arena_5cm.yaml"/>  
+  <node name="map_server" pkg="map_server" type="map_server" args="$(find rmc_2dnav)/maps/blank_map.yaml"/>  
 
 <!--
   <node pkg="tf" type="static_transform_publisher" name="map_broadcaster" args="0 0 0 0 0 0 map odom 30" />

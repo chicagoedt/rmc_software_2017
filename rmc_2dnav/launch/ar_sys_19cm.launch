@@ -3,15 +3,15 @@
 
 	<arg name="ar_sys_yaml_path" default="$(find vision)/misc/aruco_data/19cm_boardrmc.yml"/>
 
-        <node name="image_proc" pkg="image_proc" type="image_proc" ns="camera" output="screen" />
+        <node name="image_proc" pkg="image_proc" type="image_proc" ns="blackfly" output="screen" />
 <!--
         <node name="image_view_arsys" pkg="image_view" type="image_view" output="screen">
                 <remap from="image" to="/ar_single_board/result"/>
         </node>
 -->
         <node pkg="ar_sys" type="single_board" name="ar_single_board">
-                <remap from="/camera_info" to="/camera/camera_info" />
-                <remap from="/image" to="/camera/image_rect_color" />
+                <remap from="/camera_info" to="/blackfly/camera_info" />
+                <remap from="/image" to="/blackfly/image_rect_color" />
 
                 <param name="image_is_rectified" type="bool" value="true"/>
                 <param name="marker_size" type="double" value="0.19"/>

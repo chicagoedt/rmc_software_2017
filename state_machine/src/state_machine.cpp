@@ -45,8 +45,15 @@ bool StateMachineBase::Initialize()
   }
 
 //  _servoSub = _nh.subscribe<std_msgs::Bool> ("servo_camera_state", 1, &StateMachineBase::servoCameraState, this);
+  _arucoSub = _nh.subscribe<geometry_msgs::PoseWithCovarianceStamped> ("ar_single_board/pose", 1, &StateMachineBase::arucoPoseCallback, this);
 
   return true;
+}
+
+void StateMachineBase::arucoPoseCallback(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr& poseMsg)
+{
+  ROS_INFO_STREAM("Pose X: " << poseMsg->pose.pose.position.x << " Y: " << poseMsg->pose.pose.position.y);
+  //_panServoAC.stopTrackingGoal();
 }
 
 void StateMachineBase::servoCameraState(const std_msgs::Bool::ConstPtr& servoStateOK)
@@ -93,7 +100,14 @@ void StateMachineBase::run()
   _panServoAC.sendGoal(goalRequest);
 
   ROS_INFO("Sent PanServoGoal, waiting for result...");
-  _panServoAC.waitForResult();
+  //while(_panServoAC.waitForResult())
+  //ros::Rate r(1);
+
+  while(_panServoAC.getState() != actionlib::SimpleClientGoalState::SUCCEEDED)
+  {
+    ros::Duration(0.4).sleep();
+    ros::spinOnce();
+  }
   ROS_INFO("Got result...");
 
   rmc_simulation::PanServoResult::ConstPtr goalResult;

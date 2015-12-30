@@ -125,7 +125,7 @@ class ArSysSingleBoard
 
 					tf::poseTFToMsg(transform, rawPoseMsg.pose);
 
-					_tfListener.transformPose("map", rawPoseMsg, newPoseMsg);
+					_tfListener.transformPose("arena", rawPoseMsg, newPoseMsg);
 
 					poseMsg.pose.pose = newPoseMsg.pose;
 					rawPoseMsg.header.frame_id = msg->header.frame_id;

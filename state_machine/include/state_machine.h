@@ -6,6 +6,7 @@
 #include <rmc_simulation/PanServoAction.h>
 #include <actionlib/client/simple_action_client.h>
 #include <geometry_msgs/Pose.h>
+#include <geometry_msgs/PoseWithCovarianceStamped.h>
 #include <tf/transform_datatypes.h>
 #include <std_msgs/Bool.h>
 
@@ -36,7 +37,8 @@ class StateMachineBase
 		ros::NodeHandle	_nh;
 		ros::NodeHandle	_nhLocal;
 
-        	ros::Subscriber _servoSub; 
+        ros::Subscriber _servoSub; 
+        ros::Subscriber _arucoSub; 
 
 		MoveBaseClient 	_moveBaseAC;
 		PanServoClient	_panServoAC;
@@ -44,8 +46,9 @@ class StateMachineBase
 
 		bool startConnectionAC;
 		bool sendGoalToAC(geometry_msgs::Pose goalPose);
-        	void servoCameraState(const std_msgs::Bool::ConstPtr& servoState); 
-        	void moveToGoalPoint();
+        void servoCameraState(const std_msgs::Bool::ConstPtr& servoState); 
+        void arucoPoseCallback(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr& poseMsg);
+        void moveToGoalPoint();
 
 		/*
 		 * @brief 
@@ -77,6 +80,8 @@ class StateMachineBase
         eState _robotState;
 
         std::stack<eState> _stateStack;
+
+
 
 };
 

@@ -22,13 +22,14 @@
       args="0 0 0.5 0 1.57 0 map board_marker 25">
     </node>
 -->
-
+<!--
     <node 
       pkg="tf2_ros" 
       type="static_transform_publisher" 
       name="baselink_to_blackfly_mount" 
       args="0 0 0 0 0 0 base_link blackfly_mount_link" >
     </node>
+  -->
 <!--
     <node 
       pkg="tf" 
@@ -45,7 +46,7 @@
     </node>
 
 
-<!--
+
     <node
       pkg="tf" 
       type="static_transform_publisher" 
@@ -56,9 +57,8 @@
       pkg="tf" 
       type="static_transform_publisher" 
       name="marker_to_map" 
-      args="0 0 0 1.57 0 0 map marker 25">
+      args="0 0 0 1.57 0 0 arena marker 25">
     </node>
-remove THISSSS -->
 
 <!--
     <node 

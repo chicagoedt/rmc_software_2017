@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <launch>
   <group ns="rtabmap">
 
@@ -8,10 +9,13 @@
       <remap from="rgb/camera_info" to="/camera/depth_registered/camera_info"/>
 
       <param name="frame_id" type="string" value="base_link"/>
+      <param name="odom_frame_id" type="string" value="odom"/>
+      <param name="publish_tf" type="bool" value="false"/>
     </node>
 
     <node name="rtabmap" pkg="rtabmap_ros" type="rtabmap"  args="--delete_db_on_start">
           <param name="frame_id" type="string" value="base_link"/>
+          <param name="publish_tf" type="bool" value="true"/>
           <param name="subscribe_depth" type="bool" value="true"/>
 
           <remap from="odom" to="odom"/>

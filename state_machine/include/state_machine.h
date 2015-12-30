@@ -3,6 +3,7 @@
 
 #include <ros/ros.h>
 #include <move_base_msgs/MoveBaseAction.h>
+#include <rmc_simulation/PanServoAction.h>
 #include <actionlib/client/simple_action_client.h>
 #include <geometry_msgs/Pose.h>
 #include <tf/transform_datatypes.h>
@@ -14,6 +15,7 @@
 #include <stack>
 
 typedef actionlib::SimpleActionClient<move_base_msgs::MoveBaseAction> MoveBaseClient;
+typedef actionlib::SimpleActionClient<rmc_simulation::PanServoAction> PanServoClient;
 
 
 class StateMachineBase
@@ -37,6 +39,8 @@ class StateMachineBase
         	ros::Subscriber _servoSub; 
 
 		MoveBaseClient 	_moveBaseAC;
+		PanServoClient	_panServoAC;
+
 
 		bool startConnectionAC;
 		bool sendGoalToAC(geometry_msgs::Pose goalPose);

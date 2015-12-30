@@ -1,7 +1,7 @@
 #include "state_machine.h"
 
 StateMachineBase::StateMachineBase(void):
-	_moveBaseAC("move_base", true), _nhLocal("~"),
+	_moveBaseAC("move_base", true), _panServoAC("pan_servo", true), _nhLocal("~"),
    MAX_GOAL_POINTS(12), _robotState(eInitializing)
 {
 
@@ -76,44 +76,66 @@ void StateMachineBase::moveToGoalPoint()
 
 void StateMachineBase::run()
 {
+  /*
 	while(!_moveBaseAC.waitForServer(ros::Duration(2.0)))
 	{
-		ROS_INFO("Waiting for the move_base action server to come up");
+    ROS_INFO("Waiting for the move_base action server...");
 	}
+	ROS_INFO("Established Connection with move_base ActionServer!");
+  */
+  while(!_panServoAC.waitForServer(ros::Duration(5.0)))
+  {
+    ROS_INFO("Waiting for the pan_servo action server...");
+  }
+  ROS_INFO("Established Connection with pan_servo ActionServer!");
 
-	ROS_INFO("Established Connection with move_base ActionServer.");
+  rmc_simulation::PanServoGoal goalRequest;
+  _panServoAC.sendGoal(goalRequest);
 
-  	while(!_goalPointsQueue.empty())
-  	{
-		move_base_msgs::MoveBaseGoal moveBaseGoal;
-		
-    		moveBaseGoal.target_pose.header.frame_id   = "map";
-    		moveBaseGoal.target_pose.header.stamp      = ros::Time::now();
+  ROS_INFO("Sent PanServoGoal, waiting for result...");
+  _panServoAC.waitForResult();
+  ROS_INFO("Got result...");
 
-    		moveBaseGoal.target_pose.pose.position     = _goalPointsQueue.front().position;
-    		moveBaseGoal.target_pose.pose.orientation  = tf::createQuaternionMsgFromYaw(0.01);
+  rmc_simulation::PanServoResult::ConstPtr goalResult;
+  goalResult = _panServoAC.getResult();
 
-    		ROS_INFO_STREAM("Sending goal(X, Y):" << "[ " << moveBaseGoal.target_pose.pose.position.x << " , "
-                                                  		<< moveBaseGoal.target_pose.pose.position.y << " ]");
+  if(goalResult)
+    ROS_INFO("completed_panning = true");
+  else
+    ROS_INFO("completed_panning = false");
 
-    		_moveBaseAC.sendGoal(moveBaseGoal);
+  /*
+	while(!_goalPointsQueue.empty())
+	{
+    move_base_msgs::MoveBaseGoal moveBaseGoal;
+	
+		moveBaseGoal.target_pose.header.frame_id   = "map";
+		moveBaseGoal.target_pose.header.stamp      = ros::Time::now();
 
-		ROS_INFO("Sent Goal...");
+		moveBaseGoal.target_pose.pose.position     = _goalPointsQueue.front().position;
+		moveBaseGoal.target_pose.pose.orientation  = tf::createQuaternionMsgFromRollPitchYaw(0, 0, 0);
 
-    		_moveBaseAC.waitForResult();
+		ROS_INFO_STREAM("Sending goal(X, Y):" << "[ " << moveBaseGoal.target_pose.pose.position.x << " , "
+                                              		<< moveBaseGoal.target_pose.pose.position.y << " ]");
 
-		ROS_INFO("Got result...");
+		_moveBaseAC.sendGoal(moveBaseGoal);
 
-    		if(_moveBaseAC.getState() == actionlib::SimpleClientGoalState::SUCCEEDED)
-    		{
-			ROS_INFO("Removing goal from queue...");
-      			_goalPointsQueue.pop();
+    ROS_INFO("Sent Goal...");
 
-      			ROS_INFO("Succesfully moved to GoalPoint.");
-    		}
-    		else
-    		{
-      			ROS_WARN("Failed to move to GoalPoint.");
-    		}
-  	}
+		_moveBaseAC.waitForResult();
+
+    ROS_INFO("Got result...");
+
+		if(_moveBaseAC.getState() == actionlib::SimpleClientGoalState::SUCCEEDED)
+		{
+	      ROS_INFO("Removing goal from queue...");
+  			_goalPointsQueue.pop();
+  			ROS_INFO("Succesfully moved to GoalPoint.");
+		}
+		else
+		{
+  			ROS_WARN("Failed to move to GoalPoint.");
+		}
+	}
+  */
 }

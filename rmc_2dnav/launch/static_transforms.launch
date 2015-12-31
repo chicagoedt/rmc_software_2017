@@ -92,19 +92,19 @@
       pkg="tf" 
       type="static_transform_publisher" 
       name="arsys_rotate_z_to_x" 
-      args="0 0 0 0 0 0 marker board_marker 25">
+      args="0 0 0 0 0 -1.57 marker board_marker 25">
     </node>
     <node
       pkg="tf" 
       type="static_transform_publisher" 
       name="marker2_to_marker" 
-      args="0 0 0 0 3.14159 0 marker2 marker 25">
+      args="0 0 0 0 -1.57 0 marker2 marker 25">
     </node>
     <node
       pkg="tf" 
       type="static_transform_publisher" 
       name="marker2_to_map" 
-      args="-0.2 0 0 0 0 0 arena marker2 25">
+      args="0 0 -0.4 0 0 0 arena marker2 25">
     </node>
     <node 
       pkg="tf2_ros" 

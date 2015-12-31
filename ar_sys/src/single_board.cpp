@@ -59,6 +59,7 @@ class ArSysSingleBoard
 		tf::TransformBroadcaster _tfBroadcaster;
 
 		tf::StampedTransform imOffsetTransform;
+		tf::StampedTransform arOffsetTransform;
 		tf::StampedTransform firstTf;
 
 		bool gotInitialTf;
@@ -112,22 +113,26 @@ class ArSysSingleBoard
 				float probDetect=the_board_detector.detect(markers, the_board_config, the_board_detected, camParam, marker_size);
 				if (probDetect > 0.0)
 				{
-					_tfListener.lookupTransform("base_link", "blackfly_optical_link", ros::Time(0), imOffsetTransform);
+					_tfListener.lookupTransform("base_link", "blackfly_mount_link", ros::Time(0), imOffsetTransform);
+					_tfListener.lookupTransform("arena", "board_marker", ros::Time(0), arOffsetTransform);
 
 					//tf::Transform transform = ar_sys::getTf(the_board_detected.Rvec, the_board_detected.Tvec);
 					tf::Transform arucoTransform = ar_sys::getTf(the_board_detected.Rvec, the_board_detected.Tvec);
+//mult then inv
+					arucoTransform.mult(arucoTransform, arOffsetTransform);
 
 					arucoTransform = arucoTransform.inverse(); 
 					//imOffsetTransform.transform = imOffsetTransform.transform.inverse();
 
+
 					tf::Transform transform;
 
-					transform.mult(arucoTransform, imOffsetTransform);
+					transform.mult(transform, imOffsetTransform);
 
 					//transform *= imOffsetTransform.inverse();
 
 					//tf::StampedTransform stampedTransform(transform, msg->header.stamp, "aruco_mapframe_test", "robot_base_link");
-					tf::StampedTransform stampedTransform(transform, msg->header.stamp, "board_marker", "odom");
+					tf::StampedTransform stampedTransform(transform, msg->header.stamp, "arena", "odom");
 
 					if(!gotInitialTf)
 					{

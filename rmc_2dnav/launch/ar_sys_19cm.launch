@@ -18,7 +18,7 @@
                 <param name="board_config" type="string" value="$(arg ar_sys_yaml_path)"/>
                 <param name="board_frame" type="string" value="board_marker" />
                 <param name="draw_markers" type="bool" value="false" />
-                <param name="draw_markers_cube" type="bool" value="true" />
+                <param name="draw_markers_cube" type="bool" value="false" />
                 <param name="draw_markers_axis" type="bool" value="true" />
         </node>
 

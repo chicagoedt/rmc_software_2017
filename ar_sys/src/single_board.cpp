@@ -43,7 +43,7 @@ class ArSysSingleBoard
 		bool cam_info_received;
 		image_transport::Publisher image_pub;
 		image_transport::Publisher debug_pub;
-		ros::Publisher pose_pub;
+		ros::Publisher pose_cov_pub;
 		ros::Publisher transform_pub; 
 		ros::Publisher position_pub;
 		std::string board_frame;
@@ -56,21 +56,26 @@ class ArSysSingleBoard
 		image_transport::Subscriber image_sub;
 
 		tf::TransformListener _tfListener;
+		tf::TransformBroadcaster _tfBroadcaster;
 
 		tf::StampedTransform imOffsetTransform;
+		tf::StampedTransform firstTf;
+
+		bool gotInitialTf;
 
 	public:
 		ArSysSingleBoard()
 			: cam_info_received(false),
 			nh("~"),
-			it(nh)
+			it(nh),
+			gotInitialTf(false)
 		{
 			image_sub = it.subscribe("/image", 1, &ArSysSingleBoard::image_callback, this);
 			cam_info_sub = nh.subscribe("/camera_info", 1, &ArSysSingleBoard::cam_info_callback, this);
 
 			image_pub = it.advertise("result", 1);
 			debug_pub = it.advertise("debug", 1);
-			pose_pub = nh.advertise<geometry_msgs::PoseWithCovarianceStamped>("pose", 100);
+			pose_cov_pub = nh.advertise<geometry_msgs::PoseWithCovarianceStamped>("pose", 100);
 			transform_pub = nh.advertise<geometry_msgs::TransformStamped>("transform", 100);
 			position_pub = nh.advertise<geometry_msgs::Vector3Stamped>("position", 100);
 
@@ -107,13 +112,32 @@ class ArSysSingleBoard
 				float probDetect=the_board_detector.detect(markers, the_board_config, the_board_detected, camParam, marker_size);
 				if (probDetect > 0.0)
 				{
-					_tfListener.lookupTransform("base_link", "blackfly_mount_link", ros::Time(0), imOffsetTransform);
+					_tfListener.lookupTransform("base_link", "blackfly_optical_link", ros::Time(0), imOffsetTransform);
 
-					tf::Transform transform = ar_sys::getTf(the_board_detected.Rvec, the_board_detected.Tvec);
+					//tf::Transform transform = ar_sys::getTf(the_board_detected.Rvec, the_board_detected.Tvec);
+					tf::Transform arucoTransform = ar_sys::getTf(the_board_detected.Rvec, the_board_detected.Tvec);
+
+					arucoTransform = arucoTransform.inverse(); 
+					//imOffsetTransform.transform = imOffsetTransform.transform.inverse();
+
+					tf::Transform transform;
+
+					transform.mult(arucoTransform, imOffsetTransform);
 
 					//transform *= imOffsetTransform.inverse();
 
-					tf::StampedTransform stampedTransform(transform, msg->header.stamp, msg->header.frame_id, board_frame);
+					//tf::StampedTransform stampedTransform(transform, msg->header.stamp, "aruco_mapframe_test", "robot_base_link");
+					tf::StampedTransform stampedTransform(transform, msg->header.stamp, "board_marker", "odom");
+
+					if(!gotInitialTf)
+					{
+						gotInitialTf = true;
+						firstTf = stampedTransform;
+					}
+					else
+					{
+						firstTf.stamp_ = ros::Time::now();
+					}
 
 					geometry_msgs::PoseStamped newPoseMsg;
 
@@ -121,16 +145,19 @@ class ArSysSingleBoard
 					rawPoseMsg.header.frame_id = "board_marker";
 					rawPoseMsg.header.stamp = msg->header.stamp;
 					
+
 					geometry_msgs::PoseWithCovarianceStamped poseMsg;
 
 					tf::poseTFToMsg(transform, rawPoseMsg.pose);
 
-					_tfListener.transformPose("arena", rawPoseMsg, newPoseMsg);
+					_tfListener.transformPose("board_marker", rawPoseMsg, newPoseMsg);
 
-					poseMsg.pose.pose = newPoseMsg.pose;
+					//poseMsg.pose.pose = newPoseMsg.pose;
+					poseMsg.pose.pose = rawPoseMsg.pose;
+
+
 					rawPoseMsg.header.frame_id = msg->header.frame_id;
 					rawPoseMsg.header.stamp = msg->header.stamp;
-					//pose_pub.publish(poseMsg);
 					
 					
 					
@@ -143,10 +170,12 @@ class ArSysSingleBoard
 					poseMsg.header.frame_id = "map";
 					poseMsg.header.stamp = msg->header.stamp;
 
-					pose_pub.publish(poseMsg);
+					pose_cov_pub.publish(poseMsg);
 					geometry_msgs::TransformStamped transformMsg;
 					tf::transformStampedTFToMsg(stampedTransform, transformMsg);
 					transform_pub.publish(transformMsg);
+
+					_tfBroadcaster.sendTransform(firstTf);
 	
 					geometry_msgs::Vector3Stamped positionMsg;
 					positionMsg.header = transformMsg.header;

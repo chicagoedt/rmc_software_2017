@@ -4,6 +4,7 @@ project(state_machine)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
+find_package(rmc_simulation)
 find_package(catkin REQUIRED COMPONENTS
   actionlib
   geometry_msgs

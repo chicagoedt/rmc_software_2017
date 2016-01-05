@@ -60,7 +60,7 @@ class ArSysSingleBoard
 
 		tf::StampedTransform imOffsetTransform;
 		tf::StampedTransform arOffsetTransform;
-		tf::StampedTransform firstTf;
+		tf::StampedTransform _firstTf;
 
 		bool gotInitialTf;
 
@@ -113,36 +113,70 @@ class ArSysSingleBoard
 				float probDetect=the_board_detector.detect(markers, the_board_config, the_board_detected, camParam, marker_size);
 				if (probDetect > 0.0)
 				{
-					_tfListener.lookupTransform("base_link", "blackfly_mount_link", ros::Time(0), imOffsetTransform);
-					_tfListener.lookupTransform("arena", "board_marker", ros::Time(0), arOffsetTransform);
-
+/*
 					//tf::Transform transform = ar_sys::getTf(the_board_detected.Rvec, the_board_detected.Tvec);
 					tf::Transform arucoTransform = ar_sys::getTf(the_board_detected.Rvec, the_board_detected.Tvec);
 //mult then inv
+					_tfListener.lookupTransform("arena", "board_marker", ros::Time(0), arOffsetTransform);
 					arucoTransform.mult(arucoTransform, arOffsetTransform);
 
 					arucoTransform = arucoTransform.inverse(); 
-					//imOffsetTransform.transform = imOffsetTransform.transform.inverse();
+					////imOffsetTransform.transform = imOffsetTransform.transform.inverse();
 
 
 					tf::Transform transform;
 
+					_tfListener.lookupTransform("base_link", "blackfly_mount_link", ros::Time(0), imOffsetTransform);
+					//transform.mult(arucoTransform, imOffsetTransform);
 					transform.mult(transform, imOffsetTransform);
 
 					//transform *= imOffsetTransform.inverse();
 
 					//tf::StampedTransform stampedTransform(transform, msg->header.stamp, "aruco_mapframe_test", "robot_base_link");
 					tf::StampedTransform stampedTransform(transform, msg->header.stamp, "arena", "odom");
+*/
 
+
+
+
+
+					//tf::Transform transform = ar_sys::getTf(the_board_detected.Rvec, the_board_detected.Tvec);
+					tf::Transform arucoTransform = ar_sys::getTf(the_board_detected.Rvec, the_board_detected.Tvec);
+
+					//arucoTransform = arucoTransform.inverse();
+
+					
+					//arucoTransform.mult(arucoTransform, arOffsetTransform);
+
+
+					tf::Transform transform = arucoTransform;
+
+					//_tfListener.lookupTransform("base_link", "blackfly_mount_link", ros::Time(0), imOffsetTransform);
+					//transform.mult(arucoTransform, imOffsetTransform);
+					//transform.mult(transform, imOffsetTransform);
+
+					//transform *= imOffsetTransform.inverse();
+
+					//tf::StampedTransform stampedTransform(transform, msg->header.stamp, "aruco_mapframe_test", "robot_base_link");
+					tf::StampedTransform stampedTransform(transform, msg->header.stamp, "blackfly_optical_link", "ar_board_marker");
+
+					ros::spinOnce();
+
+					
+
+					_firstTf = stampedTransform;
+
+/*
 					if(!gotInitialTf)
 					{
 						gotInitialTf = true;
-						firstTf = stampedTransform;
+						_firstTf = stampedTransform;
 					}
-					else
-					{
-						firstTf.stamp_ = ros::Time::now();
-					}
+					*/
+					// else
+					// {
+					// 	_firstTf.stamp_ = ros::Time::now();
+					// }
 
 					geometry_msgs::PoseStamped newPoseMsg;
 
@@ -155,7 +189,7 @@ class ArSysSingleBoard
 
 					tf::poseTFToMsg(transform, rawPoseMsg.pose);
 
-					_tfListener.transformPose("board_marker", rawPoseMsg, newPoseMsg);
+					//_tfListener.transformPose("board_marker", rawPoseMsg, newPoseMsg);
 
 					//poseMsg.pose.pose = newPoseMsg.pose;
 					poseMsg.pose.pose = rawPoseMsg.pose;
@@ -180,8 +214,25 @@ class ArSysSingleBoard
 					tf::transformStampedTFToMsg(stampedTransform, transformMsg);
 					transform_pub.publish(transformMsg);
 
-					_tfBroadcaster.sendTransform(firstTf);
-	
+					_tfBroadcaster.sendTransform(_firstTf);
+
+/*
+				    try
+				    {
+						_tfListener.lookupTransform("base_link","ar_board_marker", ros::Time(0), arOffsetTransform);
+				    }
+				    catch (tf::TransformException ex)
+				    {
+						ROS_ERROR("%s",ex.what());
+						ros::Duration(1.0).sleep();
+				    }
+
+					
+
+					tf::Transform blToArucoTF(arOffsetTransform.getRotation(), arOffsetTransform.getOrigin());
+					tf::StampedTransform stampedBlToArucoTF(blToArucoTF, ros::Time(0), "arena", "odom");
+					_tfBroadcaster.sendTransform(stampedBlToArucoTF);
+*/
 					geometry_msgs::Vector3Stamped positionMsg;
 					positionMsg.header = transformMsg.header;
 					positionMsg.vector = transformMsg.transform.translation;
@@ -233,6 +284,13 @@ class ArSysSingleBoard
 				ROS_ERROR("cv_bridge exception: %s", e.what());
 				return;
 			}
+			/*
+			if(gotInitialTf)
+			{
+				_firstTf.stamp_ = ros::Time::now();
+				_tfBroadcaster.sendTransform(_firstTf);
+			}*/
+
 		}
 
 		// wait for one camerainfo, then shut down that subscriber

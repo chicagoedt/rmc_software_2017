@@ -2,7 +2,7 @@
 
 StateMachineBase::StateMachineBase(void):
 	_moveBaseAC("move_base", true), _panServoAC("pan_servo", true), _nhLocal("~"),
-   MAX_GOAL_POINTS(12), _robotState(eInitializing)
+   MAX_GOAL_POINTS(12), _robotState(eInitializing), _foundMarker(false)
 {
 
 }
@@ -53,6 +53,7 @@ bool StateMachineBase::Initialize()
 void StateMachineBase::arucoPoseCallback(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr& poseMsg)
 {
   ROS_INFO_STREAM("Pose X: " << poseMsg->pose.pose.position.x << " Y: " << poseMsg->pose.pose.position.y);
+  _foundMarker = true;
   //_panServoAC.stopTrackingGoal();
 }
 
@@ -96,27 +97,56 @@ void StateMachineBase::run()
   }
   ROS_INFO("Established Connection with pan_servo ActionServer!");
 
+
+
+  // rmc_simulation::PanServoGoal goalRequest;
+  // actionlib::SimpleClientGoalHandle<rmc_simulation::PanServoAction> cgh = _panServoAC.sendGoal(goalRequest);
+
   rmc_simulation::PanServoGoal goalRequest;
   _panServoAC.sendGoal(goalRequest);
 
   ROS_INFO("Sent PanServoGoal, waiting for result...");
-  //while(_panServoAC.waitForResult())
-  //ros::Rate r(1);
 
-  while(_panServoAC.getState() != actionlib::SimpleClientGoalState::SUCCEEDED)
+  while(_panServoAC.waitForResult(ros::Duration(0.1)))
   {
     ros::Duration(0.4).sleep();
     ros::spinOnce();
+    if(_foundMarker)
+    {
+      ROS_INFO("Found marker. Exiting loop...");
+      break;
+    }
   }
+
+
+  // while(!cgh.isExpired())
+  // {
+  //   ros::Duration(0.4).sleep();
+  //   ros::spinOnce();
+  //   if(_foundMarker)
+  //   {
+  //     ROS_INFO("Found marker. Exiting loop...");
+  //     break;
+  //   }
+  // }
+
   ROS_INFO("Got result...");
 
-  rmc_simulation::PanServoResult::ConstPtr goalResult;
-  goalResult = _panServoAC.getResult();
+  // if(!_foundMarker)
+  // {
+  //   rmc_simulation::PanServoResult::ConstPtr goalResult;
+  //   goalResult = cgh.getResult();
 
-  if(goalResult)
-    ROS_INFO("completed_panning = true");
-  else
-    ROS_INFO("completed_panning = false");
+  //   if(goalResult)
+  //     ROS_INFO("completed_panning = true");
+  //   else
+  //     ROS_INFO("completed_panning = false");
+  // }
+  // else
+  // {
+  //   ROS_INFO("Found marker!!");
+  // }
+
 
   /*
 	while(!_goalPointsQueue.empty())

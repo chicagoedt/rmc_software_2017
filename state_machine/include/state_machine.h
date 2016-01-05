@@ -5,6 +5,7 @@
 #include <move_base_msgs/MoveBaseAction.h>
 #include <rmc_simulation/PanServoAction.h>
 #include <actionlib/client/simple_action_client.h>
+#include <actionlib/client/action_client.h>
 #include <geometry_msgs/Pose.h>
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
 #include <tf/transform_datatypes.h>
@@ -81,6 +82,7 @@ class StateMachineBase
 
         std::stack<eState> _stateStack;
 
+        bool _foundMarker;
 
 
 };

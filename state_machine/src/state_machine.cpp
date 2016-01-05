@@ -4,7 +4,8 @@ StateMachineBase::StateMachineBase(void):
 	_moveBaseAC("move_base", true), _panServoAC("pan_servo", true), _nhLocal("~"),
    MAX_GOAL_POINTS(12), _robotState(eInitializing), _foundMarker(false)
 {
-
+	_previous_x_accel = 0;
+	_didDock = 0;
 }
 
 StateMachineBase::~StateMachineBase(void)
@@ -62,24 +63,24 @@ void StateMachineBase::servoCameraState(const std_msgs::Bool::ConstPtr& servoSta
 	// if servoState = true meaning the aruco marker is found
 	if( servoStateOK->data )
 	{
-				
+
 	}
 	else // marker is not found
 	{
-		_stateStack.push(_robotState); 
+		_stateStack.push(_robotState);
 
 		// Stack current goal, drive backward 0.5 meters, if we stil dont get it,
-		// then just rely on imu		
+		// then just rely on imu
 		if( _robotState	== StateMachineBase::eRelocalize)
 		{
-							
+
 		}
-	}		
+	}
 }
 
 void StateMachineBase::moveToGoalPoint()
 {
-	
+
 }
 
 void StateMachineBase::run()
@@ -117,33 +118,8 @@ void StateMachineBase::run()
   }
 
 
-  // while(!cgh.isExpired())
-  // {
-  //   ros::Duration(0.4).sleep();
-  //   ros::spinOnce();
-  //   if(_foundMarker)
-  //   {
-  //     ROS_INFO("Found marker. Exiting loop...");
-  //     break;
-  //   }
-  // }
-
   ROS_INFO("Got result...");
 
-  // if(!_foundMarker)
-  // {
-  //   rmc_simulation::PanServoResult::ConstPtr goalResult;
-  //   goalResult = cgh.getResult();
-
-  //   if(goalResult)
-  //     ROS_INFO("completed_panning = true");
-  //   else
-  //     ROS_INFO("completed_panning = false");
-  // }
-  // else
-  // {
-  //   ROS_INFO("Found marker!!");
-  // }
 
   while(!_moveBaseAC.waitForServer(ros::Duration(2.0)))
   {
@@ -184,4 +160,52 @@ void StateMachineBase::run()
 		}
 	}
   
+}
+
+void StateMachineBase::moveActuators(bool goUp)
+{
+    ROS_INFO("ACTUATORS MOVING");
+    _actuatorPub = _nh.advertise<std_msgs::Float64>("joint1_position_controller/command", 1);
+    std_msgs::Float64 msg;
+    msg.data = goUp ? 1.9 : 0.0;
+    ros::Rate loop_rate(10);
+
+    for (int i = 0; i < 10; i++){
+        _actuatorPub.publish(msg);
+        ros::spinOnce();
+        loop_rate.sleep();
+    }
+}
+
+void StateMachineBase::dockCallback(const sensor_msgs::Imu::ConstPtr& msg)
+{
+	//ROS_INFO("Callback Dock.");
+	float current_x_accel = msg->linear_acceleration.x;
+	if ((current_x_accel - _previous_x_accel) > 4.5){
+		_didDock = 1;
+	}
+	_previous_x_accel = current_x_accel;
+}
+
+void StateMachineBase::dock()
+{
+	ROS_INFO("DOCKING.");
+	_imuSub = _nh.subscribe("imu/data", 1, &StateMachineBase::dockCallback, this);
+	_imuPub = _nh.advertise<geometry_msgs::Twist>("cmd_vel", 1);
+	ros::Rate loop_rate(100);
+	ros::spinOnce();
+	if (!_didDock) {
+		while (!_didDock){
+			geometry_msgs::Twist msg;
+			msg.linear.x = -.1;
+			_imuPub.publish(msg);
+			ros::spinOnce();
+			loop_rate.sleep();
+		}
+	}
+	ROS_INFO("Finished Docking");
+	geometry_msgs::Twist msg;
+	msg.linear.x = 0;
+	_imuPub.publish(msg);
+	ros::spinOnce();
 }

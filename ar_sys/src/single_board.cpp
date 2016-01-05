@@ -162,17 +162,11 @@ class ArSysSingleBoard
 
 					ros::spinOnce();
 
+					// if(!gotInitialTf)
+					// {
+					// 	gotInitialTf = true;
+					// }
 					
-
-					_firstTf = stampedTransform;
-
-/*
-					if(!gotInitialTf)
-					{
-						gotInitialTf = true;
-						_firstTf = stampedTransform;
-					}
-					*/
 					// else
 					// {
 					// 	_firstTf.stamp_ = ros::Time::now();
@@ -214,7 +208,7 @@ class ArSysSingleBoard
 					tf::transformStampedTFToMsg(stampedTransform, transformMsg);
 					transform_pub.publish(transformMsg);
 
-					_tfBroadcaster.sendTransform(_firstTf);
+					_tfBroadcaster.sendTransform(stampedTransform);
 
 /*
 				    try
@@ -284,12 +278,35 @@ class ArSysSingleBoard
 				ROS_ERROR("cv_bridge exception: %s", e.what());
 				return;
 			}
-			/*
-			if(gotInitialTf)
+			
+			if(!gotInitialTf)
 			{
+				tf::StampedTransform arOffsetTransform;
+
+			    try
+			    {
+					_tfListener.lookupTransform("base_link","ar_board_marker", ros::Time(0), arOffsetTransform);
+					gotInitialTf = true;
+
+					tf::Transform blToArucoTF(arOffsetTransform.getRotation(), arOffsetTransform.getOrigin());
+
+					tf::StampedTransform stampedBlToArucoTF(blToArucoTF.inverse(), ros::Time(0), "arena", "odom");
+					_firstTf = stampedBlToArucoTF;
+					_tfBroadcaster.sendTransform(stampedBlToArucoTF);
+			    }
+			    catch (tf::TransformException ex)
+			    {
+					//ROS_ERROR("%s",ex.what());
+					//ros::Duration(1.0).sleep();
+			    }				
+			}
+			else
+			{
+
 				_firstTf.stamp_ = ros::Time::now();
 				_tfBroadcaster.sendTransform(_firstTf);
-			}*/
+			
+		    }
 
 		}
 

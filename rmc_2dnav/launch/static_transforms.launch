@@ -28,14 +28,27 @@
       args="0 0 0 0 0 -2.37 camera_mount_link camera_link" >
     </node>
 
+    <node
+      pkg="tf" 
+      type="static_transform_publisher" 
+      name="map_to_submap_tf" 
+      args="0 0 0 0 0 3.14159 map submap 25">
+    </node>
+    <node
+      pkg="tf" 
+      type="static_transform_publisher" 
+      name="submap_to_arena_tf" 
+      args="0 0 0 1.57 0 0 submap arena 25">
+    </node>
 
+<!-- 
     <node
       pkg="tf" 
       type="static_transform_publisher" 
       name="temp_odom_to_base_link" 
       args="0 0 0 0 0 0 odom base_link 25">
     </node>
-
+ -->
 
 <!--
     <node

@@ -84,13 +84,11 @@ void StateMachineBase::moveToGoalPoint()
 
 void StateMachineBase::run()
 {
-  /*
-	while(!_moveBaseAC.waitForServer(ros::Duration(2.0)))
-	{
-    ROS_INFO("Waiting for the move_base action server...");
-	}
-	ROS_INFO("Established Connection with move_base ActionServer!");
-  */
+  ROS_INFO("Sleeping for 5 seconds...");
+  ros::Duration(5.0).sleep();
+  ROS_INFO("Starting!");
+
+  
   while(!_panServoAC.waitForServer(ros::Duration(5.0)))
   {
     ROS_INFO("Waiting for the pan_servo action server...");
@@ -147,8 +145,12 @@ void StateMachineBase::run()
   //   ROS_INFO("Found marker!!");
   // }
 
-
-  /*
+  while(!_moveBaseAC.waitForServer(ros::Duration(2.0)))
+  {
+    ROS_INFO("Waiting for the move_base action server...");
+  }
+  ROS_INFO("Established Connection with move_base ActionServer!");
+  
 	while(!_goalPointsQueue.empty())
 	{
     move_base_msgs::MoveBaseGoal moveBaseGoal;
@@ -181,5 +183,5 @@ void StateMachineBase::run()
   			ROS_WARN("Failed to move to GoalPoint.");
 		}
 	}
-  */
+  
 }

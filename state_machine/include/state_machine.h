@@ -7,6 +7,9 @@
 #include <geometry_msgs/Pose.h>
 #include <tf/transform_datatypes.h>
 #include <std_msgs/Bool.h>
+#include <std_msgs/Float64.h>
+#include <geometry_msgs/Twist.h>
+#include <sensor_msgs/Imu.h>
 
 #include <vector>
 #include <queue>
@@ -34,27 +37,37 @@ class StateMachineBase
 		ros::NodeHandle	_nh;
 		ros::NodeHandle	_nhLocal;
 
-        	ros::Subscriber _servoSub; 
+        	ros::Subscriber _servoSub;
+
+		ros::Subscriber _imuSub;
+		ros::Publisher  _imuPub;
+
+		ros::Publisher  _actuatorPub;
+
+		float _previous_x_accel ;
+		bool  _didDock;
 
 		MoveBaseClient 	_moveBaseAC;
 
+        void moveActuators(bool goUp);
 		bool startConnectionAC;
 		bool sendGoalToAC(geometry_msgs::Pose goalPose);
-        	void servoCameraState(const std_msgs::Bool::ConstPtr& servoState); 
+        	void servoCameraState(const std_msgs::Bool::ConstPtr& servoState);
         	void moveToGoalPoint();
-
+		void dock();
+		void dockCallback(const sensor_msgs::Imu::ConstPtr& msg);
 		/*
-		 * @brief 
+		 * @brief
 		 *
 		 * Dumping Zone: Point 1. 		This will be our 'origin' to return to dump.
 		 * Digging Zone: Point 2/3/4. 	In our queue array we wont ittirate from Point 2
-		 *								to Point 3 to Point 4, instead these will be our 
-		 *								be each one of our dig zone end points for each 
-		 *								traversial itteration (Drive, Dig, Dump). 
-		 * Aligning Zone: Point 5		After we finish digging at one of our dig zone end 
-		 *								points (2,3, or 4), Point 5 will be the following 
+		 *								to Point 3 to Point 4, instead these will be our
+		 *								be each one of our dig zone end points for each
+		 *								traversial itteration (Drive, Dig, Dump).
+		 * Aligning Zone: Point 5		After we finish digging at one of our dig zone end
+		 *								points (2,3, or 4), Point 5 will be the following
 		 *								irrirated goal sent to actionlib server.
-		 * Example: 	Localize --> Point 2 --> Point 5 --> Point 0 
+		 * Example: 	Localize --> Point 2 --> Point 5 --> Point 0
 		 *						 --> Point 3 --> Point 5 --> Point 0
 		 *						 --> Point 4 --> Point 5 --> Point 0
 		 */

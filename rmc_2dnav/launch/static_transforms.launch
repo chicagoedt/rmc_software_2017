@@ -14,7 +14,14 @@
       args="0 0 0.15 0 0 0 base_link imu" >
     </node>
 
+    <node 
+      pkg="tf2_ros" 
+      type="static_transform_publisher" 
+      name="baselink_to_kinect_link" 
+      args="-0.28 0 0.20 0 -4.1 3.14159 base_link kinect_link" >
+    </node>
 
+<!-- set this to if statement for gazebo or using freenect 
     <node 
       pkg="tf2_ros" 
       type="static_transform_publisher" 
@@ -27,6 +34,7 @@
       name="kinect_mount_link_to_camera" 
       args="0 0 0 0 0 -2.37 camera_mount_link camera_link" >
     </node>
+-->
 
     <node
       pkg="tf" 

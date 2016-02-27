@@ -5,42 +5,17 @@
 
         <!-- tf2 args:  <x y z YAW PITCH ROLL>  Different from original tf!!! -->
 <!--
-    <node 
-      pkg="tf" 
-      type="static_transform_publisher" 
-      name="baselink_to_blackfly_mount" 
-      args="-0.45 0.0 0.47 3.14195 0 0 base_link blackfly_mount_link 25" >
-    </node>
-    <node
-      pkg="tf" 
-      type="static_transform_publisher" 
-      name="arsys_to_map" 
-      args="0 0 0.5 0 1.57 0 map board_marker 25">
-    </node>
-	This is here just for frame references-->
-<!--
-        <node name="usb_cam" pkg="usb_cam" type="usb_cam_node" >
-                <param name="video_device" value="/dev/video0" />
-                <param name="image_width" value="640" />
-                <param name="image_height" value="480" />
-                <param name="pixel_format" value="mjpeg" />
-                <param name="camera_frame_id" value="blackfly_mount_link" />
-                <param name="camera_name" value="blackfly_mount_link" />
-                <param name="camera_info_url" type="string" value="file://$(find vision)/misc/calibration_data/usb_480_fake_pointgrey.yaml" />
-        </node>
--->
-<!--
-        <node name="image_view" pkg="image_view" type="image_view" ns="usb_cam" output="screen">
-                <remap from="image" to="/usb_cam/image_raw"/>
-        </node>
+	<include file="$(find rmc_2dnav)/launch/static_transforms.launch"/>
 -->
 
         <node name="image_proc" pkg="image_proc" type="image_proc" ns="camera" output="screen" />
-
+<!--
         <node name="image_view_arsys" pkg="image_view" type="image_view" output="screen">
                 <remap from="image" to="/ar_single_board/result"/>
         </node>
+-->
 
+<!--
         <node pkg="ar_sys" type="single_board" name="ar_single_board">
                 <remap from="/camera_info" to="/camera/camera_info" />
                 <remap from="/image" to="/camera/image_rect_color" />
@@ -53,10 +28,13 @@
                 <param name="draw_markers_cube" type="bool" value="true" />
                 <param name="draw_markers_axis" type="bool" value="true" />
         </node>
-
+-->
+<!--
 	<include file="$(find vision)/launch/blackfly.launch"/>
+-->
 
 	<!-- imu -->
+<!--
 	<node pkg="microstrain_3dmgx2_imu" type="imu_node" name="microstrain_3dmgx2_node" output="screen">
 		<param name="time_offset" value="0.0" />
     		<param name="port"  type="string" value="/dev/ttyACM0" />
@@ -65,5 +43,8 @@
     		<param name="autocalibrate" type="bool" value="false" />
     		<param name="angular_velocity_stdev" type="double" value="0.00017" />
   	</node>
+-->
+
+        <include file="$(find rmc_2dnav)/launch/kinect.launch"/>
 
 </launch>

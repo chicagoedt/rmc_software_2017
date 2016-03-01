@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<launch>
+
+        <param name="robot_description" textfile="$(find rmc_simulation)/surus_sim/robots/surus_sim.URDF" />
+
+        <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" output="screen"/>
+
+	<include file="$(find rmc_2dnav)/launch/static_transforms.launch"/>
+
+</launch>
+

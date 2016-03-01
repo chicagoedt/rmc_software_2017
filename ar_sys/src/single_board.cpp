@@ -157,7 +157,7 @@ class ArSysSingleBoard
 
 					//transform *= imOffsetTransform.inverse();
 
-					//tf::StampedTransform stampedTransform(transform, msg->header.stamp, "aruco_mapframe_test", "robot_base_link");
+					//tf::StampedTransform stampedTransform(transform, msg->header.stamp, "blackfly_optical_link", "ar_board_marker");
 					tf::StampedTransform stampedTransform(transform, msg->header.stamp, "blackfly_optical_link", "ar_board_marker");
 
 					ros::spinOnce();
@@ -296,7 +296,7 @@ class ArSysSingleBoard
 			    }
 			    catch (tf::TransformException ex)
 			    {
-					//ROS_ERROR("%s",ex.what());
+					ROS_WARN("%s",ex.what());
 					//ros::Duration(1.0).sleep();
 			    }				
 			}

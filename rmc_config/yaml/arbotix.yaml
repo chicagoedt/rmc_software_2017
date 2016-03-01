@@ -1,0 +1,11 @@
+joints: {
+  blackfly_mount_joint: {id: 1, neutral: 512, max_speed: 35},
+}
+
+controllers: {
+  arm_controller: {
+    type: follow_controller,
+    joints: [blackfly_mount_joint],
+    action_name: arm_controller/follow_joint_trajectory
+  }
+}

@@ -22,3 +22,5 @@ roboteq_node/src/roboteqDbg/roboteqDbg
 *.o
 *.orig
 ./CMakeLists.txt
+
+*.pyc

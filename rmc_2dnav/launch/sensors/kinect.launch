@@ -1,4 +1,7 @@
 <?xml version="1.0"?>
+
+<!-- Using OpenNI as freenect does not work if you want to reconnect and sometimes freenect does not exit properly. With OpenNI, wait about 5-6 seconds after you close the launch file to relaunch-->
+
 <!-- Entry point for using OpenNI devices -->
 <launch>
 
@@ -8,11 +11,11 @@
   <arg name="rgb_frame_id"   default="$(arg camera)_rgb_optical_frame" />
   <arg name="depth_frame_id" default="$(arg camera)_depth_optical_frame" />
 
-  <arg name="data_skip" default="0" />
-
   <!-- device_id can have the following formats:
          "B00367707227042B": Use device with given serial number
          "#1"              : Use first device found
+         "2@3"             : Use device on USB bus 2, address 3
+         "2@0"             : Use first device found on USB bus 2
     -->
   <arg name="device_id" default="#1" />
 
@@ -54,22 +57,10 @@
   <!-- Worker threads for the nodelet manager -->
   <arg name="num_worker_threads" default="4" />
 
-  <!-- enable libfreenect debug logging -->
-  <arg name="libfreenect_debug" default="false" />
-
-  <!-- enable diagnostics support for freenect_camera -->
-  <arg name="enable_rgb_diagnostics" default="false" />
-  <arg name="enable_ir_diagnostics" default="false" />
-  <arg name="enable_depth_diagnostics" default="false" />
-  <arg name="diagnostics_max_frequency" default="30.0" />
-  <arg name="diagnostics_min_frequency" default="30.0" />
-  <arg name="diagnostics_tolerance" default="0.05" />
-  <arg name="diagnostics_window_time" default="5.0" />
- 
   <!-- Push down all topics/nodelets into "camera" namespace -->
   <group ns="$(arg camera)">
-
-    <!-- Start nodelet manager in provided namespace -->
+  
+    <!-- Start nodelet manager in top-level namespace -->
     <arg name="manager" value="$(arg camera)_nodelet_manager" />
     <arg name="debug" default="false" /> <!-- Run manager in GDB? -->
     <include file="$(find rgbd_launch)/launch/includes/manager.launch.xml">
@@ -80,30 +71,21 @@
 
     <!-- Load driver -->
     <include if="$(arg load_driver)"
-	     file="$(find freenect_launch)/launch/includes/device.launch.xml">
+	     file="$(find openni_launch)/launch/includes/device.launch.xml">
       <!-- Could really use some syntactic sugar for this -->
-      <arg name="manager"                   value="$(arg manager)" />
-      <arg name="device_id"                 value="$(arg device_id)" />
-      <arg name="rgb_frame_id"              value="$(arg rgb_frame_id)" />
-      <arg name="depth_frame_id"            value="$(arg depth_frame_id)" />
-      <arg name="rgb_camera_info_url"       value="$(arg rgb_camera_info_url)" />
-      <arg name="depth_camera_info_url"     value="$(arg depth_camera_info_url)" />
-      <arg name="depth_registration"        value="$(arg depth_registration)" />
-      <arg name="data_skip"                 value="$(arg data_skip)" />
-      <arg name="rgb"                       value="$(arg rgb)" />
-      <arg name="ir"                        value="$(arg ir)" />
-      <arg name="depth"                     value="$(arg depth)" />
-      <arg name="depth_registered"          value="$(arg depth_registered)" />
-      <arg name="projector"                 value="$(arg projector)" />
-      <arg name="respawn"                   value="$(arg respawn)" />
-      <arg name="libfreenect_debug"         value="$(arg libfreenect_debug)" />
-      <arg name="enable_rgb_diagnostics"    value="$(arg enable_rgb_diagnostics)" />
-      <arg name="enable_ir_diagnostics"     value="$(arg enable_ir_diagnostics)" />
-      <arg name="enable_depth_diagnostics"  value="$(arg enable_depth_diagnostics)" />
-      <arg name="diagnostics_max_frequency" value="$(arg diagnostics_max_frequency)" />
-      <arg name="diagnostics_min_frequency" value="$(arg diagnostics_min_frequency)" />
-      <arg name="diagnostics_tolerance"     value="$(arg diagnostics_tolerance)" />
-      <arg name="diagnostics_window_time"   value="$(arg diagnostics_window_time)" />
+      <arg name="manager"               value="$(arg manager)" />
+      <arg name="device_id"             value="$(arg device_id)" />
+      <arg name="rgb_frame_id"          value="$(arg rgb_frame_id)" />
+      <arg name="depth_frame_id"        value="$(arg depth_frame_id)" />
+      <arg name="rgb_camera_info_url"   value="$(arg rgb_camera_info_url)" />
+      <arg name="depth_camera_info_url" value="$(arg depth_camera_info_url)" />
+      <arg name="depth_registration"    value="$(arg depth_registration)" />
+      <arg name="rgb"                   value="$(arg rgb)" />
+      <arg name="ir"                    value="$(arg ir)" />
+      <arg name="depth"                 value="$(arg depth)" />
+      <arg name="depth_registered"      value="$(arg depth_registered)" />
+      <arg name="projector"             value="$(arg projector)" />
+      <arg name="respawn"               value="$(arg respawn)" />
     </include>
     
     <!-- Load standard constellation of processing nodelets -->
@@ -131,7 +113,6 @@
   <include if="$(arg publish_tf)"
 	   file="$(find rgbd_launch)/launch/kinect_frames.launch">
     <arg name="camera" value="$(arg camera)" />
-    <!-- <arg name="tf_prefix" value="kinect" /> -->
   </include>
 
 </launch>

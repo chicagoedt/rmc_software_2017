@@ -3,6 +3,8 @@
 base_controller/doc/*
 base_controller/doc/html/*
 
+build-mission_control*
+
 simulation/LunArena2/meshes/
 simulation/rmc_simulation/meshes/
 

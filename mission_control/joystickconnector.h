@@ -33,9 +33,9 @@ class InputUpdate
            eON
         };
 
-        inline const Axis&   AxisLeft(void)  const { return _axisLeft; }
-        inline const Axis&   AxisRight(void) const { return _axisRight; }
-                     eState  BtnState(unsigned char buttonID) const;
+        inline const Axis&   axisLeft(void)  const { return _axisLeft; }
+        inline const Axis&   axisRight(void) const { return _axisRight; }
+                     eState  btnState(unsigned char buttonID) const;
 
     private:
         Axis          _axisLeft;
@@ -53,31 +53,31 @@ class JoystickConnector : public QThread
             explicit JoystickConnector(QObject* parent = 0L);
             virtual ~JoystickConnector();
 
-            void     Quit();
+            void     quit();
 
-            bool     ToggleInputLock();
+            bool     toggleInputLock();
 
      signals:
-        void    DeviceConnected(const QString& label);
-        void    DeviceDisconnected(void);
-        void    DeviceUpdate(const InputUpdate& state);
-        void    DeviceBtnUpdate( eBtnState state, int btnID );
+        void    deviceConnected(const QString& label);
+        void    deviceDisconnected(void);
+        void    deviceUpdate(const InputUpdate& state);
+        void    deviceBtnUpdate( eBtnState state, int btnID );
 
-        void    StatusUpdate(const eStatus& status,
+        void    statusUpdate(const eStatus& status,
                              const QString& message);
 
      private:
-        void            Initialize(void);
-        SDL_Joystick*   SelectController(void);
-        void            HandleController(void);
-        void            OnControllerButtonEvent( const SDL_ControllerButtonEvent& event );
-        void            OnControllerAxisEvent( const SDL_ControllerAxisEvent& event );
-        void            OnJoystickAxisEvent( const SDL_JoyAxisEvent& event);
-        void            OnJoystickButtonEvent( const SDL_JoyButtonEvent& event);
-        void            AddControllerEvent( const SDL_ControllerDeviceEvent& event );
-        void            RemoveControllerEvent( const SDL_ControllerDeviceEvent& event );
-        void            AddJoystickEvent( const SDL_JoyDeviceEvent& event);
-        void            RemoveJoystickEvent( const SDL_JoyDeviceEvent& event);
+        void            initialize(void);
+        SDL_Joystick*   selectController(void);
+        void            handleController(void);
+        void            onControllerButtonEvent( const SDL_ControllerButtonEvent& event );
+        void            onControllerAxisEvent( const SDL_ControllerAxisEvent& event );
+        void            onJoystickAxisEvent( const SDL_JoyAxisEvent& event);
+        void            onJoystickButtonEvent( const SDL_JoyButtonEvent& event);
+        void            addControllerEvent( const SDL_ControllerDeviceEvent& event );
+        void            removeControllerEvent( const SDL_ControllerDeviceEvent& event );
+        void            addJoystickEvent( const SDL_JoyDeviceEvent& event);
+        void            removeJoystickEvent( const SDL_JoyDeviceEvent& event);
 
      private:
         InputUpdate _currentState;

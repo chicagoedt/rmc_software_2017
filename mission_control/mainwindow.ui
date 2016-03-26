@@ -118,6 +118,9 @@
             <property name="focusPolicy">
              <enum>Qt::ClickFocus</enum>
             </property>
+            <property name="toolTip">
+             <string extracomment="Host address"/>
+            </property>
             <property name="whatsThis">
              <string>Enter IP Adress of CC3000</string>
             </property>
@@ -149,7 +152,7 @@
            </spacer>
           </item>
           <item>
-           <widget class="QLabel" name="labelVideo">
+           <widget class="QLabel" name="labelTCP">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
               <horstretch>0</horstretch>
@@ -163,12 +166,12 @@
              </size>
             </property>
             <property name="text">
-             <string>Video</string>
+             <string>TCP</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QSpinBox" name="spinBoxVideoPort">
+           <widget class="QSpinBox" name="spinBoxTCPPort">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
               <horstretch>0</horstretch>
@@ -226,12 +229,12 @@
              </size>
             </property>
             <property name="text">
-             <string>Control</string>
+             <string>UDP</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QSpinBox" name="spinBoxControlPort">
+           <widget class="QSpinBox" name="spinBoxUDPPort">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
               <horstretch>0</horstretch>
@@ -390,6 +393,16 @@
                    <verstretch>1</verstretch>
                   </sizepolicy>
                  </property>
+                 <property name="font">
+                  <font>
+                   <pointsize>13</pointsize>
+                   <weight>50</weight>
+                   <bold>false</bold>
+                  </font>
+                 </property>
+                 <property name="toolTip">
+                  <string extracomment="Time left in current run"/>
+                 </property>
                  <property name="layoutDirection">
                   <enum>Qt::LeftToRight</enum>
                  </property>
@@ -438,6 +451,9 @@
                   <widget class="QPushButton" name="resetTimeButton">
                    <property name="enabled">
                     <bool>true</bool>
+                   </property>
+                   <property name="toolTip">
+                    <string extracomment="Reset run timer"/>
                    </property>
                    <property name="text">
                     <string>Reset</string>
@@ -788,11 +804,14 @@
                           <verstretch>0</verstretch>
                          </sizepolicy>
                         </property>
+                        <property name="toolTip">
+                         <string extracomment="Updates  per second"/>
+                        </property>
                         <property name="lineWidth">
                          <number>1</number>
                         </property>
                         <property name="text">
-                         <string>Sleep</string>
+                         <string>UPS</string>
                         </property>
                         <property name="textFormat">
                          <enum>Qt::AutoText</enum>
@@ -807,17 +826,26 @@
                           <verstretch>0</verstretch>
                          </sizepolicy>
                         </property>
+                        <property name="toolTip">
+                         <string extracomment="Change number of messages/updates per second"/>
+                        </property>
+                        <property name="toolTipDuration">
+                         <number>3</number>
+                        </property>
                         <property name="minimum">
-                         <number>30</number>
+                         <number>1</number>
                         </property>
                         <property name="maximum">
-                         <number>500</number>
+                         <number>50</number>
                         </property>
                         <property name="singleStep">
-                         <number>10</number>
+                         <number>1</number>
+                        </property>
+                        <property name="pageStep">
+                         <number>5</number>
                         </property>
                         <property name="value">
-                         <number>80</number>
+                         <number>10</number>
                         </property>
                         <property name="orientation">
                          <enum>Qt::Horizontal</enum>
@@ -832,7 +860,7 @@
                          <enum>QSlider::TicksAbove</enum>
                         </property>
                         <property name="tickInterval">
-                         <number>20</number>
+                         <number>5</number>
                         </property>
                        </widget>
                       </item>
@@ -849,6 +877,9 @@
                           <width>0</width>
                           <height>30</height>
                          </size>
+                        </property>
+                        <property name="toolTip">
+                         <string extracomment="Updates per second"/>
                         </property>
                         <property name="frameShape">
                          <enum>QFrame::Box</enum>
@@ -1245,6 +1276,9 @@
                         <pointsize>24</pointsize>
                        </font>
                       </property>
+                      <property name="toolTip">
+                       <string extracomment="Input control status "/>
+                      </property>
                       <property name="frameShape">
                        <enum>QFrame::Box</enum>
                       </property>
@@ -1536,6 +1570,9 @@
                           <pointsize>20</pointsize>
                          </font>
                         </property>
+                        <property name="toolTip">
+                         <string extracomment="Bits set in each update"/>
+                        </property>
                         <property name="frameShape">
                          <enum>QFrame::NoFrame</enum>
                         </property>
@@ -1661,8 +1698,8 @@
  <layoutdefault spacing="6" margin="11"/>
  <tabstops>
   <tabstop>pushButtonConnect</tabstop>
-  <tabstop>spinBoxControlPort</tabstop>
-  <tabstop>spinBoxVideoPort</tabstop>
+  <tabstop>spinBoxUDPPort</tabstop>
+  <tabstop>spinBoxTCPPort</tabstop>
   <tabstop>radioButtonSafe</tabstop>
   <tabstop>radioButtonAuto</tabstop>
   <tabstop>radioButtonMan</tabstop>

@@ -9,52 +9,51 @@
 #include <QMessageBox>
 #include "joystickconnector.h"
 #include "inputThrottler.h"
-#include "broadcastudp.h"
+#include "udpSender.h"
+#include "tcpSender.h"
 #include "statsMonitor.h"
 
 namespace Ui {
 class MainWindow;
 }
 
-class VideoConnector;
-class JoystickConnector;
-class BroadcastUDP;
-
 class MainWindow : public QMainWindow
 {
         Q_OBJECT
+
+        static const QString APP_NAME;
 
     public:
         explicit MainWindow(QWidget *parent = 0);
         virtual ~MainWindow();
 
-        void    Initialize();
+        void    initialize();
 
     signals:
-        void    UpdateRateChanged(unsigned int ms) ;
+        void    updateRateChanged(unsigned int ms) ;
 
     private slots:
-        void DeviceConnected(const QString& label);
-        void DeviceDisconnected(void);
-        void DeviceUpdate(const InputUpdate& state);
+        void deviceConnected(const QString& label);
+        void deviceDisconnected(void);
+        void deviceUpdate(const InputUpdate& state);
 
-        void NetworkMessageTrace(const BroadcastUDP::eDirection dir,
+        void networkMessageTrace(const UDPSender::eDirection dir,
                                  const QString& message);
 
-        void StatusUpdate(const eStatus& status,
+        void statusUpdate(const eStatus& status,
                           const QString& message);
 
         void updateLCD();
-        void BitsUpdate(const QString& bits);
+        void bitsUpdate(const QString& bits);
 
-        void ActuatorState( int level );
-        void DiggingState(bool enabled);
-        void DeviceBtnUpdate( eBtnState state, int btnID );
+        void actuatorState( int level );
+        void diggingState(bool enabled);
+        void deviceBtnUpdate( eBtnState state, int btnID );
 
         void on_pushButtonConnect_clicked();
         void on_horizontalRateSlider_sliderReleased();
         void on_horizontalRateSlider_valueChanged(int value);
-        void StatsUpdate(const Stats& stats);
+        void statsUpdate(const Stats& stats);
 
         void on_pushButtonLog_clicked();
 
@@ -71,12 +70,14 @@ class MainWindow : public QMainWindow
         void on_pushButtonResetStats_clicked();
 
     private:
-        void    LogTrace(const eStatus& status,
+        void    logTrace(const eStatus& status,
                          const QString& message);
-        void    CloseConnectors(void);
+        void    closeConnectors(void);
         void    OpenNetworkConnection(void);
-        void    CloseNetworkConnection(void);
-        void    ResetLCD();
+        void    closeNetworkConnection(void);
+        void    resetLCD();
+
+        void    closeEvent(QCloseEvent* event);
 
     private:
         Ui::MainWindow*     _ui;
@@ -89,9 +90,9 @@ class MainWindow : public QMainWindow
         QTime               _lcdTimeValue;
         QTextStream*        _textStreamLogger;
         InputThrottler*     _inputThrottler;
-        VideoConnector*     _videoConnector;
         JoystickConnector*  _joystickConnector;
-        BroadcastUDP*       _udpBroadcaster;
+        UDPSender*          _udpSender;
+        TCPSender*          _tcpSender;
         StatsMonitor*       _statsMonitor;
 };
 

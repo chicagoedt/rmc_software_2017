@@ -6,7 +6,8 @@
 
 InputThrottler::InputThrottler(QObject* parent)
     : QThread(parent), _mode(eSafety), _actuatorLevel(0),
-      _updated(false), _digging(false), _sleepRate(20)
+      _updated(false), _digging(false), _updatesMaxPerSecRate(50),
+      _updatesPerSecRate(10), _sleepInterval(100)
 {
     _byteArray.reserve(2);
 }
@@ -37,13 +38,13 @@ void    InputThrottler::run(void)
         else
             _lock.unlock();
 
-        QThread::msleep(_sleepRate);
+        QThread::msleep(_sleepInterval);
     }
 
     emit StatusUpdate( eOK, QString("Input Throttler thread terminated"));
 }
 
-void InputThrottler::SetMode(const eOperationMode mode)
+void    InputThrottler::SetMode(const eOperationMode mode)
 {
     _lock.lock();
 
@@ -55,18 +56,18 @@ void InputThrottler::SetMode(const eOperationMode mode)
     emit PublishMessage(_byteArray);
 }
 
-void InputThrottler::PackBits()
+void    InputThrottler::PackBits()
 {
     _byteArray.clear();
 
     _byteArray[0] = (char)_mode |
                     ((_actuatorLevel << 3) & 0x00FF) |
                     (char)_digging << 2;
-    _byteArray[1] = ((_state.AxisRight().Y() / JOY_PER_MSG_SCALAR) & 0x0F) |
-                    ((_state.AxisLeft().Y() / JOY_PER_MSG_SCALAR) & 0x0F) << 4;
+    _byteArray[1] = ((_state.axisRight().Y() / JOY_PER_MSG_SCALAR) & 0x0F) |
+                    ((_state.axisLeft().Y() / JOY_PER_MSG_SCALAR) & 0x0F) << 4;
 }
 
-void InputThrottler::DeviceUpdate(const InputUpdate& state)
+void    InputThrottler::DeviceUpdate(const InputUpdate& state)
 {
     _lock.lock();
 
@@ -76,14 +77,41 @@ void InputThrottler::DeviceUpdate(const InputUpdate& state)
     _lock.unlock();
 }
 
-void    InputThrottler::UpdateRateChanged(unsigned int ms)
+void    InputThrottler::SetMaxUpdateRate(unsigned int upsMax)
 {
-    if( ms > 1000)
-        _sleepRate = 1000;
-    else if (ms < 1 )
-        _sleepRate = 1;
+    if( upsMax == 0)
+    {
+        _updatesMaxPerSecRate = 2;
+        _updatesPerSecRate    = 1;
+    }
+    else if(upsMax > 100)   // No higher then 100 Updates per seconds
+        _updatesMaxPerSecRate = upsMax;
     else
-        _sleepRate = ms;
+    {
+        _updatesMaxPerSecRate = upsMax;
+
+        if( _updatesMaxPerSecRate < _updatesPerSecRate)
+            _updatesPerSecRate = _updatesMaxPerSecRate;
+    }
+
+    CalculateSleepPeriod();
+}
+
+void    InputThrottler::CalculateSleepPeriod()
+{
+    _sleepInterval = 1000 / _updatesPerSecRate;
+}
+
+void    InputThrottler::UpdateRateChanged(unsigned int ups)
+{
+    if( ups > _updatesMaxPerSecRate)
+        _updatesPerSecRate = _updatesMaxPerSecRate;
+    else if (ups < 1 )
+        _updatesPerSecRate = 1;
+    else
+        _updatesPerSecRate = ups;
+
+    CalculateSleepPeriod();
 }
 
 void    InputThrottler::DeviceBtnUpdate( eBtnState state, int btnID )

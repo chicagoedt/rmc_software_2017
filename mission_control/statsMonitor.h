@@ -12,19 +12,19 @@ class Stats
     public:
         Stats()
         {
-           Resert();
+           reset();
         }
 
-        inline uint    TxTotalBytes() const { return _txTotalBytes; }
-        inline uint    TxBytesPerSec() const { return _txBytesPerSec; }
-        inline uint    TxPacketPerSec() const { return _txPacketPerSec; }
+        inline uint    txTotalBytes()   const { return _txTotalBytes; }
+        inline uint    txBytesPerSec()  const { return _txBytesPerSec; }
+        inline uint    txPacketPerSec() const { return _txPacketPerSec; }
 
-        inline uint    RxTotalBytes() const { return _rxTotalBytes; }
-        inline uint    RxBytesPerSec() const { return _rxBytesPerSec; }
-        inline uint    RxPacketPerSec() const { return _rxPacketPerSec; }
+        inline uint    rxTotalBytes()   const { return _rxTotalBytes; }
+        inline uint    rxBytesPerSec()  const { return _rxBytesPerSec; }
+        inline uint    rxPacketPerSec() const { return _rxPacketPerSec; }
 
     private:
-        inline void    Resert()
+        inline void    reset()
         {
             _txTotalBytes       = 0;
             _txBytesPerSec      = 0;
@@ -51,16 +51,16 @@ class StatsMonitor : public QThread
     public:
         StatsMonitor(QObject* parent = 0L);
 
-        void    ResetStats();
-        void    ToggleInputLock(bool state);
-        void    ToggleConnectionState(bool state);
+        void    resetStats();
+        void    toggleInputLock(bool state);
+        void    toggleConnectionState(bool state);
 
     signals:
-        void    StatusUpdate(const eStatus& status, const QString& message);
-        void    StatsUpdate(const Stats& stats);
+        void    statusUpdate(const eStatus& status, const QString& message);
+        void    statsUpdate(const Stats& stats);
 
     public slots:
-        void    UpdateTxStats(const QByteArray& buffer);
+        void    updateTxStats(const QByteArray& buffer);
 
     protected:
        virtual void    run(void);// Q_DECL_OVERRIDE;

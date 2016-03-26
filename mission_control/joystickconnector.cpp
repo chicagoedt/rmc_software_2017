@@ -1,7 +1,7 @@
 #include "joystickconnector.h"
 #include <QDebug>
 
-InputUpdate::eState    InputUpdate::BtnState(unsigned char buttonID) const
+InputUpdate::eState    InputUpdate::btnState(unsigned char buttonID) const
 {
     switch(buttonID)
     {
@@ -38,7 +38,7 @@ JoystickConnector::~JoystickConnector()
 
 }
 
-void    JoystickConnector::Quit()
+void    JoystickConnector::quit()
 {
     terminate();
 
@@ -52,7 +52,7 @@ void    JoystickConnector::Quit()
     wait();
 }
 
-bool    JoystickConnector::ToggleInputLock()
+bool    JoystickConnector::toggleInputLock()
 {
     _lockState = ! _lockState;
 
@@ -61,22 +61,22 @@ bool    JoystickConnector::ToggleInputLock()
 
 void    JoystickConnector::run(void)
 {
-    emit StatusUpdate( eOK, QString("Joystick thread initialized."));
+    emit statusUpdate( eOK, QString("Joystick thread initialized."));
 
     while( QThread::currentThread()->isRunning() )
     {
-        Initialize();
+        initialize();
 
-        SDL_Joystick* pGameController = SelectController();
+        SDL_Joystick* pGameController = selectController();
 
         if( pGameController )
         {
-            HandleController();
+            handleController();
 
             SDL_JoystickClose( pGameController );
             pGameController = 0L;
 
-            emit DeviceDisconnected();
+            emit deviceDisconnected();
             QThread::msleep(100);
         }
         else
@@ -87,10 +87,10 @@ void    JoystickConnector::run(void)
         SDL_QuitSubSystem(SDL_INIT_JOYSTICK);
     }
 
-    emit StatusUpdate( eOK, QString("Joystick thread terminated."));
+    emit statusUpdate( eOK, QString("Joystick thread terminated."));
 }
 
-void    JoystickConnector::Initialize(void)
+void    JoystickConnector::initialize(void)
 {
     bool logOnce(true);
 
@@ -101,7 +101,7 @@ void    JoystickConnector::Initialize(void)
             if( logOnce )
             {
                 logOnce = false;
-                emit StatusUpdate( eERROR, QString("SDL init failed. SDL Error: %1")
+                emit statusUpdate( eERROR, QString("SDL init failed. SDL Error: %1")
                                                          .arg( SDL_GetError()));
             }
 
@@ -112,13 +112,13 @@ void    JoystickConnector::Initialize(void)
         if( QThread::currentThread()->isRunning() )
         {
             SDL_JoystickEventState(SDL_ENABLE);
-            emit StatusUpdate( eOK, QString("Input system initialized."));
+            emit statusUpdate( eOK, QString("Input system initialized."));
             break;
         }
     }
 }
 
-SDL_Joystick* JoystickConnector::SelectController(void)
+SDL_Joystick* JoystickConnector::selectController(void)
 {
     //Check for joysticks
     if( SDL_NumJoysticks() > 0 )
@@ -129,20 +129,20 @@ SDL_Joystick* JoystickConnector::SelectController(void)
             //Load joystick
             if( pGameController != 0L )
             {
-                emit DeviceConnected( SDL_JoystickName(pGameController));
+                emit deviceConnected( SDL_JoystickName(pGameController));
                 return pGameController;
             }
         }
 
-        emit StatusUpdate( eERROR, QString("Unable to open game controller. Found: %s").arg(SDL_NumJoysticks()) );
+        emit statusUpdate( eERROR, QString("Unable to open game controller. Found: %s").arg(SDL_NumJoysticks()) );
     }
     else
-        emit StatusUpdate( eERROR, QString("Warning: No joysticks connected. Scanning") );
+        emit statusUpdate( eERROR, QString("Warning: No joysticks connected. Scanning") );
 
     return 0L;
 }
 
-void    JoystickConnector::HandleController(void)
+void    JoystickConnector::handleController(void)
 {
     //Event handler
     SDL_Event event;
@@ -162,36 +162,36 @@ void    JoystickConnector::HandleController(void)
             {
                 case SDL_CONTROLLERBUTTONDOWN:
                 case SDL_CONTROLLERBUTTONUP:
-                    OnControllerButtonEvent( event.cbutton );
+                    onControllerButtonEvent( event.cbutton );
                     break;
 
                 case SDL_CONTROLLERAXISMOTION:
-                    OnControllerAxisEvent( event.caxis );
+                    onControllerAxisEvent( event.caxis );
                     break;
 
                 case SDL_JOYAXISMOTION:
-                    OnJoystickAxisEvent(event.jaxis);
+                    onJoystickAxisEvent(event.jaxis);
                     break;
 
                 case SDL_JOYBUTTONUP:
                 case SDL_JOYBUTTONDOWN:
-                    OnJoystickButtonEvent(event.jbutton);
+                    onJoystickButtonEvent(event.jbutton);
                     break;
 
                 case SDL_CONTROLLERDEVICEADDED:
-                    AddControllerEvent( event.cdevice );
+                    addControllerEvent( event.cdevice );
                     break;
 
                 case SDL_CONTROLLERDEVICEREMOVED:
-                    RemoveControllerEvent( event.cdevice );
+                    removeControllerEvent( event.cdevice );
                     break;
 
                 case SDL_JOYDEVICEADDED:
-                    AddJoystickEvent( event.jdevice );
+                    addJoystickEvent( event.jdevice );
                     break;
 
                 case SDL_JOYDEVICEREMOVED:
-                    RemoveJoystickEvent( event.jdevice );
+                    removeJoystickEvent( event.jdevice );
                     break;
 
                 default:
@@ -201,7 +201,7 @@ void    JoystickConnector::HandleController(void)
     }
 }
 
-void    JoystickConnector::OnJoystickAxisEvent( const SDL_JoyAxisEvent& event)
+void    JoystickConnector::onJoystickAxisEvent( const SDL_JoyAxisEvent& event)
 {
     if( event.axis == SDL_CONTROLLER_AXIS_LEFTX )
     {
@@ -240,43 +240,43 @@ void    JoystickConnector::OnJoystickAxisEvent( const SDL_JoyAxisEvent& event)
 
     //currentState._axisLeft._x << _currentState._axisLeft._y << "||" <<
                 //_currentState._axisRight._x << _currentState._axisRight._y;
-    emit DeviceUpdate( _currentState );
+    emit deviceUpdate( _currentState );
 }
 
-void    JoystickConnector::OnJoystickButtonEvent( const SDL_JoyButtonEvent& event)
+void    JoystickConnector::onJoystickButtonEvent( const SDL_JoyButtonEvent& event)
 {
     if( event.type == SDL_JOYBUTTONDOWN)
-        emit DeviceBtnUpdate( eDown, event.button );
+        emit deviceBtnUpdate( eDown, event.button );
     else if( event.type == SDL_JOYBUTTONUP)
-        emit DeviceBtnUpdate( eUp, event.button );
+        emit deviceBtnUpdate( eUp, event.button );
 }
 
-void    JoystickConnector::OnControllerButtonEvent( const SDL_ControllerButtonEvent& )
+void    JoystickConnector::onControllerButtonEvent( const SDL_ControllerButtonEvent& )
 {
     //qDebug() << "OnControllerButtonEvent";
 }
 
-void    JoystickConnector::OnControllerAxisEvent( const SDL_ControllerAxisEvent& )
+void    JoystickConnector::onControllerAxisEvent( const SDL_ControllerAxisEvent& )
 {
     //qDebug() << "OnControllerAxisEvent";
 }
 
-void    JoystickConnector::AddControllerEvent( const SDL_ControllerDeviceEvent& )
+void    JoystickConnector::addControllerEvent( const SDL_ControllerDeviceEvent& )
 {
     //qDebug() << "AddControllerEvent";
 }
 
-void    JoystickConnector::RemoveControllerEvent( const SDL_ControllerDeviceEvent& )
+void    JoystickConnector::removeControllerEvent( const SDL_ControllerDeviceEvent& )
 {
     //qDebug() << "RemoveControllerEvent";
 }
 
-void    JoystickConnector::AddJoystickEvent( const SDL_JoyDeviceEvent& )
+void    JoystickConnector::addJoystickEvent( const SDL_JoyDeviceEvent& )
 {
     //qDebug() << "AddJoystickEvent";
 }
 
-void    JoystickConnector::RemoveJoystickEvent( const SDL_JoyDeviceEvent& )
+void    JoystickConnector::removeJoystickEvent( const SDL_JoyDeviceEvent& )
 {
     //qDebug() << "RemoveJoystickEvent";
 }

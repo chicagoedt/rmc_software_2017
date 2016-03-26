@@ -6,24 +6,24 @@ StatsMonitor::StatsMonitor(QObject* parent)
 
 }
 
-void    StatsMonitor::ResetStats()
+void    StatsMonitor::resetStats()
 {
     _mutex.lock();
-        _stats.Resert();
+        _stats.reset();
     _mutex.unlock();
 }
 
-void    StatsMonitor::ToggleInputLock(bool state)
+void    StatsMonitor::toggleInputLock(bool state)
 {
     _lockState = state;
 }
 
-void    StatsMonitor::ToggleConnectionState(bool state)
+void    StatsMonitor::toggleConnectionState(bool state)
 {
     _connectionState = state;
 }
 
-void    StatsMonitor::UpdateTxStats(const QByteArray& buffer)
+void    StatsMonitor::updateTxStats(const QByteArray& buffer)
 {
     if( _connectionState )
     {
@@ -39,14 +39,14 @@ void    StatsMonitor::UpdateTxStats(const QByteArray& buffer)
 
 void    StatsMonitor::run(void)
 {
-    emit StatusUpdate( eOK, QString("Stats Monitor thread initialized"));
+    emit statusUpdate( eOK, QString("Stats Monitor thread initialized"));
 
     while( QThread::currentThread()->isRunning() )
     {
         if( _lockState == false )
         {
             _mutex.lock();
-                emit StatsUpdate(_stats);
+                emit statsUpdate(_stats);
                 _stats._txBytesPerSec  = 0;
                 _stats._txPacketPerSec = 0;
             _mutex.unlock();
@@ -55,5 +55,5 @@ void    StatsMonitor::run(void)
         QThread::msleep(1000);
     }
 
-    emit StatusUpdate( eOK, QString("Stats Monitor thread terminated"));
+    emit statusUpdate( eOK, QString("Stats Monitor thread terminated"));
 }

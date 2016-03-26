@@ -24,11 +24,12 @@ class InputThrottler : public QThread
         explicit InputThrottler(QObject* parent = 0L);
         virtual ~InputThrottler();
 
-        void SetMode(const eOperationMode mode);
+        void    SetMode(const eOperationMode mode);
+        void    SetMaxUpdateRate(unsigned int upsMax);
 
     public slots:
         void    DeviceUpdate(const InputUpdate& state);
-        void    UpdateRateChanged(unsigned int ms);
+        void    UpdateRateChanged(unsigned int ups);
         void    DeviceBtnUpdate( eBtnState state,
                                  int btnID );
 
@@ -42,6 +43,7 @@ class InputThrottler : public QThread
     private:
         void    PackBits();
         void    PrintBits();
+        void    CalculateSleepPeriod();
 
     private:
         InputUpdate     _state;
@@ -51,7 +53,9 @@ class InputThrottler : public QThread
         int             _actuatorLevel;
         bool            _updated;
         bool            _digging;
-        int             _sleepRate;
+        unsigned int    _updatesMaxPerSecRate;
+        unsigned int    _updatesPerSecRate;
+        unsigned int    _sleepInterval;
 
     protected:
        virtual void    run(void);// Q_DECL_OVERRIDE;

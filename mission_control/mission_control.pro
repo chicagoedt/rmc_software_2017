@@ -14,19 +14,19 @@ TEMPLATE       = app
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-        videoconnector.cpp \
         joystickconnector.cpp \
-        broadcastudp.cpp \
-    inputThrottler.cpp \
-    statsMonitor.cpp
+        inputThrottler.cpp \
+        statsMonitor.cpp \
+        udpSender.cpp \
+        tcpSender.cpp
 
 HEADERS  += mainwindow.h \
-            videoconnector.h \
-            joystickconnector.h \
-            broadcastudp.h \
-    inputThrottler.h \
-    commonhdr.h \
-    statsMonitor.h
+        joystickconnector.h \
+        inputThrottler.h \
+        commonhdr.h \
+        statsMonitor.h \
+        udpSender.h \
+        tcpSender.h
 
 FORMS    += mainwindow.ui
 

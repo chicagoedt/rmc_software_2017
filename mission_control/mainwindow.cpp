@@ -1,22 +1,23 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "videoconnector.h"
 #include "joystickconnector.h"
 #include "statsMonitor.h"
 #include <QDateTime>
 #include <QStandardItemModel>
+#include <QCloseEvent>
 #include <stdexcept>
 
 #define TIME_IN_GAME    10  // Init LCD Timer value
+const QString MainWindow::APP_NAME = QString("Mission Control");
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent), _ui(new Ui::MainWindow),
-    _videoConnector(0L), _joystickConnector(0L), _udpBroadcaster(0L)
+    _joystickConnector(0L), _udpSender(0L), _tcpSender(0L)
 {
     _ui->setupUi(this);
 
-    _labelHost     = new QLabel("Host: ", this);
-    _labelHostName = new QLabel("<b>Disconnected</b>", this);
+    _labelHost       = new QLabel("Host: ", this);
+    _labelHostName   = new QLabel("<b>Disconnected</b>", this);
 
     _labelDevice     = new QLabel(" Device: ", this);
     _labelDeviceName = new QLabel("<b>Scanning...</b>", this);
@@ -33,7 +34,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
-    CloseConnectors();
+    closeConnectors();
 
     if( _logger)
         delete _logger;
@@ -42,7 +43,7 @@ MainWindow::~MainWindow()
         delete _ui;
 }
 
-void MainWindow::Initialize()
+void MainWindow::initialize()
 {
     if( _joystickConnector )
         return;
@@ -56,65 +57,68 @@ void MainWindow::Initialize()
     _logger = new QFile("EDTPanel.log");
     _ui->pushButtonLog->setStyleSheet("color: green");
 
-    _udpBroadcaster  = new BroadcastUDP(this);
+    _udpSender  = new UDPSender(this);
 
-    connect(_udpBroadcaster, SIGNAL(NetworkMessageTrace(const BroadcastUDP::eDirection, const QString&)),
-                                      this, SLOT(NetworkMessageTrace(const BroadcastUDP::eDirection, const QString&)));
+    connect(_udpSender, SIGNAL(networkMessageTrace(const UDPSender::eDirection, const QString&)),
+                                      this, SLOT(networkMessageTrace(const UDPSender::eDirection, const QString&)));
 
     _inputThrottler    = new InputThrottler(this);
     _joystickConnector = new JoystickConnector(this);
     _statsMonitor      = new StatsMonitor(this);
 
-    connect(_joystickConnector, SIGNAL(DeviceConnected(const QString&)),
-                                       this, SLOT(DeviceConnected(const QString&)));
+    connect(_joystickConnector, SIGNAL(deviceConnected(const QString&)),
+                                       this, SLOT(deviceConnected(const QString&)));
 
-    connect(_joystickConnector, SIGNAL(DeviceDisconnected(void)),
-                                       this, SLOT(DeviceDisconnected(void)));
+    connect(_joystickConnector, SIGNAL(deviceDisconnected(void)),
+                                       this, SLOT(deviceDisconnected(void)));
 
-    connect(_joystickConnector, SIGNAL(StatusUpdate(const eStatus&, const QString&)),
-                                       this, SLOT(StatusUpdate(const eStatus&, const QString&)));
+    connect(_joystickConnector, SIGNAL(statusUpdate(const eStatus&, const QString&)),
+                                       this, SLOT(statusUpdate(const eStatus&, const QString&)));
 
-    connect(_joystickConnector, SIGNAL(DeviceUpdate(const InputUpdate&)),
-                                       this, SLOT(DeviceUpdate(const InputUpdate&)));
+    connect(_joystickConnector, SIGNAL(deviceUpdate(const InputUpdate&)),
+                                       this, SLOT(deviceUpdate(const InputUpdate&)));
 
-    connect( this, SIGNAL(UpdateRateChanged(unsigned int)), _inputThrottler,
-                                       SLOT(UpdateRateChanged(unsigned int)));
+    connect( this, SIGNAL(updateRateChanged(unsigned int)), _inputThrottler,
+                                       SLOT(updateRateChanged(unsigned int)));
 
-    connect(_inputThrottler, SIGNAL(StatusUpdate(const eStatus&, const QString&)),
-                                       this, SLOT(StatusUpdate(const eStatus&, const QString&)));
+    connect(_inputThrottler, SIGNAL(statusUpdate(const eStatus&, const QString&)),
+                                       this, SLOT(statusUpdate(const eStatus&, const QString&)));
 
-    connect(_joystickConnector, SIGNAL(DeviceUpdate(const InputUpdate&)),
-                                       _inputThrottler, SLOT(DeviceUpdate(const InputUpdate&)));
+    connect(_joystickConnector, SIGNAL(deviceUpdate(const InputUpdate&)),
+                                       _inputThrottler, SLOT(deviceUpdate(const InputUpdate&)));
 
-    connect(_joystickConnector, SIGNAL(DeviceBtnUpdate(eBtnState, int)),
-                                       _inputThrottler, SLOT(DeviceBtnUpdate(eBtnState, int)));
+    connect(_joystickConnector, SIGNAL(deviceBtnUpdate(eBtnState, int)),
+                                       _inputThrottler, SLOT(deviceBtnUpdate(eBtnState, int)));
 
-    connect(_joystickConnector, SIGNAL(DeviceBtnUpdate(eBtnState, int)),
-                                       this, SLOT(DeviceBtnUpdate(eBtnState, int)));
+    connect(_joystickConnector, SIGNAL(deviceBtnUpdate(eBtnState, int)),
+                                       this, SLOT(deviceBtnUpdate(eBtnState, int)));
 
     connect(_inputThrottler, SIGNAL(PublishMessage(const QByteArray&)),
-                                       _udpBroadcaster, SLOT(PublishMessage(const QByteArray&)));
+                                       _tcpSender, SLOT(publishMessage(const QByteArray&)));
 
     connect(_inputThrottler, SIGNAL(PublishMessage(const QByteArray&)),
                                        _statsMonitor, SLOT(UpdateTxStats(const QByteArray&)));
 
-    connect(_inputThrottler, SIGNAL(ActuatorState(int)),
-                                       this, SLOT(ActuatorState(int)));
+    connect(_inputThrottler, SIGNAL(actuatorState(int)),
+                                       this, SLOT(actuatorState(int)));
 
-    connect(_inputThrottler, SIGNAL(DiggingState(bool)),
-                                       this, SLOT(DiggingState(bool)));
+    connect(_inputThrottler, SIGNAL(diggingState(bool)),
+                                       this, SLOT(diggingState(bool)));
 
-    connect(_udpBroadcaster, SIGNAL(StatusUpdate(const eStatus&, const QString&)),
-                                       this, SLOT(StatusUpdate(const eStatus&, const QString&)));
+    connect(_tcpSender, SIGNAL(publishUDPMessage(const QByteArray& buffer)),
+                                       this, SLOT(publishMessage(const QByteArray& buffer)));
 
-    connect(_inputThrottler, SIGNAL(BitsUpdate(const QString&)),
-                                       this, SLOT(BitsUpdate(const QString&)));
+    connect(_udpSender, SIGNAL(statusUpdate(const eStatus&, const QString&)),
+                                       this, SLOT(statusUpdate(const eStatus&, const QString&)));
 
-    connect(_statsMonitor, SIGNAL(StatusUpdate(const eStatus&, const QString&)),
-                                       this, SLOT(StatusUpdate(const eStatus&, const QString&)));
+    connect(_inputThrottler, SIGNAL(bitsUpdate(const QString&)),
+                                       this, SLOT(bitsUpdate(const QString&)));
 
-    connect(_statsMonitor, SIGNAL(StatsUpdate(const Stats&)),
-                                       this, SLOT(StatsUpdate(const Stats&)));
+    connect(_statsMonitor, SIGNAL(statusUpdate(const eStatus&, const QString&)),
+                                       this, SLOT(statusUpdate(const eStatus&, const QString&)));
+
+    connect(_statsMonitor, SIGNAL(statsUpdate(const Stats&)),
+                                       this, SLOT(statsUpdate(const Stats&)));
 
     _inputThrottler->start();
     _statsMonitor->start();
@@ -123,7 +127,7 @@ void MainWindow::Initialize()
     _lcdTimer     = new QTimer(this);
     connect(_lcdTimer, SIGNAL(timeout()), this, SLOT(updateLCD()));\
 
-    ResetLCD();
+    resetLCD();
 
     _ui->lcdActuatorNumber->setPalette(QColor::fromRgb(0, 200, 0));
     _ui->labelDig->setStyleSheet("QLabel { background-color : rgb(0, 200, 0) }");
@@ -133,26 +137,38 @@ void MainWindow::Initialize()
                                               'f', 2) );
 }
 
-void MainWindow::DeviceBtnUpdate( eBtnState state, int btnID )
+void    MainWindow::closeEvent(QCloseEvent* event)
+{
+    QMessageBox::StandardButton resBtn = QMessageBox::question( this, APP_NAME,
+                                                                tr("Are you sure?\n"),
+                                                                QMessageBox::No | QMessageBox::Yes,
+                                                                QMessageBox::No);
+    if (resBtn != QMessageBox::Yes)
+        event->ignore();
+    else
+        event->accept();
+}
+
+void MainWindow::deviceBtnUpdate( eBtnState state, int btnID )
 {
     if( state == eDown && btnID == 2 ) // Btn labeled 3 on joy
     {
-        if( _joystickConnector->ToggleInputLock() )
+        if( _joystickConnector->toggleInputLock() )
         {
-            _statsMonitor->ToggleInputLock(true);
+            _statsMonitor->toggleInputLock(true);
             _ui->labelLock->setText("Control Locked");
             _ui->labelLock->setStyleSheet("QLabel { background-color : rgb(0, 200, 0) }");
         }
         else
         {
-            _statsMonitor->ToggleInputLock(false);
+            _statsMonitor->toggleInputLock(false);
             _ui->labelLock->setText("Control Enabled");
             _ui->labelLock->setStyleSheet("QLabel { background-color : rgb(250, 0, 0) }");
         }
     }
 }
 
-void MainWindow::ResetLCD()
+void MainWindow::resetLCD()
 {
     //TIME_IN_GAME
     _ui->countdownTimer->display("10.00");
@@ -160,7 +176,7 @@ void MainWindow::ResetLCD()
     _ui->countdownTimer->setPalette(QColor::fromRgb(0, 200, 0));
 }
 
-void MainWindow::BitsUpdate(const QString& bits)
+void MainWindow::bitsUpdate(const QString& bits)
 {
     _ui->labelBits->setText(bits);
 }
@@ -184,32 +200,32 @@ void MainWindow::updateLCD()
     _ui->countdownTimer->display(_lcdTimeValue.toString());
 }
 
-void MainWindow::DeviceConnected(const QString& label)
+void MainWindow::deviceConnected(const QString& label)
 {
     _labelDeviceName->setText( QString("<b>%1</b>").arg(label));
 }
 
-void MainWindow::DeviceDisconnected(void)
+void MainWindow::deviceDisconnected(void)
 {
     _labelDeviceName->setText("<b>Scanning...</b>");
 }
 
-void MainWindow::StatusUpdate(const eStatus& status,
+void MainWindow::statusUpdate(const eStatus& status,
                               const QString& message)
 {
-    LogTrace(status, message);
+    logTrace(status, message);
 }
 
-void MainWindow::DeviceUpdate(const InputUpdate& state)
+void MainWindow::deviceUpdate(const InputUpdate& state)
 {
-    _ui->labelJoyXLeftValue->setText(QString::number( state.AxisLeft().X()));
-    _ui->labelJoyYLeftValue->setText(QString::number( state.AxisLeft().Y()));
+    _ui->labelJoyXLeftValue->setText(QString::number( state.axisLeft().X()));
+    _ui->labelJoyYLeftValue->setText(QString::number( state.axisLeft().Y()));
 
-    _ui->labelJoyXRightValue->setText(QString::number( state.AxisRight().X()));
-    _ui->labelJoyYRightValue->setText(QString::number( state.AxisRight().Y()));
+    _ui->labelJoyXRightValue->setText(QString::number( state.axisRight().X()));
+    _ui->labelJoyYRightValue->setText(QString::number( state.axisRight().Y()));
 }
 
-void MainWindow::ActuatorState( int level )
+void MainWindow::actuatorState( int level )
 {
     _ui->lcdActuatorNumber->display( level );
     _ui->progressBarActuator->setValue( level );
@@ -222,7 +238,7 @@ void MainWindow::ActuatorState( int level )
         _ui->lcdActuatorNumber->setPalette(QColor::fromRgb(255, 135, 0));
 }
 
-void MainWindow::DiggingState(bool enabled)
+void MainWindow::diggingState(bool enabled)
 {
     if( enabled )
     {
@@ -240,7 +256,7 @@ void MainWindow::on_horizontalRateSlider_sliderReleased()
 {
     _ui->lcdRateNumber->display( _ui->horizontalRateSlider->value());
 
-    emit UpdateRateChanged(_ui->horizontalRateSlider->value());
+    emit updateRateChanged(_ui->horizontalRateSlider->value());
 }
 
 void MainWindow::on_horizontalRateSlider_valueChanged(int value)
@@ -257,7 +273,7 @@ void MainWindow::on_pushButtonConnect_clicked()
         if( _ui->pushButtonConnect->isChecked() )
             OpenNetworkConnection();
         else
-            CloseNetworkConnection();
+            closeNetworkConnection();
     }
     catch( std::runtime_error& err)
     {
@@ -272,46 +288,39 @@ void MainWindow::on_pushButtonConnect_clicked()
 
 void MainWindow::OpenNetworkConnection()
 {
-    if( _udpBroadcaster->IsConnected() == false )
+    if( _udpSender->isConnected() == false )
     {
-        _udpBroadcaster->Connect(_ui->hostAddressTextBox->text(), (quint16)_ui->spinBoxControlPort->value() );
+        _udpSender->connect(_ui->hostAddressTextBox->text(), (quint16)_ui->spinBoxUDPPort->value() );
         _ui->pushButtonConnect->setStyleSheet("color: red");
         _ui->pushButtonConnect->setText("Disconnect");
-        _ui->spinBoxControlPort->setEnabled(false);
-        _ui->spinBoxVideoPort->setEnabled(false);
+        _ui->spinBoxUDPPort->setEnabled(false);
+        _ui->spinBoxTCPPort->setEnabled(false);
         _ui->hostAddressTextBox->setEnabled(false);
         _labelHostName->setText("<b>Connected</b>");
-        _statsMonitor->ToggleConnectionState(true);
+        _statsMonitor->toggleConnectionState(true);
     }
 }
 
-void MainWindow::CloseNetworkConnection()
+void MainWindow::closeNetworkConnection()
 {
-    if( _udpBroadcaster->IsConnected() )
+    if( _udpSender->isConnected() )
     {
-        _udpBroadcaster->Disconnect();
+        _udpSender->disconnect();
         _ui->pushButtonConnect->setStyleSheet("color: green");
         _ui->pushButtonConnect->setText("Connect");
-        _ui->spinBoxControlPort->setEnabled(true);
-        _ui->spinBoxVideoPort->setEnabled(true);
+        _ui->spinBoxUDPPort->setEnabled(true);
+        _ui->spinBoxTCPPort->setEnabled(true);
         _ui->hostAddressTextBox->setEnabled(true);
         _labelHostName->setText("<b>Disconnected</b>");
-        _statsMonitor->ToggleConnectionState(false);
+        _statsMonitor->toggleConnectionState(false);
     }
 }
 
-void MainWindow::CloseConnectors(void)
+void MainWindow::closeConnectors(void)
 {
-     if( _videoConnector )
-     {
-         _videoConnector->terminate();
-         _videoConnector->wait();
-         delete _videoConnector;
-     }
-
      if( _joystickConnector )
      {
-         _joystickConnector->Quit();
+         _joystickConnector->quit();
          delete _joystickConnector;
      }
 
@@ -329,11 +338,14 @@ void MainWindow::CloseConnectors(void)
          delete _statsMonitor;
      }
 
-     if( _udpBroadcaster )
-         _udpBroadcaster->Disconnect();
+     if( _tcpSender )
+         _tcpSender->disconnect();
+
+     if( _udpSender )
+         _udpSender->disconnect();
 }
 
-void    MainWindow::LogTrace(const eStatus& status,
+void    MainWindow::logTrace(const eStatus& status,
                              const QString& message)
 {
     QString msg = QDateTime::currentDateTime().toString("hh:mm:ss");
@@ -361,7 +373,7 @@ void    MainWindow::LogTrace(const eStatus& status,
     textStreamLogger << "-- " << message;
 }
 
-void    MainWindow::NetworkMessageTrace(const BroadcastUDP::eDirection dir,
+void    MainWindow::networkMessageTrace(const UDPSender::eDirection dir,
                                         const QString& message)
 {
     if( _logger->isOpen() == false )
@@ -369,7 +381,7 @@ void    MainWindow::NetworkMessageTrace(const BroadcastUDP::eDirection dir,
 
     QTextStream textStreamLogger(_logger);
 
-    if( dir == BroadcastUDP::eIn )
+    if( dir == UDPSender::eIn )
         textStreamLogger << "<- " << message;
     else
         textStreamLogger << "-> " << message;
@@ -430,23 +442,23 @@ void MainWindow::on_startTimeButton_clicked()
 
 void MainWindow::on_resetTimeButton_clicked()
 {
-    ResetLCD();
+    resetLCD();
 
     _ui->startTimeButton->setText("Start Time");
 }
 
-void MainWindow::StatsUpdate(const Stats& stats)
+void MainWindow::statsUpdate(const Stats& stats)
 {
-    _ui->lineEditTxTotalBytes->setText(QString::number(stats.TxTotalBytes()));
-    _ui->lineEditTxBytesPerSec->setText(QString::number(stats.TxBytesPerSec()));
-    _ui->lineEditTxPacketPerSec->setText(QString::number(stats.TxPacketPerSec()));
+    _ui->lineEditTxTotalBytes->setText(QString::number(stats.txTotalBytes()));
+    _ui->lineEditTxBytesPerSec->setText(QString::number(stats.txBytesPerSec()));
+    _ui->lineEditTxPacketPerSec->setText(QString::number(stats.txPacketPerSec()));
 
-    _ui->lineEditRxTotalBytes->setText(QString::number(stats.RxTotalBytes()));
-    _ui->lineEditRxBytesPerSec->setText(QString::number(stats.RxBytesPerSec()));
-    _ui->lineEditRxPacketPerSec->setText(QString::number(stats.RxPacketPerSec()));
+    _ui->lineEditRxTotalBytes->setText(QString::number(stats.rxTotalBytes()));
+    _ui->lineEditRxBytesPerSec->setText(QString::number(stats.rxBytesPerSec()));
+    _ui->lineEditRxPacketPerSec->setText(QString::number(stats.rxPacketPerSec()));
 }
 
 void MainWindow::on_pushButtonResetStats_clicked()
 {
-    _statsMonitor->ResetStats();
+    _statsMonitor->resetStats();
 }

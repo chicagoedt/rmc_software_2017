@@ -27,6 +27,7 @@ void    TCPSender::connect(const QString& host, quint16 port )
         return;
 
     _tcpSocket->connectToHost(host, port);
+     emit statusUpdate( eOK, QString("TCPSender Connect: ") + host + "  " + QString::number(port));
 }
 
 void    TCPSender::disconnect(void)
@@ -50,7 +51,7 @@ void    TCPSender::send(const QByteArray& buffer)
     _snapShotData = buffer;
     _lock.unlock();
 
-    emit publishUDPMessage(buffer);
+    emit publishBackupUDPMessage(buffer);
 
     // This is to debug when testing TCP only
     // In final version comment this out

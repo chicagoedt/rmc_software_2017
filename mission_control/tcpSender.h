@@ -4,6 +4,7 @@
 #include <QThread>
 #include <QTcpSocket>
 #include "commonhdr.h"
+#include <QMutex>
 
 class TCPSender :  public QObject
 {
@@ -26,7 +27,8 @@ class TCPSender :  public QObject
         void    readyRead();
 
     signals:
-        void    publishUDPMessage(const QByteArray& buffer);
+        void    publishBackupUDPMessage(const QByteArray& buffer);
+        void    statusUpdate(const eStatus& status, const QString& message);
 
     private:
         void    sendSnapshot();

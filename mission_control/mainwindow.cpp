@@ -58,6 +58,8 @@ void MainWindow::initialize()
     _ui->pushButtonLog->setStyleSheet("color: green");
 
     _udpSender  = new UDPSender(this);
+    _tcpSender  = new TCPSender(this);
+
 
     connect(_udpSender, SIGNAL(networkMessageTrace(const UDPSender::eDirection, const QString&)),
                                       this, SLOT(networkMessageTrace(const UDPSender::eDirection, const QString&)));
@@ -79,16 +81,17 @@ void MainWindow::initialize()
                                        this, SLOT(deviceUpdate(const InputUpdate&)));
 
     connect( this, SIGNAL(updateRateChanged(unsigned int)), _inputThrottler,
-                                       SLOT(updateRateChanged(unsigned int)));
+                                       SLOT(UpdateRateChanged(unsigned int)));
 
-    connect(_inputThrottler, SIGNAL(statusUpdate(const eStatus&, const QString&)),
+    connect(_inputThrottler, SIGNAL(StatusUpdate(const eStatus&, const QString&)),
                                        this, SLOT(statusUpdate(const eStatus&, const QString&)));
 
     connect(_joystickConnector, SIGNAL(deviceUpdate(const InputUpdate&)),
-                                       _inputThrottler, SLOT(deviceUpdate(const InputUpdate&)));
+                                       _inputThrottler, SLOT(DeviceUpdate(const InputUpdate&)));
+
 
     connect(_joystickConnector, SIGNAL(deviceBtnUpdate(eBtnState, int)),
-                                       _inputThrottler, SLOT(deviceBtnUpdate(eBtnState, int)));
+                                       _inputThrottler, SLOT(DeviceBtnUpdate(eBtnState, int)));
 
     connect(_joystickConnector, SIGNAL(deviceBtnUpdate(eBtnState, int)),
                                        this, SLOT(deviceBtnUpdate(eBtnState, int)));
@@ -97,21 +100,24 @@ void MainWindow::initialize()
                                        _tcpSender, SLOT(publishMessage(const QByteArray&)));
 
     connect(_inputThrottler, SIGNAL(PublishMessage(const QByteArray&)),
-                                       _statsMonitor, SLOT(UpdateTxStats(const QByteArray&)));
+                                       _statsMonitor, SLOT(updateTxStats(const QByteArray&)));
 
-    connect(_inputThrottler, SIGNAL(actuatorState(int)),
+    connect(_inputThrottler, SIGNAL(ActuatorState(int)),
                                        this, SLOT(actuatorState(int)));
 
-    connect(_inputThrottler, SIGNAL(diggingState(bool)),
+    connect(_inputThrottler, SIGNAL(DiggingState(bool)),
                                        this, SLOT(diggingState(bool)));
 
-    connect(_tcpSender, SIGNAL(publishUDPMessage(const QByteArray& buffer)),
-                                       this, SLOT(publishMessage(const QByteArray& buffer)));
+    connect(_tcpSender, SIGNAL(publishBackupUDPMessage(const QByteArray&)),
+                                       _udpSender, SLOT(publishMessage(const QByteArray&)));
 
     connect(_udpSender, SIGNAL(statusUpdate(const eStatus&, const QString&)),
                                        this, SLOT(statusUpdate(const eStatus&, const QString&)));
 
-    connect(_inputThrottler, SIGNAL(bitsUpdate(const QString&)),
+    connect(_tcpSender, SIGNAL(statusUpdate(const eStatus&, const QString&)),
+                                       this, SLOT(statusUpdate(const eStatus&, const QString&)));
+
+    connect(_inputThrottler, SIGNAL(BitsUpdate(const QString&)),
                                        this, SLOT(bitsUpdate(const QString&)));
 
     connect(_statsMonitor, SIGNAL(statusUpdate(const eStatus&, const QString&)),
@@ -291,6 +297,18 @@ void MainWindow::OpenNetworkConnection()
     if( _udpSender->isConnected() == false )
     {
         _udpSender->connect(_ui->hostAddressTextBox->text(), (quint16)_ui->spinBoxUDPPort->value() );
+        _ui->pushButtonConnect->setStyleSheet("color: red");
+        _ui->pushButtonConnect->setText("Disconnect");
+        _ui->spinBoxUDPPort->setEnabled(false);
+        _ui->spinBoxTCPPort->setEnabled(false);
+        _ui->hostAddressTextBox->setEnabled(false);
+        _labelHostName->setText("<b>Connected</b>");
+        _statsMonitor->toggleConnectionState(true);
+    }
+
+    if( _tcpSender->isConnected() == false )
+    {
+        _tcpSender->connect(_ui->hostAddressTextBox->text(), (quint16)_ui->spinBoxTCPPort->value() );
         _ui->pushButtonConnect->setStyleSheet("color: red");
         _ui->pushButtonConnect->setText("Disconnect");
         _ui->spinBoxUDPPort->setEnabled(false);

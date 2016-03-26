@@ -332,6 +332,18 @@ void MainWindow::closeNetworkConnection()
         _labelHostName->setText("<b>Disconnected</b>");
         _statsMonitor->toggleConnectionState(false);
     }
+
+    if( _tcpSender->isConnected() )
+    {
+        _tcpSender->disconnect();
+        _ui->pushButtonConnect->setStyleSheet("color: green");
+        _ui->pushButtonConnect->setText("Connect");
+        _ui->spinBoxUDPPort->setEnabled(true);
+        _ui->spinBoxTCPPort->setEnabled(true);
+        _ui->hostAddressTextBox->setEnabled(true);
+        _labelHostName->setText("<b>Disconnected</b>");
+        _statsMonitor->toggleConnectionState(false);
+    }
 }
 
 void MainWindow::closeConnectors(void)

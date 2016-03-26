@@ -35,7 +35,12 @@ void    TCPSender::disconnect(void)
     if( isConnected() == false )
         return;
 
-    _tcpSocket->disconnect();
+    //_tcpSocket->disconnect();
+    _tcpSocket->disconnectFromHost();
+
+    emit statusUpdate( eOK, QString("TCPSender Disconnect"));
+
+
 }
 
 void    TCPSender::send(const QByteArray& buffer)
@@ -55,7 +60,10 @@ void    TCPSender::send(const QByteArray& buffer)
 
     // This is to debug when testing TCP only
     // In final version comment this out
-    // sendSnapshot();
+    //sendSnapshot();
+    if(_tcpSocket->waitForConnected()){
+        _tcpSocket->write(buffer);
+    }
 }
 
 void    TCPSender::sendSnapshot()

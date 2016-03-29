@@ -27,6 +27,8 @@ MainWindow::MainWindow(QWidget *parent) :
     _ui->statusBar->addPermanentWidget(_labelDevice);
     _ui->statusBar->addPermanentWidget(_labelDeviceName, 1);
 
+    _streamTCP = _ui->tcpStreamCheckBox->isChecked(); // Whether or not to stream joystick data over TCP or not (UDP)
+
     _ui->lcdRateNumber->display( _ui->horizontalRateSlider->value());
 
     _ui->pushButtonConnect->setStyleSheet("color: green");
@@ -96,8 +98,17 @@ void MainWindow::initialize()
     connect(_joystickConnector, SIGNAL(deviceBtnUpdate(eBtnState, int)),
                                        this, SLOT(deviceBtnUpdate(eBtnState, int)));
 
-    connect(_inputThrottler, SIGNAL(PublishMessage(const QByteArray&)),
-                                       _tcpSender, SLOT(publishMessage(const QByteArray&)));
+    if(_streamTCP)
+    {
+        connect(_inputThrottler, SIGNAL(PublishMessage(const QByteArray&)),
+                                           _tcpSender, SLOT(publishMessage(const QByteArray&)));
+    }
+    else
+    {
+        connect(_inputThrottler, SIGNAL(PublishMessage(const QByteArray&)),
+                                           _udpSender, SLOT(publishMessage(const QByteArray&)));
+    }
+
 
     connect(_inputThrottler, SIGNAL(PublishMessage(const QByteArray&)),
                                        _statsMonitor, SLOT(updateTxStats(const QByteArray&)));
@@ -491,4 +502,9 @@ void MainWindow::statsUpdate(const Stats& stats)
 void MainWindow::on_pushButtonResetStats_clicked()
 {
     _statsMonitor->resetStats();
+}
+
+void MainWindow::on_tcpStreamCheckBox_clicked()
+{
+
 }

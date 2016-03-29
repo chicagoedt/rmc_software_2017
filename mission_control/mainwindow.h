@@ -69,7 +69,9 @@ class MainWindow : public QMainWindow
 
         void on_pushButtonResetStats_clicked();
 
-    private:
+        void on_tcpStreamCheckBox_clicked();
+
+private:
         void    logTrace(const eStatus& status,
                          const QString& message);
         void    closeConnectors(void);
@@ -94,6 +96,7 @@ class MainWindow : public QMainWindow
         UDPSender*          _udpSender;
         TCPSender*          _tcpSender;
         StatsMonitor*       _statsMonitor;
+        bool                _streamTCP;
 };
 
 #endif // MAINWINDOW_H

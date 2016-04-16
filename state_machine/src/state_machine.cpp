@@ -196,7 +196,7 @@ void StateMachineBase::dockCallback(const sensor_msgs::Imu::ConstPtr& msg)
 	double xImuAcceleration = msg->linear_acceleration.x;
 	double xRealAcceleration = xImuAcceleration-GRAVITY*sin(pitch);
 	//ROS_INFO_STREAM("Pitch: "<<pitch);
-	ROS_INFO_STREAM("Size: " << _average_imu_g.size() << " Accel: " << xRealAcceleration<<"    "<<_above_threshold_count);
+	//ROS_INFO_STREAM("Size: " << _average_imu_g.size() << " Accel: " << xRealAcceleration<<"    "<<_above_threshold_count);
 	if (_average_imu_g.size() < _values_for_average)
 	{
 		//ROS_INFO_STREAM("IM HERE");
@@ -213,11 +213,11 @@ void StateMachineBase::dockCallback(const sensor_msgs::Imu::ConstPtr& msg)
 		}
 
 		average = total/count;
-		ROS_INFO_STREAM("Average x accel: " << average);
+		//ROS_INFO_STREAM("Average x accel: " << average);
 		if (xRealAcceleration > _threshold)
 		{
 			_above_threshold_count++;
-			if (_above_threshold_count >= _num_to_dock) _didDock = 1;
+			if (_above_threshold_count >= _num_to_dock) {_didDock = 1; ROS_INFO_STREAM("Docked with imu");}
 		}
 		else
 		{
@@ -239,10 +239,12 @@ void StateMachineBase::dockCallback(const sensor_msgs::Imu::ConstPtr& msg)
 void StateMachineBase::dock()
 {
 	int useAruco = 0;
+	double arucoDistance = 0;
 	_nh.param("values_for_average", _values_for_average, 15);
 	_nh.param("threshold_for_average", _threshold, 1.2);
 	_nh.param("num_to_dock", _num_to_dock, 5);
 	_nh.param("useAruco", useAruco, 0);
+	_nh.param("arucoDistance", arucoDistance, 1.01);
 	if (useAruco) ROS_INFO("USING ARUCO!");
 	if (!useAruco)
 	{
@@ -278,6 +280,13 @@ void StateMachineBase::dock()
 		ros::Rate loop_rate(250);
 		ros::spinOnce();
 		_arucoPub = _nh.advertise<geometry_msgs::Twist>("cmd_vel", 1);
+// testing failsafe system
+		//ROS_INFO_STREAM("DOCKING." << _average_imu_g.size() << " ");
+
+		_imuSub = _nh.subscribe("imu/data", 1, &StateMachineBase::dockCallback, this);
+
+		_above_threshold_count = 0;
+// end testing
 		while (!_didDock)
 		{
 			geometry_msgs::Twist msg;
@@ -312,16 +321,17 @@ void StateMachineBase::dock()
 
 			if (absYaw > .02) msg.angular.z = (yaw > 0) ? -.15 : .15;
 
-			ROS_INFO_STREAM("Transform: " << x << " " << y << " " << z);
-			ROS_INFO_STREAM("Rotation:  " << roll << " " << pitch << " " << yaw);
+			//ROS_INFO_STREAM("Transform: " << x << " " << y << " " << z);
+			//ROS_INFO_STREAM("Rotation:  " << roll << " " << pitch << " " << yaw);
 			msg.linear.x = -.1;
 			
 			_arucoPub.publish(msg);
 			ros::spinOnce();
 			loop_rate.sleep();
 
-			if (x < 1.01){
+			if (x < arucoDistance){
 				_didDock = 1;
+				ROS_INFO_STREAM("Docked with ArUco");
 				msg.linear.x = 0;
 				_arucoPub.publish(msg);
 				ros::spinOnce();

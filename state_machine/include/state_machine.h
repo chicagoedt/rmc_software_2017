@@ -9,15 +9,19 @@
 #include <geometry_msgs/Pose.h>
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
 #include <tf/transform_datatypes.h>
+#include <tf/transform_listener.h>
 #include <std_msgs/Bool.h>
 #include <std_msgs/Float64.h>
 #include <geometry_msgs/Twist.h>
 #include <sensor_msgs/Imu.h>
 
+#include <math.h>
+
 #include <vector>
 #include <queue>
 #include <sstream>
 #include <stack>
+#include <deque>
 
 typedef actionlib::SimpleActionClient<move_base_msgs::MoveBaseAction> MoveBaseClient;
 typedef actionlib::SimpleActionClient<rmc_simulation::PanServoAction> PanServoClient;
@@ -46,11 +50,21 @@ class StateMachineBase
 
 		ros::Subscriber _imuSub;
 		ros::Publisher  _imuPub;
-
+		ros::Publisher  _arucoPub;
 		ros::Publisher  _actuatorPub;
 
 		float _previous_x_accel ;
 		bool  _didDock;
+		// Tweak below three parameters inside the launch file for optimal dock performance
+		int   _values_for_average;  // Number of values considered in the 'average' calculation
+		double _threshold; // The minimum difference in acceleration to be considered a hit
+		int   _num_to_dock; // How many consecutive hits needed to consider dock
+		int   _above_threshold_count;
+		int   _numCheck; // How many more datum to check for hits
+		std::deque<double> _average_imu_g; // Double ended queue that stores the imu values
+		tf::StampedTransform  _tf_base_link_to_map;
+		tf::TransformListener _tf_listener;
+
 
 		MoveBaseClient 	_moveBaseAC;
 		PanServoClient	_panServoAC;

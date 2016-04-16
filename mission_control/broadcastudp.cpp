@@ -25,7 +25,7 @@ void BroadcastUDP::Connect(const QString& host, quint16 port )
     connect(_udpSocket, SIGNAL(readyRead()),
             this, SLOT(ReadPendingDatagrams()));
 
-    _udpSocket->bind(QHostAddress::LocalHost, port);
+    _udpSocket->bind(QHostAddress::Any, port);
     _udpSocket->connectToHost(host, port);
 
     emit StatusUpdate( eOK, QString("BroadcastUDP Connect: ") + host + "  " + QString::number(port));

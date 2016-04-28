@@ -19,88 +19,181 @@ StateMachineBase::~StateMachineBase(void)
 
 bool StateMachineBase::Initialize()
 {
-  std::string   goalParamName = "GoalPoint";
 
-  for(int i = 0; i < MAX_GOAL_POINTS; i++)
-  {
-    std::ostringstream gp; gp << "GoalPoint" << i;
+	if (_nhLocal.hasParam("DockingPosition"))
+	{
+		std::vector<double>   pose;
+		_nhLocal.getParam("DockingPosition", pose);
+		_dockingPose.position.x = pose[0];
+		_dockingPose.position.y = pose[1];
+	}
+	else
+	{
+		ROS_ERROR_STREAM("Docking Position NOT found!");
+      		return false;
+	}
 
-    ROS_DEBUG_STREAM("Loaded param: " << gp.str());
+	if (_nhLocal.hasParam("DigStart"))
+	{
+		std::vector<double>   pose;
+		_nhLocal.getParam("DigStart", pose);
+		_digStartPose.position.x = pose[0];
+		_digStartPose.position.y = pose[1];
+	}
+	else
+	{
+		ROS_ERROR_STREAM("Dig Start Position NOT found!");
+      		return false;
+	}
 
-    if (_nhLocal.hasParam(gp.str()))
-    {
-      std::vector<double>   goalXY;
+	if (_nhLocal.hasParam("DigDistance"))
+	{
+		double digDistance = 0;
+		_nhLocal.getParam("DigDistance", digDistance);
+		_digEndPose.position.x = _digStartPose.position.x + digDistance;
+	}
+	else
+	{
+		ROS_ERROR_STREAM("Dig Distance NOT found!");
+      		return false;
+	}
 
-      geometry_msgs::Pose   tmpPose;
+	if(initializeServo()
+		ROS_INFO("Servo Initialized.");
+	else
+		ROS_ERROR("TF of Servo not changing!");
 
-      _nhLocal.getParam(gp.str(), goalXY);
+	_currentDigCycleCount = 0;
 
-      tmpPose.position.x  = goalXY[0];
-      tmpPose.position.y  = goalXY[1];
-      //tf::quaternionTFToMsg(tf::createIdentityQuaternion(), tmpPose.orientation);
-      //tmpPose.orientation = tf::createQuaternionMsgYaw(3.14159);
+	_servoPub = _nh.advertise<std_msgs::Float64>("blackfly_mount_joint/command", 1);
+  	_arucoSub = _nh.subscribe<geometry_msgs::PoseWithCovarianceStamped> ("ar_single_board/pose", 1, &StateMachineBase::arucoPoseCallback, this);
+  	_actuatorClient = _nh.serviceClient<roboteq_node::Actuators>("set_actuators"); // need to figure out how to not make roboteq_node a dependency to state_machine which can also be used by the simulator
 
-      _goalPointsQueue.push(tmpPose);
-    }
-    else
-    {
-      ROS_ERROR_STREAM("Please fill the goalpoints.yaml for GoalPoint" << i);
-      return false;
-    }
-  }
-
-//  _servoSub = _nh.subscribe<std_msgs::Bool> ("servo_camera_state", 1, &StateMachineBase::servoCameraState, this);
-  _arucoSub = _nh.subscribe<geometry_msgs::PoseWithCovarianceStamped> ("ar_single_board/pose", 1, &StateMachineBase::arucoPoseCallback, this);
-
-  return true;
+  	return true;
 }
 
 void StateMachineBase::arucoPoseCallback(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr& poseMsg)
 {
-  ROS_INFO_STREAM("Pose X: " << poseMsg->pose.pose.position.x << " Y: " << poseMsg->pose.pose.position.y);
-  _foundMarker = true;
+	ROS_INFO_STREAM("Aruco Pose X: " << poseMsg->pose.pose.position.x << " Y: " << poseMsg->pose.pose.position.y);
+  	_foundMarker = true;
   //_panServoAC.stopTrackingGoal();
 }
 
-void StateMachineBase::servoCameraState(const std_msgs::Bool::ConstPtr& servoStateOK)
+void StateMachineBase::setActuatorPosition(eDigPosition digPosition)
 {
-	// if servoState = true meaning the aruco marker is found
-	if( servoStateOK->data )
+	roboteq_node::Actuators srv;
+	srv.request.actuator_position = digPosition;
+
+	if(_actuatorClient.call(srv))  // blocking call
 	{
-
+		ROS_INFO_STREAM("Moved/Moving to " << digPosition);
 	}
-	else // marker is not found
+	else
 	{
-		_stateStack.push(_robotState);
-
-		// Stack current goal, drive backward 0.5 meters, if we stil dont get it,
-		// then just rely on imu
-		if( _robotState	== StateMachineBase::eRelocalize)
-		{
-
-		}
+		ROS_ERROR_STREAM("Failed to call actuator service! Check if roboteq's are on...");
 	}
+
 }
 
-void StateMachineBase::moveToGoalPoint()
+bool StateMachineBase::initializeServo()
+{
+	//TODO: Check TF if it is changing after we publish the angle. return false if it isnt.
+
+	setServoAngle(-1.0); //1.0 radians counter clockwise
+	ros::Duration(3.0).sleep();
+	setServoAngle(0); // put it back to center. the tf should now be proper.
+}
+
+void StateMachineBase::setServoAngle(float angle)
+{
+	// angle is in radians
+	std_msgs::Float64 servoAngle;
+	servoAngle.data = angle;
+
+	_servoPub.publish(servoAngle);	
+}
+
+bool StateMachineBase::moveToGoalPoint(geometry_msgs::Pose waypoint)
 {
 
+	move_base_msgs::MoveBaseGoal moveBaseGoal;
+        
+        moveBaseGoal.target_pose.header.frame_id   = "map";
+        moveBaseGoal.target_pose.header.stamp      = ros::Time::now();
+
+        moveBaseGoal.target_pose.pose.position     = waypoint.position;
+        moveBaseGoal.target_pose.pose.orientation  = tf::createQuaternionMsgFromRollPitchYaw(0, 0, 0);
+
+        ROS_INFO_STREAM("Sending goal(X, Y):" << "[ " << moveBaseGoal.target_pose.pose.position.x << " , " << moveBaseGoal.target_pose.pose.position.y << " ]");
+
+        _moveBaseAC.sendGoal(moveBaseGoal);
+
+        ROS_INFO("Sent Goal...");
+
+        _moveBaseAC.waitForResult();
+
+        ROS_INFO("Got result...");
+
+        if(_moveBaseAC.getState() == actionlib::SimpleClientGoalState::SUCCEEDED)
+        {
+                ROS_INFO("Succesfully moved to GoalPoint.");
+		return true;
+        }
+	else
+	{
+		ROS_ERROR("Failed to move to GoalPoint.");
+		return false;
+	}
 }
 
 void StateMachineBase::run()
 {
-  ROS_INFO("Sleeping for 5 seconds...");
-  ros::Duration(2.0).sleep();
-  ROS_INFO("Starting!");
+  	ROS_INFO("Sleeping for 2 seconds...");
+ 	ros::Duration(3.0).sleep();
+ 	ROS_INFO("Starting!");
 
-  /*
+        while(!_foundMarker)
+        {
+                ros::Duration(1.0).sleep();
+                ROS_INFO("Looking for Aruco Marker...");
+        }
+        ROS_INFO("Found Aruco Marker!");
+
+	if(moveToGoalPoint(_digStartPose))
+	{
+		setActuatorPosition(eDig);
+		ros::Duration(8.0).sleep();
+        	ROS_INFO("Lower Actuators to Dig...");
+
+		// Start digging motors
+
+		if(moveToGoalPoint(_digEndPose))
+		{
+			setActuatorPosition(eHome);
+			ros::Duration(8.0).sleep();
+        		ROS_INFO("Raising Actuators to Home Position...");
+			
+			if(moveToGoalPoint(_dockingPose))
+			{
+				dock();
+
+                        	setActuatorPosition(eDump);
+                        	ros::Duration(15.0).sleep();
+                        	ROS_INFO("Raising Actuators to Dump Position...");
+			}
+		}
+
+	}	
+		
+
+/* 
   while(!_panServoAC.waitForServer(ros::Duration(5.0)))
   {
     ROS_INFO("Waiting for the pan_servo action server...");
   }
   ROS_INFO("Established Connection with pan_servo ActionServer!");
-
-
+*/
+/*
 
   // rmc_simulation::PanServoGoal goalRequest;
   // actionlib::SimpleClientGoalHandle<rmc_simulation::PanServoAction> cgh = _panServoAC.sendGoal(goalRequest);
@@ -120,7 +213,44 @@ void StateMachineBase::run()
       break;
     }
   }
+*/
+/* ------
+	while(!foundMarker)
+	{
+		ros::Duration(1.0).sleep();
+		ROS_INFO("Looking for Aruco Marker...");
+	}
+	ROS_INFO("Found Aruco Marker!");
 
+    move_base_msgs::MoveBaseGoal moveBaseGoal;
+        
+	moveBaseGoal.target_pose.header.frame_id   = "map";
+	moveBaseGoal.target_pose.header.stamp      = ros::Time::now();
+
+	moveBaseGoal.target_pose.pose.position     = _goalPointsQueue.front().position;
+	moveBaseGoal.target_pose.pose.orientation  = tf::createQuaternionMsgFromRollPitchYaw(0, 0, 0);
+
+	ROS_INFO_STREAM("Sending goal(X, Y):" << "[ " << moveBaseGoal.target_pose.pose.position.x << " , " << moveBaseGoal.target_pose.pose.position.y << " ]");
+
+        _moveBaseAC.sendGoal(moveBaseGoal);
+
+    	ROS_INFO("Sent Goal...");
+
+        _moveBaseAC.waitForResult();
+
+    	ROS_INFO("Got result...");
+
+        if(_moveBaseAC.getState() == actionlib::SimpleClientGoalState::SUCCEEDED)
+        {
+                ROS_INFO("Succesfully moved to GoalPoint.");
+        }
+        else
+        {
+                ROS_WARN("Failed to move to GoalPoint.");
+        }
+*/
+
+/*
 
   ROS_INFO("Got result...");
 
@@ -164,7 +294,7 @@ void StateMachineBase::run()
 		}
 	}*/
 
-	StateMachineBase::dock();
+	//StateMachineBase::dock();
   
 }
 
@@ -297,7 +427,7 @@ void StateMachineBase::dock()
 			while (!foundTransform){
 				try
 				{
-					_tf_listener.lookupTransform("/map", "/base_link",  
+					_tf_listener.lookupTransform("/base_link", "/ar_board_marker",  
 										   ros::Time(0), _tf_base_link_to_map/*transform*/);
 					foundTransform = 1;
 				}
@@ -317,17 +447,20 @@ void StateMachineBase::dock()
 			double roll, pitch, yaw;
 			tf::Matrix3x3(rotation).getRPY(roll, pitch, yaw);
 
+			yaw += 1.57;
+
 			double absYaw = (yaw > 0) ? yaw : -1*yaw;
 
-			if (absYaw > .02) msg.angular.z = (yaw > 0) ? -.15 : .15;
+			if (absYaw > .02) msg.angular.z = (yaw > 0) ? .15 : -.15;
 
-			//ROS_INFO_STREAM("Transform: " << x << " " << y << " " << z);
+			ROS_INFO_STREAM("Transform: " << x << " " << y << " " << z);
 			//ROS_INFO_STREAM("Rotation:  " << roll << " " << pitch << " " << yaw);
-			msg.linear.x = -.1;
+			msg.linear.x = -0.24;
 			
 			_arucoPub.publish(msg);
 			ros::spinOnce();
 			loop_rate.sleep();
+			x = ( x > 0) ? x : -1*x ;
 
 			if (x < arucoDistance){
 				_didDock = 1;

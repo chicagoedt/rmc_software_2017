@@ -48,7 +48,7 @@
       pkg="tf" 
       type="static_transform_publisher" 
       name="map_to_submap_tf" 
-      args="0 0 0 0 0 3.14159 map submap 25">
+      args="-0.457 0 0.60 0 0 3.14159 map submap 25">
     </node>
     <node
       pkg="tf" 

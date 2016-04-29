@@ -58,16 +58,18 @@ bool StateMachineBase::Initialize()
       		return false;
 	}
 
-	if(initializeServo()
-		ROS_INFO("Servo Initialized.");
-	else
-		ROS_ERROR("TF of Servo not changing!");
 
 	_currentDigCycleCount = 0;
 
 	_servoPub = _nh.advertise<std_msgs::Float64>("blackfly_mount_joint/command", 1);
+	_digPub = _nh.advertise<std_msgs::Float64>("dig_vel", 1);
   	_arucoSub = _nh.subscribe<geometry_msgs::PoseWithCovarianceStamped> ("ar_single_board/pose", 1, &StateMachineBase::arucoPoseCallback, this);
   	_actuatorClient = _nh.serviceClient<roboteq_node::Actuators>("set_actuators"); // need to figure out how to not make roboteq_node a dependency to state_machine which can also be used by the simulator
+
+	if(initializeServo())
+		ROS_INFO("Servo Initialized.");
+	else
+		ROS_ERROR("TF of Servo not changing!");
 
   	return true;
 }
@@ -111,6 +113,7 @@ void StateMachineBase::setServoAngle(float angle)
 	servoAngle.data = angle;
 
 	_servoPub.publish(servoAngle);	
+	ros::spinOnce();
 }
 
 bool StateMachineBase::moveToGoalPoint(geometry_msgs::Pose waypoint)
@@ -130,10 +133,24 @@ bool StateMachineBase::moveToGoalPoint(geometry_msgs::Pose waypoint)
 
         ROS_INFO("Sent Goal...");
 
-        _moveBaseAC.waitForResult();
+        //_moveBaseAC.waitForResult();
 
-        ROS_INFO("Got result...");
+        //ROS_INFO("Got result...");
 
+
+	while(_moveBaseAC.getState() != actionlib::SimpleClientGoalState::SUCCEEDED)
+	{
+		if(_robotState == eDigging)
+		{
+			std_msgs::Float64 digVel;
+			digVel.data = -400;
+			_digPub.publish(digVel);
+			ROS_WARN("Digging...");
+		}	
+		ros::spinOnce();
+		ros::Duration(0.1).sleep();	
+	}
+/*
         if(_moveBaseAC.getState() == actionlib::SimpleClientGoalState::SUCCEEDED)
         {
                 ROS_INFO("Succesfully moved to GoalPoint.");
@@ -144,6 +161,7 @@ bool StateMachineBase::moveToGoalPoint(geometry_msgs::Pose waypoint)
 		ROS_ERROR("Failed to move to GoalPoint.");
 		return false;
 	}
+*/
 }
 
 void StateMachineBase::run()
@@ -156,16 +174,21 @@ void StateMachineBase::run()
         {
                 ros::Duration(1.0).sleep();
                 ROS_INFO("Looking for Aruco Marker...");
+		ros::spinOnce();
         }
         ROS_INFO("Found Aruco Marker!");
+
+	setActuatorPosition(eHome);
+
+	_robotState = eDriveToDig; // Start digging motors
 
 	if(moveToGoalPoint(_digStartPose))
 	{
 		setActuatorPosition(eDig);
-		ros::Duration(8.0).sleep();
+		ros::Duration(12.0).sleep();
         	ROS_INFO("Lower Actuators to Dig...");
 
-		// Start digging motors
+		_robotState = eDigging; // Start digging motors
 
 		if(moveToGoalPoint(_digEndPose))
 		{
@@ -173,8 +196,11 @@ void StateMachineBase::run()
 			ros::Duration(8.0).sleep();
         		ROS_INFO("Raising Actuators to Home Position...");
 			
+			_robotState = eDriveToDig;
+
 			if(moveToGoalPoint(_dockingPose))
 			{
+				_robotState = eDumping;
 				dock();
 
                         	setActuatorPosition(eDump);

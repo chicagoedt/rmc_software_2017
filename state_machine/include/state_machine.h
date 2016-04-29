@@ -35,9 +35,9 @@ class StateMachineBase
 
 	enum eDigPosition
 	{
-		eDig = 400,
+		eDig = 850,
 		eHome = 0,
-		eDump = -400
+		eDump = -800
 	};
 
 	public:
@@ -75,6 +75,7 @@ class StateMachineBase
 		ros::Subscriber _imuSub;
 		ros::Publisher	_servoPub;
 		ros::Publisher  _imuPub;
+		ros::Publisher  _digPub;
 		ros::Publisher  _arucoPub;
 		ros::Publisher  _actuatorPub;
 

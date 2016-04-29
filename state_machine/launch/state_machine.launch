@@ -9,7 +9,7 @@
   <param name="arucoDistance" type="double" value=".90"/> <!-- 84! --> 
 
   <node pkg="state_machine" type="state_machine_node" name="state_machine" output="screen" >
-  	<rosparam command="load" file="$(find rmc_config)/yaml/goalpoints.yaml" />
+  	<rosparam command="load" file="$(find rmc_config)/yaml/waypoints.yaml" />
   </node> 
 
 </launch>

@@ -15,6 +15,7 @@
 #include <geometry_msgs/Twist.h>
 #include <sensor_msgs/Imu.h>
 #include <roboteq_node/Actuators.h>
+#include <state_machine/ValidateSensors.h>
 
 #include <math.h>
 
@@ -51,7 +52,6 @@ class StateMachineBase
 	private:
 
         	void moveActuators(bool goUp);
-		bool initializeServo();
 		
 		bool startConnectionAC;
 		bool sendGoalToAC(geometry_msgs::Pose goalPose);
@@ -80,8 +80,9 @@ class StateMachineBase
 		ros::Publisher  _actuatorPub;
 
 		ros::ServiceClient _actuatorClient;
+		ros::ServiceClient _validatorClient;
 
-		float 	_previous_x_accel ;
+		float 	_previous_x_accel;
 		bool  	_didDock;
 		// Tweak below three parameters inside the launch file for optimal dock performance
 		int   	_values_for_average;  		// Number of values considered in the 'average' calculation

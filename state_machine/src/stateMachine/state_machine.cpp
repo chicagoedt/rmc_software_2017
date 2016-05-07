@@ -19,6 +19,10 @@ StateMachineBase::~StateMachineBase(void)
 
 bool StateMachineBase::Initialize()
 {
+        if( ros::console::set_logger_level(ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Debug) )
+        {
+                ros::console::notifyLoggerLevelsChanged();
+        }
 
 	if (_nhLocal.hasParam("DockingPosition"))
 	{
@@ -61,22 +65,23 @@ bool StateMachineBase::Initialize()
 
 	_currentDigCycleCount = 0;
 
-	_servoPub = _nh.advertise<std_msgs::Float64>("blackfly_mount_joint/command", 1);
+	_servoPub = _nh.advertise<std_msgs::Float64>("blackfly_mount_joint/command", 5);
 	_digPub = _nh.advertise<std_msgs::Float64>("dig_vel", 1);
   	_arucoSub = _nh.subscribe<geometry_msgs::PoseWithCovarianceStamped> ("ar_single_board/pose", 1, &StateMachineBase::arucoPoseCallback, this);
   	_actuatorClient = _nh.serviceClient<roboteq_node::Actuators>("set_actuators"); // need to figure out how to not make roboteq_node a dependency to state_machine which can also be used by the simulator
-
+	_validatorClient = _nh.serviceClient<state_machine::ValidateSensors>("validate_sensors");
+/*
 	if(initializeServo())
 		ROS_INFO("Servo Initialized.");
 	else
 		ROS_ERROR("TF of Servo not changing!");
-
+*/
   	return true;
 }
 
 void StateMachineBase::arucoPoseCallback(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr& poseMsg)
 {
-	ROS_INFO_STREAM("Aruco Pose X: " << poseMsg->pose.pose.position.x << " Y: " << poseMsg->pose.pose.position.y);
+	//ROS_INFO_STREAM("Aruco Pose X: " << poseMsg->pose.pose.position.x << " Y: " << poseMsg->pose.pose.position.y);
   	_foundMarker = true;
   //_panServoAC.stopTrackingGoal();
 }
@@ -95,15 +100,6 @@ void StateMachineBase::setActuatorPosition(eDigPosition digPosition)
 		ROS_ERROR_STREAM("Failed to call actuator service! Check if roboteq's are on...");
 	}
 
-}
-
-bool StateMachineBase::initializeServo()
-{
-	//TODO: Check TF if it is changing after we publish the angle. return false if it isnt.
-
-	setServoAngle(-1.0); //1.0 radians counter clockwise
-	ros::Duration(3.0).sleep();
-	setServoAngle(0); // put it back to center. the tf should now be proper.
 }
 
 void StateMachineBase::setServoAngle(float angle)
@@ -166,10 +162,45 @@ bool StateMachineBase::moveToGoalPoint(geometry_msgs::Pose waypoint)
 
 void StateMachineBase::run()
 {
-  	ROS_INFO("Sleeping for 2 seconds...");
- 	ros::Duration(3.0).sleep();
+  	//ROS_INFO("Sleeping for 2 seconds...");
+ 	//ros::Duration(3.0).sleep();
  	ROS_INFO("Starting!");
 
+	state_machine::ValidateSensors srv;
+	if(_validatorClient.call(srv))
+	{
+
+		ROS_WARN("--------------------------------------------------");
+		// bunch of if's so that status print statements are color coordinated
+		// TODO: Its printing out all of them false, even though at least one should be true
+		if(srv.response.status.roboteq == true)
+			ROS_DEBUG("Roboteq = True");
+		else
+			ROS_ERROR("Roboteq = False");
+
+		if(srv.response.status.aruco == true)
+			ROS_DEBUG("Aruco = True");
+		else
+			ROS_ERROR("Aruco = False");
+
+		if(srv.response.status.servo == true)
+			ROS_DEBUG("Servo = True");
+		else
+			ROS_ERROR("Servo = False");
+
+		if(srv.response.status.rtab == true)
+			ROS_DEBUG("RTAB = True");
+		else
+			ROS_ERROR("RTAB = False");
+		
+		ROS_WARN("--------------------------------------------------");
+
+		if(srv.response.validated)
+			ROS_INFO("-- Sensors Initialized and Validated --");
+		else
+			ROS_ERROR("-- Sensors could not be initialized. Exiting... --"); return;
+	}
+/*
         while(!_foundMarker)
         {
                 ros::Duration(1.0).sleep();
@@ -177,7 +208,7 @@ void StateMachineBase::run()
 		ros::spinOnce();
         }
         ROS_INFO("Found Aruco Marker!");
-
+*/
 	setActuatorPosition(eHome);
 
 	_robotState = eDriveToDig; // Start digging motors
@@ -211,114 +242,6 @@ void StateMachineBase::run()
 
 	}	
 		
-
-/* 
-  while(!_panServoAC.waitForServer(ros::Duration(5.0)))
-  {
-    ROS_INFO("Waiting for the pan_servo action server...");
-  }
-  ROS_INFO("Established Connection with pan_servo ActionServer!");
-*/
-/*
-
-  // rmc_simulation::PanServoGoal goalRequest;
-  // actionlib::SimpleClientGoalHandle<rmc_simulation::PanServoAction> cgh = _panServoAC.sendGoal(goalRequest);
-
-  rmc_simulation::PanServoGoal goalRequest;
-  _panServoAC.sendGoal(goalRequest);
-
-  ROS_INFO("Sent PanServoGoal, waiting for result...");
-
-  while(_panServoAC.waitForResult(ros::Duration(0.1)))
-  {
-    ros::Duration(0.4).sleep();
-    ros::spinOnce();
-    if(_foundMarker)
-    {
-      ROS_INFO("Found marker. Exiting loop...");
-      break;
-    }
-  }
-*/
-/* ------
-	while(!foundMarker)
-	{
-		ros::Duration(1.0).sleep();
-		ROS_INFO("Looking for Aruco Marker...");
-	}
-	ROS_INFO("Found Aruco Marker!");
-
-    move_base_msgs::MoveBaseGoal moveBaseGoal;
-        
-	moveBaseGoal.target_pose.header.frame_id   = "map";
-	moveBaseGoal.target_pose.header.stamp      = ros::Time::now();
-
-	moveBaseGoal.target_pose.pose.position     = _goalPointsQueue.front().position;
-	moveBaseGoal.target_pose.pose.orientation  = tf::createQuaternionMsgFromRollPitchYaw(0, 0, 0);
-
-	ROS_INFO_STREAM("Sending goal(X, Y):" << "[ " << moveBaseGoal.target_pose.pose.position.x << " , " << moveBaseGoal.target_pose.pose.position.y << " ]");
-
-        _moveBaseAC.sendGoal(moveBaseGoal);
-
-    	ROS_INFO("Sent Goal...");
-
-        _moveBaseAC.waitForResult();
-
-    	ROS_INFO("Got result...");
-
-        if(_moveBaseAC.getState() == actionlib::SimpleClientGoalState::SUCCEEDED)
-        {
-                ROS_INFO("Succesfully moved to GoalPoint.");
-        }
-        else
-        {
-                ROS_WARN("Failed to move to GoalPoint.");
-        }
-*/
-
-/*
-
-  ROS_INFO("Got result...");
-
-
-  while(!_moveBaseAC.waitForServer(ros::Duration(2.0)))
-  {
-    ROS_INFO("Waiting for the move_base action server...");
-  }
-  ROS_INFO("Established Connection with move_base ActionServer!");
-  
-	while(!_goalPointsQueue.empty())
-	{
-    move_base_msgs::MoveBaseGoal moveBaseGoal;
-	
-		moveBaseGoal.target_pose.header.frame_id   = "map";
-		moveBaseGoal.target_pose.header.stamp      = ros::Time::now();
-
-		moveBaseGoal.target_pose.pose.position     = _goalPointsQueue.front().position;
-		moveBaseGoal.target_pose.pose.orientation  = tf::createQuaternionMsgFromRollPitchYaw(0, 0, 0);
-
-		ROS_INFO_STREAM("Sending goal(X, Y):" << "[ " << moveBaseGoal.target_pose.pose.position.x << " , "
-                                              		<< moveBaseGoal.target_pose.pose.position.y << " ]");
-
-		_moveBaseAC.sendGoal(moveBaseGoal);
-
-    ROS_INFO("Sent Goal...");
-
-		_moveBaseAC.waitForResult();
-
-    ROS_INFO("Got result...");
-
-		if(_moveBaseAC.getState() == actionlib::SimpleClientGoalState::SUCCEEDED)
-		{
-	      ROS_INFO("Removing goal from queue...");
-  			_goalPointsQueue.pop();
-  			ROS_INFO("Succesfully moved to GoalPoint.");
-		}
-		else
-		{
-  			ROS_WARN("Failed to move to GoalPoint.");
-		}
-	}*/
 
 	//StateMachineBase::dock();
   

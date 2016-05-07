@@ -19,11 +19,12 @@ StateMachineBase::~StateMachineBase(void)
 
 bool StateMachineBase::Initialize()
 {
+/*
         if( ros::console::set_logger_level(ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Debug) )
         {
                 ros::console::notifyLoggerLevelsChanged();
         }
-
+*/
 	if (_nhLocal.hasParam("DockingPosition"))
 	{
 		std::vector<double>   pose;
@@ -174,22 +175,22 @@ void StateMachineBase::run()
 		// bunch of if's so that status print statements are color coordinated
 		// TODO: Its printing out all of them false, even though at least one should be true
 		if(srv.response.status.roboteq == true)
-			ROS_DEBUG("Roboteq = True");
+			ROS_INFO("Roboteq = True");
 		else
 			ROS_ERROR("Roboteq = False");
 
 		if(srv.response.status.aruco == true)
-			ROS_DEBUG("Aruco = True");
+			ROS_INFO("Aruco TF = True");
 		else
-			ROS_ERROR("Aruco = False");
+			ROS_ERROR("Aruco TF = False");
 
 		if(srv.response.status.servo == true)
-			ROS_DEBUG("Servo = True");
+			ROS_INFO("Servo = True");
 		else
 			ROS_ERROR("Servo = False");
 
 		if(srv.response.status.rtab == true)
-			ROS_DEBUG("RTAB = True");
+			ROS_INFO("RTAB = True");
 		else
 			ROS_ERROR("RTAB = False");
 		

@@ -32,6 +32,7 @@ class MissionValidator
 		bool validateSensors(void);
 		bool validateRtab(void);
 		bool validateServo(void);
+		bool validateArucoTF(void);
 		bool validateHardware(void);
 
 		void arucoPoseCallback(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr& poseMsg);

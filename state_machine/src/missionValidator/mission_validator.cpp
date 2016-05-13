@@ -34,21 +34,25 @@ void MissionValidator::Run(void)
 	}	
 }
 
-bool MissionValidator::validateSensors(void)
+bool MissionValidator::validateSensors(ValidationRequest request)
 {
 	_eStatus = eEvaluating; 
 
-	if(!validateServo())
-		_eStatus = eInvalidated;
+	if(request.sensors.servo)
+		if(!validateServo())
+			_eStatus = eInvalidated;
 
-	if(!validateHardware())
-		_eStatus = eInvalidated;
+	if(request.sensors.roboteq)
+		if(!validateHardware())
+			_eStatus = eInvalidated;
 
-	if(!validateRtab())
-		_eStatus = eInvalidated;
+	if(request.sensors.rtab)
+		if(!validateRtab())
+			_eStatus = eInvalidated;
 
-	if(!validateArucoTF())
-		_eStatus = eInvalidated;
+	if(request.sensors.aruco)
+		if(!validateArucoTF())
+			_eStatus = eInvalidated;
 
 	if(_eStatus == eEvaluating)
 		_eStatus = eValidated;
@@ -93,17 +97,17 @@ bool MissionValidator::validateServo(void)
 	_currentStatusMsg.servo = true; // reset and assume true, unless an error makes it false
 
 	ROS_DEBUG("-- Publishing servo position --");
-	servoAngle.data = 1.0;
+	servoAngle.data = 2.61799; // 150 degress in radians
 	_servoPub.publish(servoAngle);
 	ros::spinOnce();
-	ros::Duration(4).sleep();
+	ros::Duration(5).sleep();
 
 	try
 	{
 		ROS_DEBUG("-- Looking up servo_mount_link transform --");
 		_tfListener.waitForTransform("servo_mount_link","blackfly_mount_link", ros::Time(0), ros::Duration(3));
 		_tfListener.lookupTransform("servo_mount_link","blackfly_mount_link", ros::Time(0), servoTf);
-		if(getYaw(servoTf.getRotation()) > 0.8) // should be 1, but 
+		if(getYaw(servoTf.getRotation()) > 1.57) // should be 1, but 
 		{
 			ROS_DEBUG("-- TF Lookup Successful --");
 			servoAngle.data = 0.0; // double check that we really are moving the servo
@@ -188,7 +192,7 @@ bool MissionValidator::validationServiceCallback(ValidationRequest& request, Val
 	_currentStatusMsg.camera 	= false;
 	_currentStatusMsg.kinect 	= false;
 
-	validateSensors();
+	validateSensors(request);
 
 	response.status = _currentStatusMsg;
 	response.validated = (_eStatus == eValidated);

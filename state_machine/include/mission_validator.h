@@ -29,7 +29,7 @@ class MissionValidator
 		void Run(void);
 
 	private:
-		bool validateSensors(void);
+		bool validateSensors(ValidationRequest request);
 		bool validateRtab(void);
 		bool validateServo(void);
 		bool validateArucoTF(void);

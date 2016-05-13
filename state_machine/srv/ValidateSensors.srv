@@ -1,3 +1,4 @@
+state_machine/SensorStatus sensors
 ---
 state_machine/SensorStatus status
 bool validated

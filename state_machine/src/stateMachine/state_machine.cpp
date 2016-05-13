@@ -63,6 +63,17 @@ bool StateMachineBase::Initialize()
       		return false;
 	}
 
+	_currentSensorRequest.roboteq = true;
+	_nhLocal.param<bool>("Roboteq", _currentSensorRequest.roboteq);
+
+	_currentSensorRequest.aruco = true;
+	_nhLocal.param<bool>("Aruco", _currentSensorRequest.servo);
+
+	_currentSensorRequest.servo = true;
+	_nhLocal.param<bool>("Servo", _currentSensorRequest.servo);
+
+	_currentSensorRequest.rtab = true;
+	_nhLocal.param<bool>("RTAB", _currentSensorRequest.rtab);
 
 	_currentDigCycleCount = 0;
 
@@ -161,46 +172,73 @@ bool StateMachineBase::moveToGoalPoint(geometry_msgs::Pose waypoint)
 */
 }
 
-void StateMachineBase::run()
+bool StateMachineBase::callSensorValidator(state_machine::ValidateSensors srv)
 {
-  	//ROS_INFO("Sleeping for 2 seconds...");
- 	//ros::Duration(3.0).sleep();
- 	ROS_INFO("Starting!");
-
-	state_machine::ValidateSensors srv;
 	if(_validatorClient.call(srv))
 	{
 
 		ROS_WARN("--------------------------------------------------");
 		// bunch of if's so that status print statements are color coordinated
 		// TODO: Its printing out all of them false, even though at least one should be true
-		if(srv.response.status.roboteq == true)
-			ROS_INFO("Roboteq = True");
+		if(srv.request.sensors.roboteq)
+			if(srv.response.status.roboteq == true)
+				ROS_INFO("Roboteq = True");
+			else
+				ROS_ERROR("Roboteq = False");
 		else
-			ROS_ERROR("Roboteq = False");
+			ROS_WARN("Roboteq = Unknown");
 
-		if(srv.response.status.aruco == true)
-			ROS_INFO("Aruco TF = True");
+		if(srv.request.sensors.aruco)
+			if(srv.response.status.aruco == true)
+				ROS_INFO("Aruco TF = True");
+			else
+				ROS_ERROR("Aruco TF = False");
 		else
-			ROS_ERROR("Aruco TF = False");
+			ROS_WARN("Aruco = Unknown");
 
-		if(srv.response.status.servo == true)
-			ROS_INFO("Servo = True");
+		if(srv.request.sensors.servo)
+			if(srv.response.status.servo == true)
+				ROS_INFO("Servo = True");
+			else
+				ROS_ERROR("Servo = False");
 		else
-			ROS_ERROR("Servo = False");
+			ROS_WARN("Servo = Unknown");
 
-		if(srv.response.status.rtab == true)
-			ROS_INFO("RTAB = True");
+		if(srv.request.sensors.rtab)
+			if(srv.response.status.rtab == true)
+				ROS_INFO("RTAB = True");
+			else
+				ROS_ERROR("RTAB = False");
 		else
-			ROS_ERROR("RTAB = False");
+			ROS_WARN("RTAB = Unknown");
 		
 		ROS_WARN("--------------------------------------------------");
 
 		if(srv.response.validated)
-			ROS_INFO("-- Sensors Initialized and Validated --");
+			ROS_INFO("-- Sensors Initialized and Validated --"); return true;
 		else
-			ROS_ERROR("-- Sensors could not be initialized. Exiting... --"); return;
+			ROS_ERROR("-- Sensors could not be initialized. Exiting... --"); return false;
 	}
+
+}
+
+void StateMachineBase::run()
+{
+  	//ROS_INFO("Sleeping for 2 seconds...");
+ 	//ros::Duration(3.0).sleep();
+ 	ROS_INFO("Starting!");
+
+	// TODO: add request component to ValidateSensors message so that we can request specific
+	//       validations (all, or individual)
+	state_machine::ValidateSensors srv;
+	srv.request.sensors.roboteq 	= _currentSensorRequest.roboteq;
+	srv.request.sensors.rtab 	= _currentSensorRequest.rtab;
+	srv.request.sensors.servo 	= _currentSensorRequest.servo; 
+	srv.request.sensors.aruco 	= _currentSensorRequest.aruco;
+
+	if(!callSensorValidator(srv))
+		return;
+
 /*
         while(!_foundMarker)
         {

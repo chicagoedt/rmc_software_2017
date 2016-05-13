@@ -15,6 +15,7 @@
 #include <geometry_msgs/Twist.h>
 #include <sensor_msgs/Imu.h>
 #include <roboteq_node/Actuators.h>
+#include <state_machine/SensorStatus.h>
 #include <state_machine/ValidateSensors.h>
 
 #include <math.h>
@@ -57,6 +58,7 @@ class StateMachineBase
 		bool sendGoalToAC(geometry_msgs::Pose goalPose);
         	void servoCameraState(const std_msgs::Bool::ConstPtr& servoState); 
         	void arucoPoseCallback(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr& poseMsg);
+		bool callSensorValidator(state_machine::ValidateSensors srv);
         	bool moveToGoalPoint(geometry_msgs::Pose waypoint);
 		void setActuatorPosition(eDigPosition digPosition);
 		void setServoAngle(float angle);
@@ -81,6 +83,8 @@ class StateMachineBase
 
 		ros::ServiceClient _actuatorClient;
 		ros::ServiceClient _validatorClient;
+
+		state_machine::SensorStatus _currentSensorRequest;
 
 		float 	_previous_x_accel;
 		bool  	_didDock;

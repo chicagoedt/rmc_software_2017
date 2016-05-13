@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<launch>
+
+	<include file="$(find rmc_2dnav)/launch/description.launch"/>
+
+	<!-- Need to check if real or fake sensors -->
+        <include file="$(find rmc_2dnav)/launch/test/navigation/sensors-no-kinect.launch"/>
+<!--
+        <include file="$(find rmc_2dnav)/launch/sensors/localization.launch"/>
+-->
+        <include file="$(find rmc_2dnav)/launch/rtabmap-with-odom-tf.launch"/>
+
+</launch>
+

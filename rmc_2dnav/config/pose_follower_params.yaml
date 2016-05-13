@@ -6,7 +6,7 @@ PoseFollower:
   tolerance_timeout: 0.6
   holonomic: false
   samples: 100
-  max_vel_lin: 1.0
+  max_vel_lin: 0.6
   min_vel_lin: 0.21
   max_vel_th: 2.3
   min_vel_th: -2.3

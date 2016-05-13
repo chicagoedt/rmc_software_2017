@@ -14,6 +14,9 @@
 #include <std_msgs/Float64.h>
 #include <geometry_msgs/Twist.h>
 #include <sensor_msgs/Imu.h>
+#include <roboteq_node/Actuators.h>
+#include <state_machine/SensorStatus.h>
+#include <state_machine/ValidateSensors.h>
 
 #include <math.h>
 
@@ -32,6 +35,13 @@ class StateMachineBase
 
 	const int MAX_GOAL_POINTS; // Refer to Goal Points vector
 
+	enum eDigPosition
+	{
+		eDig = 850,
+		eHome = 0,
+		eDump = -800
+	};
+
 	public:
 
 		StateMachineBase(void);
@@ -42,6 +52,22 @@ class StateMachineBase
 
 	private:
 
+        	void moveActuators(bool goUp);
+		
+		bool startConnectionAC;
+		bool sendGoalToAC(geometry_msgs::Pose goalPose);
+        	void servoCameraState(const std_msgs::Bool::ConstPtr& servoState); 
+        	void arucoPoseCallback(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr& poseMsg);
+		bool callSensorValidator(state_machine::ValidateSensors srv);
+        	bool moveToGoalPoint(geometry_msgs::Pose waypoint);
+		void setActuatorPosition(eDigPosition digPosition);
+		void setServoAngle(float angle);
+		
+		void dock();
+		void dockCallback(const sensor_msgs::Imu::ConstPtr& msg);
+
+	private:
+
 		ros::NodeHandle	_nh;
 		ros::NodeHandle	_nhLocal;
 
@@ -49,53 +75,40 @@ class StateMachineBase
        		ros::Subscriber _arucoSub; 
 
 		ros::Subscriber _imuSub;
+		ros::Publisher	_servoPub;
 		ros::Publisher  _imuPub;
+		ros::Publisher  _digPub;
 		ros::Publisher  _arucoPub;
 		ros::Publisher  _actuatorPub;
 
-		float _previous_x_accel ;
-		bool  _didDock;
+		ros::ServiceClient _actuatorClient;
+		ros::ServiceClient _validatorClient;
+
+		state_machine::SensorStatus _currentSensorRequest;
+
+		float 	_previous_x_accel;
+		bool  	_didDock;
 		// Tweak below three parameters inside the launch file for optimal dock performance
-		int   _values_for_average;  // Number of values considered in the 'average' calculation
-		double _threshold; // The minimum difference in acceleration to be considered a hit
-		int   _num_to_dock; // How many consecutive hits needed to consider dock
-		int   _above_threshold_count;
-		int   _numCheck; // How many more datum to check for hits
-		std::deque<double> _average_imu_g; // Double ended queue that stores the imu values
-		tf::StampedTransform  _tf_base_link_to_map;
-		tf::TransformListener _tf_listener;
+		int   	_values_for_average;  		// Number of values considered in the 'average' calculation
+		double 	_threshold; 			// The minimum difference in acceleration to be considered a hit
+		int   	_num_to_dock; 			// How many consecutive hits needed to consider dock
+		int   	_above_threshold_count;
+		int   	_numCheck; 			// How many more datum to check for hits
+		std::deque<double> 	_average_imu_g; // Double ended queue that stores the imu values
+		tf::StampedTransform  	_tf_base_link_to_map;
+		tf::TransformListener 	_tf_listener;
 
 
 		MoveBaseClient 	_moveBaseAC;
 		PanServoClient	_panServoAC;
 
-
-        	void moveActuators(bool goUp);
-		
-		bool startConnectionAC;
-		bool sendGoalToAC(geometry_msgs::Pose goalPose);
-        	void servoCameraState(const std_msgs::Bool::ConstPtr& servoState); 
-        	void arucoPoseCallback(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr& poseMsg);
-        	void moveToGoalPoint();
-		
-		void dock();
-		void dockCallback(const sensor_msgs::Imu::ConstPtr& msg);
-		/*
-		 * @brief
-		 *
-		 * Dumping Zone: Point 1. 		This will be our 'origin' to return to dump.
-		 * Digging Zone: Point 2/3/4. 	In our queue array we wont ittirate from Point 2
-		 *								to Point 3 to Point 4, instead these will be our
-		 *								be each one of our dig zone end points for each
-		 *								traversial itteration (Drive, Dig, Dump).
-		 * Aligning Zone: Point 5		After we finish digging at one of our dig zone end
-		 *								points (2,3, or 4), Point 5 will be the following
-		 *								irrirated goal sent to actionlib server.
-		 * Example: 	Localize --> Point 2 --> Point 5 --> Point 0
-		 *						 --> Point 3 --> Point 5 --> Point 0
-		 *						 --> Point 4 --> Point 5 --> Point 0
-		 */
 		std::queue<geometry_msgs::Pose> _goalPointsQueue;
+
+		geometry_msgs::Pose	_dockingPose;
+		geometry_msgs::Pose	_digStartPose;
+		geometry_msgs::Pose	_digEndPose;
+
+		int	_currentDigCycleCount;
 
         enum eState
         {
@@ -106,6 +119,7 @@ class StateMachineBase
             eDriveToDump,
             eDumping
         };
+
 
         eState _robotState;
 

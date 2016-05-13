@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<launch>
+
+        <include file="$(find rmc_2dnav)/launch/sensors/servo_and_camera.launch"/>
+        <include file="$(find rmc_2dnav)/launch/ar_sys_19cm.launch"/>
+
+</launch>

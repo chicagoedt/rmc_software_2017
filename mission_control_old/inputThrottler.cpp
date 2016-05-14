@@ -19,7 +19,7 @@ InputThrottler::~InputThrottler()
 
 void    InputThrottler::run(void)
 {
-    emit StatusUpdate( eInfo, QString("Input Throttler thread initialized"));
+    emit StatusUpdate( eOK, QString("Input Throttler thread initialized"));
 
     while( QThread::currentThread()->isRunning() )
     {
@@ -41,7 +41,7 @@ void    InputThrottler::run(void)
         QThread::msleep(_sleepInterval);
     }
 
-    emit StatusUpdate( eInfo, QString("Input Throttler thread terminated"));
+    emit StatusUpdate( eOK, QString("Input Throttler thread terminated"));
 }
 
 void    InputThrottler::SetMode(const eOperationMode mode)
@@ -116,7 +116,7 @@ void    InputThrottler::UpdateRateChanged(unsigned int ups)
 
 void    InputThrottler::DeviceBtnUpdate( eBtnState state, int btnID )
 {
-    //qDebug() << "Button " << btnID;
+    qDebug() << "Button " << btnID;
 
     if( state == eDown )
     {

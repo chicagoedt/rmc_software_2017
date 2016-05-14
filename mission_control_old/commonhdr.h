@@ -3,16 +3,8 @@
 
 enum eStatus
 {
-    eInfo,
-    eConnected,
-    eDisconnected,
-    eError
-};
-
-enum eDirection
-{
-    eOut,
-    eIn
+    eOK,
+    eERROR
 };
 
 enum eBtnState

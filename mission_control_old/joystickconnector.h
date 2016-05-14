@@ -49,7 +49,6 @@ class JoystickConnector : public QThread
 
         const int DEAD_ZONE;
 
-
     public:
             explicit JoystickConnector(QObject* parent = 0L);
             virtual ~JoystickConnector();

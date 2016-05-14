@@ -17,25 +17,21 @@ class TCPSender :  public QObject
         bool    isConnected(void);
         void    connect(const QString& host, quint16 port );
         void    disconnect(void);
+        void    send(const QByteArray& buffer);
 
     public slots:
         void    publishMessage(const QByteArray& buffer);
-
-    private slots:
         void    connected();
         void    disconnected();
         void    bytesWritten(qint64 bytes);
         void    readyRead();
-        void    error(QAbstractSocket::SocketError socketError);
 
     signals:
         void    publishBackupUDPMessage(const QByteArray& buffer);
         void    statusUpdate(const eStatus& status, const QString& message);
-        void    networkMessageTrace(const eDirection dir,
-                                    const QString& message);
 
     private:
-        qint64  sendSnapshot();
+        void    sendSnapshot();
 
     private:
        QTcpSocket*   _tcpSocket;

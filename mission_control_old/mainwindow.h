@@ -37,17 +37,11 @@ class MainWindow : public QMainWindow
         void deviceDisconnected(void);
         void deviceUpdate(const InputUpdate& state);
 
-        void networkMessageTrace(const eDirection dir,
+        void networkMessageTrace(const UDPSender::eDirection dir,
                                  const QString& message);
 
-        void statusUpdate(   const eStatus& status,
-                             const QString& message);
-
-        void statusUDPUpdate(const eStatus& status,
-                             const QString& message);
-
-        void statusTCPUpdate(const eStatus& status,
-                             const QString& message);
+        void statusUpdate(const eStatus& status,
+                          const QString& message);
 
         void updateLCD();
         void bitsUpdate(const QString& bits);

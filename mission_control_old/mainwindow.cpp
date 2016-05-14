@@ -63,11 +63,8 @@ void MainWindow::initialize()
     _tcpSender  = new TCPSender(this);
 
 
-    connect(_udpSender, SIGNAL(networkMessageTrace(const eDirection, const QString&)),
-                  this, SLOT(networkMessageTrace(const eDirection, const QString&)));
-
-    connect(_tcpSender, SIGNAL(networkMessageTrace(const eDirection, const QString&)),
-                  this, SLOT(networkMessageTrace(const eDirection, const QString&)));
+    connect(_udpSender, SIGNAL(networkMessageTrace(const UDPSender::eDirection, const QString&)),
+                                      this, SLOT(networkMessageTrace(const UDPSender::eDirection, const QString&)));
 
     _inputThrottler    = new InputThrottler(this);
     _joystickConnector = new JoystickConnector(this);
@@ -101,16 +98,16 @@ void MainWindow::initialize()
     connect(_joystickConnector, SIGNAL(deviceBtnUpdate(eBtnState, int)),
                                        this, SLOT(deviceBtnUpdate(eBtnState, int)));
 
-    //if(_streamTCP)
-    //{
+    if(_streamTCP)
+    {
         connect(_inputThrottler, SIGNAL(PublishMessage(const QByteArray&)),
                                            _tcpSender, SLOT(publishMessage(const QByteArray&)));
-    //}
-    //else
-    //{
-    //    connect(_inputThrottler, SIGNAL(PublishMessage(const QByteArray&)),
-    //                                       _udpSender, SLOT(publishMessage(const QByteArray&)));
-    //}
+    }
+    else
+    {
+        connect(_inputThrottler, SIGNAL(PublishMessage(const QByteArray&)),
+                                           _udpSender, SLOT(publishMessage(const QByteArray&)));
+    }
 
 
     connect(_inputThrottler, SIGNAL(PublishMessage(const QByteArray&)),
@@ -126,10 +123,10 @@ void MainWindow::initialize()
                                        _udpSender, SLOT(publishMessage(const QByteArray&)));
 
     connect(_udpSender, SIGNAL(statusUpdate(const eStatus&, const QString&)),
-                                       this, SLOT(statusUDPUpdate(const eStatus&, const QString&)));
+                                       this, SLOT(statusUpdate(const eStatus&, const QString&)));
 
     connect(_tcpSender, SIGNAL(statusUpdate(const eStatus&, const QString&)),
-                                       this, SLOT(statusTCPUpdate(const eStatus&, const QString&)));
+                                       this, SLOT(statusUpdate(const eStatus&, const QString&)));
 
     connect(_inputThrottler, SIGNAL(BitsUpdate(const QString&)),
                                        this, SLOT(bitsUpdate(const QString&)));
@@ -232,18 +229,6 @@ void MainWindow::deviceDisconnected(void)
 
 void MainWindow::statusUpdate(const eStatus& status,
                               const QString& message)
-{
-    logTrace(status, message);
-}
-
-void MainWindow::statusUDPUpdate(const eStatus& status,
-                                 const QString& message)
-{
-    logTrace(status, message);
-}
-
-void MainWindow::statusTCPUpdate(const eStatus& status,
-                                 const QString& message)
 {
     logTrace(status, message);
 }
@@ -406,35 +391,19 @@ void    MainWindow::logTrace(const eStatus& status,
 {
     QString msg = QDateTime::currentDateTime().toString("hh:mm:ss");
 
-    switch(status)
+    if( status == eOK )
     {
-        case eInfo:
-            msg += " INF  - ";
-            msg +=  message;
+        msg += " OK  - ";
+        msg +=  message;
 
-            qDebug() << message;
-            break;
+        qDebug() << message;
+    }
+    else
+    {
+        msg += " ERR - ";
+        msg +=  message;
 
-        case eConnected:
-            msg += " CON - ";
-            msg +=  message;
-
-            qWarning() << message;
-            break;
-
-        case eDisconnected:
-            msg += " DIS - ";
-            msg +=  message;
-
-            qWarning() << message;
-            break;
-
-        case eError:
-            msg += " ERR - ";
-            msg +=  message;
-
-            qWarning() << message;
-            break;
+        qWarning() << message;
     }
 
     if( _logger->isOpen() == false )
@@ -445,7 +414,7 @@ void    MainWindow::logTrace(const eStatus& status,
     textStreamLogger << "-- " << message;
 }
 
-void    MainWindow::networkMessageTrace(const eDirection dir,
+void    MainWindow::networkMessageTrace(const UDPSender::eDirection dir,
                                         const QString& message)
 {
     if( _logger->isOpen() == false )
@@ -453,7 +422,7 @@ void    MainWindow::networkMessageTrace(const eDirection dir,
 
     QTextStream textStreamLogger(_logger);
 
-    if( dir == eIn )
+    if( dir == UDPSender::eIn )
         textStreamLogger << "<- " << message;
     else
         textStreamLogger << "-> " << message;

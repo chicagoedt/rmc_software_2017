@@ -29,7 +29,7 @@ void UDPSender::connect(const QString& host, quint16 port )
     _udpSocket->bind(QHostAddress::Any, port);
     _udpSocket->connectToHost(host, port);
 
-    emit statusUpdate( eInfo, QString("UDPSender Connect: ") + host + "  " + QString::number(port));
+    emit statusUpdate( eOK, QString("UDPSender Connect: ") + host + "  " + QString::number(port));
 }
 
 void UDPSender::disconnect(void)
@@ -39,7 +39,7 @@ void UDPSender::disconnect(void)
 
     _udpSocket->disconnectFromHost();
 
-    emit statusUpdate( eDisconnected, QString("UDPSender Disconnect"));
+    emit statusUpdate( eOK, QString("UDPSender Disconnect"));
 
     QObject::disconnect(_udpSocket, SIGNAL(readyRead()),
                         this, SLOT(readPendingDatagrams()));
@@ -57,7 +57,7 @@ void    UDPSender::send(const QByteArray& buffer)
 
 void    UDPSender::readPendingDatagrams()
 {
-    emit statusUpdate( eInfo, QString("UDPSender Reader Created"));
+    emit statusUpdate( eOK, QString("UDPSender Reader Created"));
 
     QByteArray   datagram;
     QHostAddress host;
@@ -75,7 +75,7 @@ void    UDPSender::readPendingDatagrams()
         datagram.clear();
     }
 
-    emit statusUpdate( eInfo, QString("UDPSender Reader Finished"));
+    emit statusUpdate( eOK, QString("UDPSender Reader Finished"));
 }
 
 void    UDPSender::processDatagram(const QByteArray& buffer)

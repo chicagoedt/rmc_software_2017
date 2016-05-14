@@ -10,6 +10,12 @@ class UDPSender : public QObject
         Q_OBJECT
 
         public:
+            enum eDirection
+            {
+                eOut,
+                eIn
+            };
+
            explicit UDPSender(QObject* parent = 0L);
            virtual ~UDPSender();
 
@@ -23,8 +29,8 @@ class UDPSender : public QObject
            void     publishMessage(const QByteArray& buffer);
 
         signals:
-           void     networkMessageTrace(const eDirection dir,
-                                        const QString& message);
+           void     networkMessageTrace(const UDPSender::eDirection dir,
+                                       const QString& message);
            void     statusUpdate(const eStatus& status, const QString& message);
 
         private:

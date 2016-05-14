@@ -128,7 +128,7 @@
              <bool>false</bool>
             </property>
             <property name="text">
-             <string extracomment="1">192.168.1.154</string>
+             <string extracomment="1">192.168.1.205</string>
             </property>
             <property name="placeholderText">
              <string/>
@@ -531,7 +531,7 @@
                        <string>Safety Mode</string>
                       </property>
                       <property name="checked">
-                       <bool>false</bool>
+                       <bool>true</bool>
                       </property>
                      </widget>
                     </item>
@@ -539,9 +539,6 @@
                      <widget class="QRadioButton" name="radioButtonAuto">
                       <property name="text">
                        <string>Auto Mode</string>
-                      </property>
-                      <property name="checked">
-                       <bool>true</bool>
                       </property>
                      </widget>
                     </item>

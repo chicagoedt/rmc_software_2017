@@ -203,7 +203,7 @@ void    JoystickConnector::handleController(void)
 
 void    JoystickConnector::onJoystickAxisEvent( const SDL_JoyAxisEvent& event)
 {
-/*
+
     if( event.axis == SDL_CONTROLLER_AXIS_LEFTX )
     {
         if( qAbs<Sint32>(event.value) < DEAD_ZONE)
@@ -212,7 +212,7 @@ void    JoystickConnector::onJoystickAxisEvent( const SDL_JoyAxisEvent& event)
             _currentState._axisLeft._x = event.value;
         //qDebug() << "AXIS_LEFTX " << event.value << _currentState._axisLeft._x;
     }
-*/
+
     if( event.axis == SDL_CONTROLLER_AXIS_LEFTY )
     {
         if( qAbs<Sint32>(event.value) < DEAD_ZONE)
@@ -237,6 +237,7 @@ void    JoystickConnector::onJoystickAxisEvent( const SDL_JoyAxisEvent& event)
         //qDebug() << "AXIS_RIGHTX " << event.value << _currentState._axisRight._x;
     }
 
+
     else if(event.axis == SDL_CONTROLLER_AXIS_RIGHTY)
     {
         if( qAbs<Sint32>(event.value) < DEAD_ZONE)
@@ -244,11 +245,17 @@ void    JoystickConnector::onJoystickAxisEvent( const SDL_JoyAxisEvent& event)
             //qDebug() << "Doing dumb shit " << event.value << _currentState._axisRight._y;
             _currentState._axisRight._y = 0;
         }
+        else if(qAbs<Sint32>(event.value) > 32767 )
+        {
+            _currentState._axisRight._y = 32767;
+           //qDebug() << "Editing weird val " << event.value << "to" << _currentState._axisLeft._y << endl;
+        }
         else
-            _currentState._axisRight._y = event.value;
+            _currentState._axisRight._y = -event.value;
 
         //qDebug() << "AXIS_RIGHTY " << event.value << _currentState._axisRight._y;
     }
+
 
 
 /*

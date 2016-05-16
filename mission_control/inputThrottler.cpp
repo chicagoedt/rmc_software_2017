@@ -66,7 +66,6 @@ void    InputThrottler::PackBits()
     _byteArray[1] = ((_state.axisRight().Y() / JOY_PER_MSG_SCALAR) & 0x0F) |
                     ((_state.axisLeft().Y() / JOY_PER_MSG_SCALAR) & 0x0F) << 4;
 }
-
 void    InputThrottler::DeviceUpdate(const InputUpdate& state)
 {
     _lock.lock();

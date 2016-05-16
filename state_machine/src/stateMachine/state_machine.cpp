@@ -63,17 +63,28 @@ bool StateMachineBase::Initialize()
       		return false;
 	}
 
-	_currentSensorRequest.roboteq = true;
-	_nhLocal.param<bool>("Roboteq", _currentSensorRequest.roboteq);
+	_isSimulation = false;
+	_nhLocal.param<bool>("simulation", _isSimulation);
 
-	_currentSensorRequest.aruco = true;
-	_nhLocal.param<bool>("Aruco", _currentSensorRequest.servo);
+	if(!_isSimulation)
+	{
+		_currentSensorRequest.roboteq = true;
+		_nhLocal.param<bool>("Roboteq", _currentSensorRequest.roboteq);
 
-	_currentSensorRequest.servo = true;
-	_nhLocal.param<bool>("Servo", _currentSensorRequest.servo);
+		_currentSensorRequest.servo = true;
+		_nhLocal.param<bool>("Servo", _currentSensorRequest.servo);
+	}
+	else
+	{
+		_currentSensorRequest.roboteq = false;
+		_currentSensorRequest.servo = false;
+	}
 
 	_currentSensorRequest.rtab = true;
 	_nhLocal.param<bool>("RTAB", _currentSensorRequest.rtab);
+
+	_currentSensorRequest.aruco = true;
+	_nhLocal.param<bool>("Aruco", _currentSensorRequest.servo);
 
 	_currentDigCycleCount = 0;
 
@@ -100,16 +111,23 @@ void StateMachineBase::arucoPoseCallback(const geometry_msgs::PoseWithCovariance
 
 void StateMachineBase::setActuatorPosition(eDigPosition digPosition)
 {
-	roboteq_node::Actuators srv;
-	srv.request.actuator_position = digPosition;
-
-	if(_actuatorClient.call(srv))  // blocking call
+	if(!_isSimulation)
 	{
-		ROS_INFO_STREAM("Moved/Moving to " << digPosition);
+		roboteq_node::Actuators srv;
+		srv.request.actuator_position = digPosition;
+
+		if(_actuatorClient.call(srv))  // blocking call
+		{
+			ROS_INFO_STREAM("Moved/Moving to " << digPosition);
+		}
+		else
+		{
+			ROS_ERROR_STREAM("Failed to call actuator service! Check if roboteq's are on...");
+		}
 	}
 	else
 	{
-		ROS_ERROR_STREAM("Failed to call actuator service! Check if roboteq's are on...");
+		ROS_INFO("Simulation Actuators to position.");
 	}
 
 }
@@ -215,9 +233,13 @@ bool StateMachineBase::callSensorValidator(state_machine::ValidateSensors srv)
 		ROS_WARN("--------------------------------------------------");
 
 		if(srv.response.validated)
+		{
 			ROS_INFO("-- Sensors Initialized and Validated --"); return true;
+		}
 		else
+		{
 			ROS_ERROR("-- Sensors could not be initialized. Exiting... --"); return false;
+		}
 	}
 
 }
@@ -239,16 +261,10 @@ void StateMachineBase::run()
 	if(!callSensorValidator(srv))
 		return;
 
-/*
-        while(!_foundMarker)
-        {
-                ros::Duration(1.0).sleep();
-                ROS_INFO("Looking for Aruco Marker...");
-		ros::spinOnce();
-        }
-        ROS_INFO("Found Aruco Marker!");
-*/
+
 	setActuatorPosition(eHome);
+
+ 	ros::Duration(5.0).sleep();
 
 	_robotState = eDriveToDig; // Start digging motors
 
@@ -279,10 +295,9 @@ void StateMachineBase::run()
 			}
 		}
 
-	}	
-		
+	}			
 
-	//StateMachineBase::dock();
+	StateMachineBase::dock();
   
 }
 
@@ -450,7 +465,7 @@ void StateMachineBase::dock()
 			loop_rate.sleep();
 			x = ( x > 0) ? x : -1*x ;
 
-			if (x < arucoDistance){
+			if ((x - 0.1) < arucoDistance){
 				_didDock = 1;
 				ROS_INFO_STREAM("Docked with ArUco");
 				msg.linear.x = 0;
@@ -461,4 +476,37 @@ void StateMachineBase::dock()
 
 		}
 	}
+}
+
+void StateMachineBase::undock()
+{
+    //int xvel = 0;
+    ros::Publisher undockPub = _nh.advertise<geometry_msgs::Twist>("cmd_vel", 1);
+    tf::TransformListener tfListener;
+    tf::StampedTransform map2base;
+    ros::Rate loop_rate(50);
+
+
+    bool foundTransform = 0;
+    geometry_msgs::Twist msg;
+    ros::spinOnce();
+    loop_rate.sleep();
+    while (!foundTransform){
+        try
+        {
+            _tf_listener.lookupTransform("/base_link", "/map", ros::Time(0), map2base/*transform*/);
+            foundTransform = 1;
+        }
+        catch (tf::TransformException ex){
+            ROS_INFO_STREAM("Not found");
+            msg.linear.x = .2;
+            undockPub.publish(msg);
+            ros::spinOnce();
+            loop_rate.sleep();
+        }
+    }
+    msg.linear.x = 0;
+    undockPub.publish(msg);
+    ros::spinOnce();
+    loop_rate.sleep();
 }

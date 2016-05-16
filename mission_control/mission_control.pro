@@ -18,7 +18,8 @@ SOURCES += main.cpp\
         inputThrottler.cpp \
         statsMonitor.cpp \
         udpSender.cpp \
-        tcpSender.cpp
+        tcpSender.cpp \
+    arenawindow.cpp
 
 HEADERS  += mainwindow.h \
         joystickconnector.h \
@@ -26,9 +27,14 @@ HEADERS  += mainwindow.h \
         commonhdr.h \
         statsMonitor.h \
         udpSender.h \
-        tcpSender.h
+        tcpSender.h \
+    arenawindow.h
 
-FORMS    += mainwindow.ui
+FORMS    += mainwindow.ui \
+    arenawindow.ui
 
 LIBS += -L/usr/local/lib -lSDL2
 INCLUDEPATH += /usr/local/include
+
+RESOURCES += \
+    resources.qrc

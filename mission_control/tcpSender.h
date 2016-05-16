@@ -5,6 +5,7 @@
 #include <QTcpSocket>
 #include "commonhdr.h"
 #include <QMutex>
+#include "pointMapper.h"
 
 class TCPSender :  public QObject
 {
@@ -17,6 +18,7 @@ class TCPSender :  public QObject
         bool    isConnected(void);
         void    connect(const QString& host, quint16 port );
         void    disconnect(void);
+
 
     public slots:
         void    publishMessage(const QByteArray& buffer);
@@ -33,6 +35,7 @@ class TCPSender :  public QObject
         void    statusUpdate(const eStatus& status, const QString& message);
         void    networkMessageTrace(const eDirection dir,
                                     const QString& message);
+        void    onNewMessage(char* pBUF,int size);
 
     private:
         qint64  sendSnapshot();
@@ -41,6 +44,7 @@ class TCPSender :  public QObject
        QTcpSocket*   _tcpSocket;
        QMutex        _lock;
        QByteArray    _snapShotData;
+       char          _receiveBuffer[4];
 };
 
 #endif // TCPSENDER_H

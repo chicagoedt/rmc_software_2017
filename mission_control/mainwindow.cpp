@@ -32,6 +32,9 @@ MainWindow::MainWindow(QWidget *parent) :
     _ui->lcdRateNumber->display( _ui->horizontalRateSlider->value());
 
     _ui->pushButtonConnect->setStyleSheet("color: green");
+
+    _ui->tcpConnectionStatus->setText("TCP NOT CONNECTED");
+    _ui->tcpConnectionStatus->setStyleSheet("color: green");
 }
 
 MainWindow::~MainWindow()
@@ -139,6 +142,9 @@ void MainWindow::initialize()
 
     connect(_statsMonitor, SIGNAL(statsUpdate(const Stats&)),
                                        this, SLOT(statsUpdate(const Stats&)));
+
+    connect(_tcpSender, SIGNAL(onNewMessage(char*,int)),
+                this, SLOT(on_rmcMessage(char*,int)) );
 
     _inputThrottler->start();
     _statsMonitor->start();
@@ -335,6 +341,8 @@ void MainWindow::OpenNetworkConnection()
     if( _tcpSender->isConnected() == false )
     {
         _tcpSender->connect(_ui->hostAddressTextBox->text(), (quint16)_ui->spinBoxTCPPort->value() );
+       // _ui->tcpConnectionStatus->setText("TCP CONNECTED");
+        //_ui->tcpConnectionStatus->setStyleSheet("color: red");
         _ui->pushButtonConnect->setStyleSheet("color: red");
         _ui->pushButtonConnect->setText("Disconnect");
         _ui->spinBoxUDPPort->setEnabled(false);
@@ -538,4 +546,9 @@ void MainWindow::on_pushButtonResetStats_clicked()
 void MainWindow::on_tcpStreamCheckBox_clicked()
 {
 
+}
+
+void MainWindow::on_rmcMessage(char* pBUF,int size){
+    _ui->tcpConnectionStatus->setText("TCP CONNECTED");
+    _ui->tcpConnectionStatus->setStyleSheet("color: red");
 }

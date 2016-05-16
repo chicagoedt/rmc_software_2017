@@ -77,6 +77,8 @@ class MainWindow : public QMainWindow
 
         void on_tcpStreamCheckBox_clicked();
 
+        void on_rmcMessage(char* pBUF,int size);
+
 private:
         void    logTrace(const eStatus& status,
                          const QString& message);
@@ -93,6 +95,7 @@ private:
         QLabel*             _labelHostName;
         QLabel*             _labelDevice;
         QLabel*             _labelDeviceName;
+        QLabel*             _tcpConnectionStatus;
         QFile*              _logger;
         QTimer*             _lcdTimer;
         QTime               _lcdTimeValue;

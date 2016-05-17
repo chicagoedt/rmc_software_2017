@@ -37,9 +37,9 @@ class RMCEnDecoder
 
         inline void enableDebug(bool b) { _printDebug = b; }
 
-        const RMCEnDecoder::TVec& encodeMesage(const RMCData& data);
-        const RMCData&            decodeMesage(const RMCEnDecoder::TVec& rawData);
-        const RMCData&            decodeMesage(const unsigned char* pBuffer, unsigned int size);
+        const RMCEnDecoder::TVec& encodeMessage(const RMCData& data);
+        const RMCData&            decodeMessage(const RMCEnDecoder::TVec& rawData);
+        const RMCData&            decodeMessage(const unsigned char* pBuffer, unsigned int size);
 
     private:
         RMCData _rmcData;

@@ -14,8 +14,8 @@ void    test(bool debug, unsigned int testID, int x, int y, int orient, RMCData:
 
     RMCData         rmcData(x, y, orient, state);
 
-    const RMCEnDecoder::TVec& encodedData = rmcEnDecoder.encodeMesage(rmcData);
-    const RMCData&            decodedData = rmcEnDecoder.decodeMesage(encodedData);
+    const RMCEnDecoder::TVec& encodedData = rmcEnDecoder.encodeMessage(rmcData);
+    const RMCData&            decodedData = rmcEnDecoder.decodeMessage(encodedData);
 
     if( debug )
     {

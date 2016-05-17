@@ -10,7 +10,7 @@ RMCEnDecoder::RMCEnDecoder(void)
 // D - Dig state
 // U - Unused bits
 // <OOOOO XXX> <XXXXXX YY> <YYYYYYYY> <UUUUUU DD>
-const RMCEnDecoder::TVec& RMCEnDecoder::encodeMesage(const RMCData& data)
+const RMCEnDecoder::TVec& RMCEnDecoder::encodeMessage(const RMCData& data)
 {
     // <OOOOO...> <........> <........>
     _rawData[0] = (unsigned char)((data.orient() & 0x1F) << 3);
@@ -38,9 +38,9 @@ const RMCEnDecoder::TVec& RMCEnDecoder::encodeMesage(const RMCData& data)
     return _rawData;
 }
 
-const RMCData&  RMCEnDecoder::decodeMesage(const RMCEnDecoder::TVec& rawData)
+const RMCData&  RMCEnDecoder::decodeMessage(const RMCEnDecoder::TVec& rawData)
 {
-    return decodeMesage(rawData.buffer(), rawData.size());
+    return decodeMessage(rawData.buffer(), rawData.size());
 }
 
 // O - Orientation
@@ -49,7 +49,7 @@ const RMCData&  RMCEnDecoder::decodeMesage(const RMCEnDecoder::TVec& rawData)
 // D - Dig state
 // U - Unused bits
 // <OOOOO XXX> <XXXXXX YY> <YYYYYYYY> <UUUUUU DD>
-const RMCData&  RMCEnDecoder::decodeMesage(const unsigned char* pBuffer, unsigned int size)
+const RMCData&  RMCEnDecoder::decodeMessage(const unsigned char* pBuffer, unsigned int size)
 {
     assert(size == MAX_MSG_SIZE);
 

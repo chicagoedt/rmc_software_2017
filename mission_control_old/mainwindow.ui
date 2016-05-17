@@ -128,7 +128,7 @@
              <bool>false</bool>
             </property>
             <property name="text">
-             <string extracomment="1">192.168.1.154</string>
+             <string extracomment="1">192.168.1.205</string>
             </property>
             <property name="placeholderText">
              <string/>
@@ -262,26 +262,6 @@
            <widget class="QCheckBox" name="tcpStreamCheckBox">
             <property name="text">
              <string>Stream TCP</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <spacer name="horizontalSpacer_8">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>25</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-          <item>
-           <widget class="QLabel" name="tcpConnectionStatus">
-            <property name="text">
-             <string/>
             </property>
            </widget>
           </item>
@@ -551,7 +531,7 @@
                        <string>Safety Mode</string>
                       </property>
                       <property name="checked">
-                       <bool>false</bool>
+                       <bool>true</bool>
                       </property>
                      </widget>
                     </item>
@@ -559,9 +539,6 @@
                      <widget class="QRadioButton" name="radioButtonAuto">
                       <property name="text">
                        <string>Auto Mode</string>
-                      </property>
-                      <property name="checked">
-                       <bool>true</bool>
                       </property>
                      </widget>
                     </item>

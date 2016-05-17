@@ -32,9 +32,6 @@ MainWindow::MainWindow(QWidget *parent) :
     _ui->lcdRateNumber->display( _ui->horizontalRateSlider->value());
 
     _ui->pushButtonConnect->setStyleSheet("color: green");
-
-    _ui->tcpConnectionStatus->setText("TCP NOT CONNECTED");
-    _ui->tcpConnectionStatus->setStyleSheet("color: green");
 }
 
 MainWindow::~MainWindow()
@@ -66,11 +63,8 @@ void MainWindow::initialize()
     _tcpSender  = new TCPSender(this);
 
 
-    connect(_udpSender, SIGNAL(networkMessageTrace(const eDirection, const QString&)),
-                  this, SLOT(networkMessageTrace(const eDirection, const QString&)));
-
-    connect(_tcpSender, SIGNAL(networkMessageTrace(const eDirection, const QString&)),
-                  this, SLOT(networkMessageTrace(const eDirection, const QString&)));
+    connect(_udpSender, SIGNAL(networkMessageTrace(const UDPSender::eDirection, const QString&)),
+                                      this, SLOT(networkMessageTrace(const UDPSender::eDirection, const QString&)));
 
     _inputThrottler    = new InputThrottler(this);
     _joystickConnector = new JoystickConnector(this);
@@ -104,16 +98,16 @@ void MainWindow::initialize()
     connect(_joystickConnector, SIGNAL(deviceBtnUpdate(eBtnState, int)),
                                        this, SLOT(deviceBtnUpdate(eBtnState, int)));
 
-    //if(_streamTCP)
-    //{
+    if(_streamTCP)
+    {
         connect(_inputThrottler, SIGNAL(PublishMessage(const QByteArray&)),
                                            _tcpSender, SLOT(publishMessage(const QByteArray&)));
-    //}
-    //else
-    //{
-    //    connect(_inputThrottler, SIGNAL(PublishMessage(const QByteArray&)),
-    //                                       _udpSender, SLOT(publishMessage(const QByteArray&)));
-    //}
+    }
+    else
+    {
+        connect(_inputThrottler, SIGNAL(PublishMessage(const QByteArray&)),
+                                           _udpSender, SLOT(publishMessage(const QByteArray&)));
+    }
 
 
     connect(_inputThrottler, SIGNAL(PublishMessage(const QByteArray&)),
@@ -129,10 +123,10 @@ void MainWindow::initialize()
                                        _udpSender, SLOT(publishMessage(const QByteArray&)));
 
     connect(_udpSender, SIGNAL(statusUpdate(const eStatus&, const QString&)),
-                                       this, SLOT(statusUDPUpdate(const eStatus&, const QString&)));
+                                       this, SLOT(statusUpdate(const eStatus&, const QString&)));
 
     connect(_tcpSender, SIGNAL(statusUpdate(const eStatus&, const QString&)),
-                                       this, SLOT(statusTCPUpdate(const eStatus&, const QString&)));
+                                       this, SLOT(statusUpdate(const eStatus&, const QString&)));
 
     connect(_inputThrottler, SIGNAL(BitsUpdate(const QString&)),
                                        this, SLOT(bitsUpdate(const QString&)));
@@ -142,9 +136,6 @@ void MainWindow::initialize()
 
     connect(_statsMonitor, SIGNAL(statsUpdate(const Stats&)),
                                        this, SLOT(statsUpdate(const Stats&)));
-
-    connect(_tcpSender, SIGNAL(onRMCMessage(RMCEnDecoder::TVec)),
-                                       this, SLOT(on_rmcMessage(RMCEnDecoder::TVec msg)));
 
     _inputThrottler->start();
     _statsMonitor->start();
@@ -242,18 +233,6 @@ void MainWindow::statusUpdate(const eStatus& status,
     logTrace(status, message);
 }
 
-void MainWindow::statusUDPUpdate(const eStatus& status,
-                                 const QString& message)
-{
-    logTrace(status, message);
-}
-
-void MainWindow::statusTCPUpdate(const eStatus& status,
-                                 const QString& message)
-{
-    logTrace(status, message);
-}
-
 void MainWindow::deviceUpdate(const InputUpdate& state)
 {
     _ui->labelJoyXLeftValue->setText(QString::number( state.axisLeft().X()));
@@ -341,8 +320,6 @@ void MainWindow::OpenNetworkConnection()
     if( _tcpSender->isConnected() == false )
     {
         _tcpSender->connect(_ui->hostAddressTextBox->text(), (quint16)_ui->spinBoxTCPPort->value() );
-       // _ui->tcpConnectionStatus->setText("TCP CONNECTED");
-        //_ui->tcpConnectionStatus->setStyleSheet("color: red");
         _ui->pushButtonConnect->setStyleSheet("color: red");
         _ui->pushButtonConnect->setText("Disconnect");
         _ui->spinBoxUDPPort->setEnabled(false);
@@ -414,35 +391,19 @@ void    MainWindow::logTrace(const eStatus& status,
 {
     QString msg = QDateTime::currentDateTime().toString("hh:mm:ss");
 
-    switch(status)
+    if( status == eOK )
     {
-        case eInfo:
-            msg += " INF  - ";
-            msg +=  message;
+        msg += " OK  - ";
+        msg +=  message;
 
-            qDebug() << message;
-            break;
+        qDebug() << message;
+    }
+    else
+    {
+        msg += " ERR - ";
+        msg +=  message;
 
-        case eConnected:
-            msg += " CON - ";
-            msg +=  message;
-
-            qWarning() << message;
-            break;
-
-        case eDisconnected:
-            msg += " DIS - ";
-            msg +=  message;
-
-            qWarning() << message;
-            break;
-
-        case eError:
-            msg += " ERR - ";
-            msg +=  message;
-
-            qWarning() << message;
-            break;
+        qWarning() << message;
     }
 
     if( _logger->isOpen() == false )
@@ -453,7 +414,7 @@ void    MainWindow::logTrace(const eStatus& status,
     textStreamLogger << "-- " << message;
 }
 
-void    MainWindow::networkMessageTrace(const eDirection dir,
+void    MainWindow::networkMessageTrace(const UDPSender::eDirection dir,
                                         const QString& message)
 {
     if( _logger->isOpen() == false )
@@ -461,7 +422,7 @@ void    MainWindow::networkMessageTrace(const eDirection dir,
 
     QTextStream textStreamLogger(_logger);
 
-    if( dir == eIn )
+    if( dir == UDPSender::eIn )
         textStreamLogger << "<- " << message;
     else
         textStreamLogger << "-> " << message;
@@ -546,12 +507,4 @@ void MainWindow::on_pushButtonResetStats_clicked()
 void MainWindow::on_tcpStreamCheckBox_clicked()
 {
 
-}
-
-void MainWindow::on_rmcMessage(RMCEnDecoder::TVec msg)
-{
-    const RMCData& rmcData = _rmcDecoder.decodeMesage(msg);
-
-    //_ui->tcpConnectionStatus->setText("TCP CONNECTED");
-    //_ui->tcpConnectionStatus->setStyleSheet("color: red");
 }

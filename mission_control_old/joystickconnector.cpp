@@ -61,7 +61,7 @@ bool    JoystickConnector::toggleInputLock()
 
 void    JoystickConnector::run(void)
 {
-    emit statusUpdate( eInfo, QString("Joystick thread initialized."));
+    emit statusUpdate( eOK, QString("Joystick thread initialized."));
 
     while( QThread::currentThread()->isRunning() )
     {
@@ -87,7 +87,7 @@ void    JoystickConnector::run(void)
         SDL_QuitSubSystem(SDL_INIT_JOYSTICK);
     }
 
-    emit statusUpdate( eInfo, QString("Joystick thread terminated."));
+    emit statusUpdate( eOK, QString("Joystick thread terminated."));
 }
 
 void    JoystickConnector::initialize(void)
@@ -101,7 +101,7 @@ void    JoystickConnector::initialize(void)
             if( logOnce )
             {
                 logOnce = false;
-                emit statusUpdate( eError, QString("SDL init failed. SDL Error: %1")
+                emit statusUpdate( eERROR, QString("SDL init failed. SDL Error: %1")
                                                          .arg( SDL_GetError()));
             }
 
@@ -112,7 +112,7 @@ void    JoystickConnector::initialize(void)
         if( QThread::currentThread()->isRunning() )
         {
             SDL_JoystickEventState(SDL_ENABLE);
-            emit statusUpdate( eInfo, QString("Input system initialized."));
+            emit statusUpdate( eOK, QString("Input system initialized."));
             break;
         }
     }
@@ -134,10 +134,10 @@ SDL_Joystick* JoystickConnector::selectController(void)
             }
         }
 
-        emit statusUpdate( eError, QString("Unable to open game controller. Found: %s").arg(SDL_NumJoysticks()) );
+        emit statusUpdate( eERROR, QString("Unable to open game controller. Found: %s").arg(SDL_NumJoysticks()) );
     }
     else
-        emit statusUpdate( eError, QString("Warning: No joysticks connected. Scanning") );
+        emit statusUpdate( eERROR, QString("Warning: No joysticks connected. Scanning") );
 
     return 0L;
 }
@@ -203,7 +203,6 @@ void    JoystickConnector::handleController(void)
 
 void    JoystickConnector::onJoystickAxisEvent( const SDL_JoyAxisEvent& event)
 {
-
     if( event.axis == SDL_CONTROLLER_AXIS_LEFTX )
     {
         if( qAbs<Sint32>(event.value) < DEAD_ZONE)
@@ -212,21 +211,14 @@ void    JoystickConnector::onJoystickAxisEvent( const SDL_JoyAxisEvent& event)
             _currentState._axisLeft._x = event.value;
         //qDebug() << "AXIS_LEFTX " << event.value << _currentState._axisLeft._x;
     }
-
-    if( event.axis == SDL_CONTROLLER_AXIS_LEFTY )
+    else  if( event.axis == SDL_CONTROLLER_AXIS_LEFTY )
     {
         if( qAbs<Sint32>(event.value) < DEAD_ZONE)
             _currentState._axisLeft._y = 0;
-        else if(qAbs<Sint32>(event.value) > 32767 )
-        {
-            _currentState._axisLeft._y = 32767;
-           //qDebug() << "Editing weird val " << event.value << "to" << _currentState._axisLeft._y << endl;
-        }
         else
             _currentState._axisLeft._y = -event.value;
         //qDebug() << "AXIS_LEFTY " << event.value << _currentState._axisLeft._y;
     }
-
     else if( event.axis == SDL_CONTROLLER_AXIS_RIGHTX )
     {
         if( qAbs<Sint32>(event.value) < DEAD_ZONE)
@@ -236,42 +228,18 @@ void    JoystickConnector::onJoystickAxisEvent( const SDL_JoyAxisEvent& event)
 
         //qDebug() << "AXIS_RIGHTX " << event.value << _currentState._axisRight._x;
     }
-
-
     else if(event.axis == SDL_CONTROLLER_AXIS_RIGHTY)
     {
         if( qAbs<Sint32>(event.value) < DEAD_ZONE)
-        {
-            //qDebug() << "Doing dumb shit " << event.value << _currentState._axisRight._y;
             _currentState._axisRight._y = 0;
-        }
-        else if(qAbs<Sint32>(event.value) > 32767 )
-        {
-            _currentState._axisRight._y = 32767;
-           //qDebug() << "Editing weird val " << event.value << "to" << _currentState._axisLeft._y << endl;
-        }
         else
-            _currentState._axisRight._y = -event.value;
+            _currentState._axisRight._y = event.value;
 
         //qDebug() << "AXIS_RIGHTY " << event.value << _currentState._axisRight._y;
     }
 
-
-
-/*
-    else{
-        if( qAbs<Sint32>(event.value) < DEAD_ZONE_LEFT)
-            _currentState._axisRight._y = 0;
-        else if(qAbs<Sint32>(event.value) > 32767 )
-        {
-            _currentState._axisRight._y = 32767;
-           //qDebug() << "Editing weird val " << event.value << "to" << _currentState._axisLeft._y << endl;
-        }
-        else
-            _currentState._axisRight._y = -event.value;
-        qDebug() << "AXIS_RIGHTX " << event.value << _currentState._axisRight._x;
-    }
-    */
+    //currentState._axisLeft._x << _currentState._axisLeft._y << "||" <<
+                //_currentState._axisRight._x << _currentState._axisRight._y;
     emit deviceUpdate( _currentState );
 }
 

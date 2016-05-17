@@ -12,7 +12,6 @@
 #include "udpSender.h"
 #include "tcpSender.h"
 #include "statsMonitor.h"
-#include "../rmcDecode/rmcEnDecoder.h"
 
 namespace Ui {
 class MainWindow;
@@ -38,17 +37,11 @@ class MainWindow : public QMainWindow
         void deviceDisconnected(void);
         void deviceUpdate(const InputUpdate& state);
 
-        void networkMessageTrace(const eDirection dir,
+        void networkMessageTrace(const UDPSender::eDirection dir,
                                  const QString& message);
 
-        void statusUpdate(   const eStatus& status,
-                             const QString& message);
-
-        void statusUDPUpdate(const eStatus& status,
-                             const QString& message);
-
-        void statusTCPUpdate(const eStatus& status,
-                             const QString& message);
+        void statusUpdate(const eStatus& status,
+                          const QString& message);
 
         void updateLCD();
         void bitsUpdate(const QString& bits);
@@ -78,9 +71,7 @@ class MainWindow : public QMainWindow
 
         void on_tcpStreamCheckBox_clicked();
 
-        void on_rmcMessage(RMCEnDecoder::TVec msg);
-
-    private:
+private:
         void    logTrace(const eStatus& status,
                          const QString& message);
         void    closeConnectors(void);
@@ -96,7 +87,6 @@ class MainWindow : public QMainWindow
         QLabel*             _labelHostName;
         QLabel*             _labelDevice;
         QLabel*             _labelDeviceName;
-        QLabel*             _tcpConnectionStatus;
         QFile*              _logger;
         QTimer*             _lcdTimer;
         QTime               _lcdTimeValue;
@@ -107,7 +97,6 @@ class MainWindow : public QMainWindow
         TCPSender*          _tcpSender;
         StatsMonitor*       _statsMonitor;
         bool                _streamTCP;
-        RMCEnDecoder        _rmcDecoder;
 };
 
 #endif // MAINWINDOW_H

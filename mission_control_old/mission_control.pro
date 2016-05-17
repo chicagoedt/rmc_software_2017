@@ -19,9 +19,6 @@ SOURCES += main.cpp\
         statsMonitor.cpp \
         udpSender.cpp \
         tcpSender.cpp \
-        arenawindow.cpp \
-        ../rmcDecode/rmcEnDecoder.cpp \
-        ../rmcDecode/rmcData.cpp
 
 HEADERS  += mainwindow.h \
         joystickconnector.h \
@@ -29,16 +26,9 @@ HEADERS  += mainwindow.h \
         commonhdr.h \
         statsMonitor.h \
         udpSender.h \
-        tcpSender.h \
-        arenawindow.h \
-        ../rmcDecode/rmcData.h \
-        ../rmcDecode/rmcEnDecoder.h
+        tcpSender.h
 
-FORMS    += mainwindow.ui \
-        arenawindow.ui
+FORMS    += mainwindow.ui
 
 LIBS += -L/usr/local/lib -lSDL2
 INCLUDEPATH += /usr/local/include
-
-RESOURCES += \
-    resources.qrc

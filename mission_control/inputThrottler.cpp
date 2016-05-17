@@ -119,6 +119,7 @@ void    InputThrottler::DeviceBtnUpdate( eBtnState state, int btnID )
 
     if( state == eDown )
     {
+        /*
         if( btnID == 6 )    //Decrease Actuator Level
         {
             // Down
@@ -143,6 +144,51 @@ void    InputThrottler::DeviceBtnUpdate( eBtnState state, int btnID )
             _lock.lock();
 
             ++_actuatorLevel;
+            _updated = true;
+
+            emit ActuatorState(_actuatorLevel);
+
+            _lock.unlock();
+        }
+        */
+        if( btnID == 3 )    // Up
+        {
+            if( _actuatorLevel == 2)
+                return;
+
+            _lock.lock();
+
+            _actuatorLevel = 2;
+            _updated = true;
+
+            emit ActuatorState(_actuatorLevel);
+
+            _lock.unlock();
+        }
+        else if( btnID == 2 )    // Home
+        {
+            if( _actuatorLevel == 0)
+                return;
+
+            _lock.lock();
+
+            _actuatorLevel = 0;
+
+            _updated = true;
+
+            emit ActuatorState(_actuatorLevel);
+
+            _lock.unlock();
+        }
+        else if( btnID == 1 )    // Down
+        {
+            if( _actuatorLevel == 1)
+                return;
+
+            _lock.lock();
+
+            _actuatorLevel = 1;
+
             _updated = true;
 
             emit ActuatorState(_actuatorLevel);

@@ -152,7 +152,7 @@ void    JoystickConnector::handleController(void)
         //if( SDL_PollEvent( &event ) )
         if( SDL_WaitEvent(&event ) )
         {
-            if( !( event.type == SDL_JOYBUTTONDOWN && event.jbutton.button == 2) )
+            if( !( event.type == SDL_JOYBUTTONDOWN && event.jbutton.button == 0) )
             {
                 if( _lockState )
                     continue;

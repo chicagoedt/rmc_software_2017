@@ -177,7 +177,7 @@ void    MainWindow::closeEvent(QCloseEvent* event)
 
 void MainWindow::deviceBtnUpdate( eBtnState state, int btnID )
 {
-    if( state == eDown && btnID == 2 ) // Btn labeled 3 on joy
+    if( state == eDown && btnID == 0 ) // Btn labeled 1 on joy
     {
         if( _joystickConnector->toggleInputLock() )
         {
@@ -270,7 +270,7 @@ void MainWindow::actuatorState( int level )
 
     if( level == 0)
         _ui->lcdActuatorNumber->setPalette(QColor::fromRgb(240, 0, 0));
-    else if (level == 3)
+    else if (level == 2)
         _ui->lcdActuatorNumber->setPalette(QColor::fromRgb(255, 255, 0));
     else
         _ui->lcdActuatorNumber->setPalette(QColor::fromRgb(255, 135, 0));

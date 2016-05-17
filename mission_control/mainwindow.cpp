@@ -22,6 +22,8 @@ MainWindow::MainWindow(QWidget *parent) :
     _labelDevice     = new QLabel(" Device: ", this);
     _labelDeviceName = new QLabel("<b>Scanning...</b>", this);
 
+    _arenaWindow = new ArenaWindow();
+
     _ui->statusBar->addPermanentWidget(_labelHost);
     _ui->statusBar->addPermanentWidget(_labelHostName);
     _ui->statusBar->addPermanentWidget(_labelDevice);
@@ -32,9 +34,6 @@ MainWindow::MainWindow(QWidget *parent) :
     _ui->lcdRateNumber->display( _ui->horizontalRateSlider->value());
 
     _ui->pushButtonConnect->setStyleSheet("color: green");
-
-    _ui->tcpConnectionStatus->setText("TCP NOT CONNECTED");
-    _ui->tcpConnectionStatus->setStyleSheet("color: green");
 }
 
 MainWindow::~MainWindow()
@@ -52,6 +51,8 @@ void MainWindow::initialize()
 {
     if( _joystickConnector )
         return;
+
+    _arenaWindow->show();
 
     qRegisterMetaType<eStatus>("eStatus");
     qRegisterMetaType<eStatus>("eStatus");
@@ -146,6 +147,9 @@ void MainWindow::initialize()
     connect(_tcpSender, SIGNAL(onRMCMessage(RMCEnDecoder::TVec)),
                                        this, SLOT(on_rmcMessage(RMCEnDecoder::TVec msg)));
 
+    connect(this, SIGNAL(onRMCMessage(const RMCData&)),
+                                       _arenaWindow, SLOT(on_rmcMessage(const RMCData&)));
+
     _inputThrottler->start();
     _statsMonitor->start();
     _joystickConnector->start();
@@ -161,6 +165,8 @@ void MainWindow::initialize()
 
     _ui->labelJoyHz->setText( QString::number(1000.0 / (double)_ui->horizontalRateSlider->value(),
                                               'f', 2) );
+
+    _inputThrottler->Initialize();
 }
 
 void    MainWindow::closeEvent(QCloseEvent* event)
@@ -172,7 +178,10 @@ void    MainWindow::closeEvent(QCloseEvent* event)
     if (resBtn != QMessageBox::Yes)
         event->ignore();
     else
+    {
+        _arenaWindow->close();
         event->accept();
+    }
 }
 
 void MainWindow::deviceBtnUpdate( eBtnState state, int btnID )
@@ -551,6 +560,8 @@ void MainWindow::on_tcpStreamCheckBox_clicked()
 void MainWindow::on_rmcMessage(RMCEnDecoder::TVec msg)
 {
     const RMCData& rmcData = _rmcDecoder.decodeMessage(msg);
+
+    emit onRMCMessage(rmcData);
 
     //_ui->tcpConnectionStatus->setText("TCP CONNECTED");
     //_ui->tcpConnectionStatus->setStyleSheet("color: red");

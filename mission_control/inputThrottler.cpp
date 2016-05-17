@@ -5,7 +5,7 @@
 //This file deals with the actuator/digging controls.
 
 InputThrottler::InputThrottler(QObject* parent)
-    : QThread(parent), _mode(eSafety), _actuatorLevel(0),
+    : QThread(parent), _mode(eAuto), _actuatorLevel(0),
       _updated(false), _digging(false), _updatesMaxPerSecRate(50),
       _updatesPerSecRate(10), _sleepInterval(100)
 {
@@ -15,6 +15,12 @@ InputThrottler::InputThrottler(QObject* parent)
 InputThrottler::~InputThrottler()
 {
 
+}
+
+void    InputThrottler::Initialize(void)
+{
+    PackBits();
+    PrintBits();
 }
 
 void    InputThrottler::run(void)

@@ -12,6 +12,7 @@
 #include "udpSender.h"
 #include "tcpSender.h"
 #include "statsMonitor.h"
+#include "arenawindow.h"
 #include "../rmcDecode/rmcEnDecoder.h"
 
 namespace Ui {
@@ -32,6 +33,7 @@ class MainWindow : public QMainWindow
 
     signals:
         void    updateRateChanged(unsigned int ms) ;
+        void    onRMCMessage(const RMCData& data);
 
     private slots:
         void deviceConnected(const QString& label);
@@ -92,6 +94,7 @@ class MainWindow : public QMainWindow
 
     private:
         Ui::MainWindow*     _ui;
+        ArenaWindow*        _arenaWindow;
         QLabel*             _labelHost;
         QLabel*             _labelHostName;
         QLabel*             _labelDevice;

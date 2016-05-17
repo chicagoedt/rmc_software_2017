@@ -1,10 +1,12 @@
 #include "tcpSender.h"
 
+
 int debug = 1;
 
 TCPSender::TCPSender(QObject* parent) : QObject(parent)
 {
     _tcpSocket = new QTcpSocket(this);
+
 
     QObject::connect(_tcpSocket, SIGNAL(connected()),    this,      SLOT(connected()));
     QObject::connect(_tcpSocket, SIGNAL(disconnected()), this,      SLOT(disconnected()));
@@ -117,11 +119,19 @@ void    TCPSender::readyRead()
 {
     qDebug() << "ready to read";
 
-    char buf[2];
-    _tcpSocket->read(buf, 1);
-    buf[1] = 0;
+    if(_tcpSocket->read(_receiveBuffer, 3) > 0 ){
+        qDebug() << "data " << _receiveBuffer[0] << " "
+                 << _receiveBuffer[1] << " "
+                 << _receiveBuffer[2] << "\n";
 
-    qDebug() << "data " << buf[0];
+        emit onNewMessage(_receiveBuffer, sizeof(_receiveBuffer));
+
+    }
+    else{
+        //not connected
+        return;
+    }
+
     // In this case if you recive message from Sigmax asking for data
     // in case on UDP side did not delivered we will send last snapshot
     // sendSnapshot()

@@ -14,6 +14,7 @@ simulation/rmc_simulation/meshes/
 ./CMakeLists.txt
 
 *.log
+*.pro.user
 
 *.swp
 **/core.*

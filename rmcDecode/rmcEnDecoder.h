@@ -1,7 +1,7 @@
 #ifndef RMCENDECODER_H
 #define RMCENDECODER_H
 
-#include "rmcdata.h"
+#include "rmcData.h"
 #include <cassert>
 
 class RMCEnDecoder

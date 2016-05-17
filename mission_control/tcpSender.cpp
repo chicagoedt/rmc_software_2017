@@ -119,12 +119,12 @@ void    TCPSender::readyRead()
 {
     qDebug() << "ready to read";
 
-    if(_tcpSocket->read(_receiveBuffer, 3) > 0 ){
+    if(_tcpSocket->read(reinterpret_cast<char*>(_receiveBuffer.buffer()), MAX_MSG_SIZE) > 0 ){
         qDebug() << "data " << _receiveBuffer[0] << " "
                  << _receiveBuffer[1] << " "
                  << _receiveBuffer[2] << "\n";
 
-        emit onNewMessage(_receiveBuffer, sizeof(_receiveBuffer));
+        emit onRMCMessage(_receiveBuffer);
 
     }
     else{

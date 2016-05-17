@@ -3,9 +3,9 @@
 
 #include <QThread>
 #include <QTcpSocket>
-#include "commonhdr.h"
 #include <QMutex>
-#include "pointMapper.h"
+#include "commonhdr.h"
+#include "../rmcDecode/rmcEnDecoder.h"
 
 class TCPSender :  public QObject
 {
@@ -35,16 +35,16 @@ class TCPSender :  public QObject
         void    statusUpdate(const eStatus& status, const QString& message);
         void    networkMessageTrace(const eDirection dir,
                                     const QString& message);
-        void    onNewMessage(char* pBUF,int size);
+        void    onRMCMessage(RMCEnDecoder::TVec msg);
 
     private:
         qint64  sendSnapshot();
 
     private:
-       QTcpSocket*   _tcpSocket;
-       QMutex        _lock;
-       QByteArray    _snapShotData;
-       char          _receiveBuffer[4];
+       QTcpSocket*          _tcpSocket;
+       QMutex               _lock;
+       QByteArray           _snapShotData;
+       RMCEnDecoder::TVec   _receiveBuffer;
 };
 
 #endif // TCPSENDER_H

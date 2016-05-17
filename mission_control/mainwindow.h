@@ -12,6 +12,7 @@
 #include "udpSender.h"
 #include "tcpSender.h"
 #include "statsMonitor.h"
+#include "../rmcDecode/rmcEnDecoder.h"
 
 namespace Ui {
 class MainWindow;
@@ -77,9 +78,9 @@ class MainWindow : public QMainWindow
 
         void on_tcpStreamCheckBox_clicked();
 
-        void on_rmcMessage(char* pBUF,int size);
+        void on_rmcMessage(RMCEnDecoder::TVec msg);
 
-private:
+    private:
         void    logTrace(const eStatus& status,
                          const QString& message);
         void    closeConnectors(void);
@@ -106,6 +107,7 @@ private:
         TCPSender*          _tcpSender;
         StatsMonitor*       _statsMonitor;
         bool                _streamTCP;
+        RMCEnDecoder        _rmcDecoder;
 };
 
 #endif // MAINWINDOW_H

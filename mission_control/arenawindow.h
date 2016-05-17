@@ -3,43 +3,36 @@
 
 #include <QWidget>
 #include <QLabel>
-#include <vector>
 #include <list>
+#include "../rmcDecode/rmcData.h"
 
 namespace Ui {
 class arenaWindow;
 }
 
-class arenaWindow : public QWidget
+class ArenaWindow : public QWidget
 {
     Q_OBJECT
 
+    public:
 
-public:
+        explicit ArenaWindow(QWidget *parent = 0);
+                ~ArenaWindow();
 
-    explicit arenaWindow(QWidget *parent = 0);
-    ~arenaWindow();
+        void statusActive();
+        void statusNotActive();
 
-    void statusActive();
-    void statusNotActive();
+        void drawPoints();
+        void clearPoints();
+        void drawOrientation();
 
-    void getPoints();
-    void drawPoints();
-    void clearPoints();
-    void drawOrientation();
+    private slots:
+        void on_rmcMessage(const RMCData& msg);
 
-    struct point{
-        int length;
-        int width;
-        float orientation;
-        QLabel *rep;
-    };
-
-    //std::vector<point> points;
-    std::list<point> points;
-private:
-    Ui::arenaWindow *ui;
-    QLabel *status;
+    private:
+        Ui::arenaWindow     *ui;
+        QLabel              *status;
+        std::list<RMCData>  _points;
 };
 
 #endif // ARENAWINDOW_H

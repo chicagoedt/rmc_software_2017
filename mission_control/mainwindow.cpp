@@ -143,8 +143,8 @@ void MainWindow::initialize()
     connect(_statsMonitor, SIGNAL(statsUpdate(const Stats&)),
                                        this, SLOT(statsUpdate(const Stats&)));
 
-    connect(_tcpSender, SIGNAL(onNewMessage(char*,int)),
-                this, SLOT(on_rmcMessage(char*,int)) );
+    connect(_tcpSender, SIGNAL(onRMCMessage(RMCEnDecoder::TVec)),
+                                       this, SLOT(on_rmcMessage(RMCEnDecoder::TVec msg)));
 
     _inputThrottler->start();
     _statsMonitor->start();
@@ -548,7 +548,10 @@ void MainWindow::on_tcpStreamCheckBox_clicked()
 
 }
 
-void MainWindow::on_rmcMessage(char* pBUF,int size){
-    _ui->tcpConnectionStatus->setText("TCP CONNECTED");
-    _ui->tcpConnectionStatus->setStyleSheet("color: red");
+void MainWindow::on_rmcMessage(RMCEnDecoder::TVec msg)
+{
+    const RMCData& rmcData = _rmcDecoder.decodeMesage(msg);
+
+    //_ui->tcpConnectionStatus->setText("TCP CONNECTED");
+    //_ui->tcpConnectionStatus->setStyleSheet("color: red");
 }

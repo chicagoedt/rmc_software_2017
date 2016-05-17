@@ -4,7 +4,7 @@
 #include <QLabel>
 #include <list>
 
-arenaWindow::arenaWindow(QWidget *parent) :
+ArenaWindow::ArenaWindow(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::arenaWindow)
 {
@@ -12,53 +12,51 @@ arenaWindow::arenaWindow(QWidget *parent) :
     statusNotActive();
 }
 
-arenaWindow::~arenaWindow()
+ArenaWindow::~ArenaWindow()
 {
     delete ui;
 }
 
+void ArenaWindow::on_rmcMessage(const RMCData& msg)
+{
+    _points.push_back(msg);
+}
+
 // display drawing mode
-void arenaWindow::statusActive(){
+void ArenaWindow::statusActive()
+{
     ui->status->setText("DRAWING");
     ui->status->setStyleSheet("color: red");
 }
 
 // display not drawing mode
-void arenaWindow::statusNotActive(){
+void ArenaWindow::statusNotActive()
+{
     ui->status->setText("NOT DRAWING");
     ui->status->setStyleSheet("color: green");
 }
 
 // draw the point(s)
-void arenaWindow::drawPoints(){
+void ArenaWindow::drawPoints()
+{
     statusActive();
-    int length = points.back().length; //Simpler way to get length & width & orientation
-    int width = points.back().width;
-    float angle = points.back().orientation;
 
-    points.back().rep = new QLabel;
-    points.back().rep->setText("");
+    for(const RMCData &point : _points)
+    {
 
-    points.back().rep->move(length,width);
+    }
 }
 
 // clears all the point(s)
-void arenaWindow::clearPoints(){
-    for(int i = points.size(); i > 0; i--){
-        //delete points
-        points.pop_back();
-    }
+void ArenaWindow::clearPoints()
+{
+    _points.clear();
+
     statusNotActive();
 }
 
-void arenaWindow::drawOrientation(){
+void ArenaWindow::drawOrientation(){
 
 }
 
-void arenaWindow::getPoints(){
-    point newPoint;
-    //newPoint x =
-    //newPoint y =
-    //newPoint orientation =
-    points.push_back(newPoint);
-}
+

@@ -1,4 +1,5 @@
 #include "rmcEnDecoder.h"
+#include <bitset>
 
 RMCEnDecoder::RMCEnDecoder(void)
 {

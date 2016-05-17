@@ -550,7 +550,7 @@ void MainWindow::on_tcpStreamCheckBox_clicked()
 
 void MainWindow::on_rmcMessage(RMCEnDecoder::TVec msg)
 {
-    const RMCData& rmcData = _rmcDecoder.decodeMesage(msg);
+    const RMCData& rmcData = _rmcDecoder.decodeMessage(msg);
 
     //_ui->tcpConnectionStatus->setText("TCP CONNECTED");
     //_ui->tcpConnectionStatus->setStyleSheet("color: red");

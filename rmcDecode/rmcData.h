@@ -22,8 +22,8 @@ class RMCData
 
         RMCData(void)
             : _posX(0), _posY(0), _orient(0), _digState(eDigState_Home) {}
-        RMCData(int X, int Y, int oritnt, eDigState state)
-            : _posX(X), _posY(Y), _orient(oritnt), _digState(state) {}
+        RMCData(int X, int Y, int orient, eDigState state)
+            : _posX(X), _posY(Y), _orient(orient), _digState(state) {}
 
         inline int          posX(void)    const { return _posX;   }
         inline int          posY(void)    const { return _posY;   }

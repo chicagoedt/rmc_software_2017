@@ -13,8 +13,10 @@ filep1 = '''<?xml version="1.0" encoding="utf-8"?>
 
 filep2= '''"/>
 
+  <node pkg="state_machine" type="mission_validator" name="mission_validator" output="screen"/>
+
   <node pkg="state_machine" type="state_machine_node" name="state_machine" output="screen" >
-    <rosparam command="load" file="$(find rmc_config)/yaml/goalpoints.yaml" />
+        <rosparam command="load" file="$(find rmc_config)/yaml/waypoints.yaml" />
   </node>
 
 </launch>
@@ -44,7 +46,7 @@ if (lookup not in output):
 
 print("checking for errors");
 
-val = subprocess.Popen("timeout 3s rostopic echo /ar_single_board/pose | head -n 12 | sed -n '12p'", stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True);
+val = subprocess.Popen("timeout 3s rosrun tf tf_echo /base_link /ar_board_marker | head -n 2 | sed -n '2p'", stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True);
 output = '';
 err = '';
 output, err = val.communicate();
@@ -60,13 +62,18 @@ if (err[:7] == 'WARNING'):
 #############################################################################
 
 print("No errors detected. Processing...")
+print(output[2:])
 
-while (output[:1].lower() != "x"):
-	output = output[2:]
-output = output[3:].rstrip();
-final = filep1+output+filep2;
+while (output[:1] != ":"):
+	output = output[1:]
+output = output[4:].rstrip();
+finout = '';
+while (output[:1] != ","):
+	finout+=output[:1];
+	output = output[1:];
+final = filep1+finout+filep2;
 
-print("Writing to ../launch/newLaunch.launch")
-target = open("../launch/newLaunch.launch", 'w')
+print("Writing to ../launch/state_machine.launch")
+target = open("../launch/state_machine.launch", 'w')
 target.write(final);
 target.close();

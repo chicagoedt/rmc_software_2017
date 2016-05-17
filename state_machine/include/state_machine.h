@@ -64,6 +64,7 @@ class StateMachineBase
 		void setServoAngle(float angle);
 		
 		void dock();
+		void undock();
 		void dockCallback(const sensor_msgs::Imu::ConstPtr& msg);
 
 	private:
@@ -127,6 +128,7 @@ class StateMachineBase
 
         bool _foundMarker;
 
+        bool _isSimulation;
 
 };
 

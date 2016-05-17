@@ -63,13 +63,15 @@ class ArSysSingleBoard
 		tf::StampedTransform _firstTf;
 
 		bool gotInitialTf;
+		bool rtabTfExists;
 
 	public:
 		ArSysSingleBoard()
 			: cam_info_received(false),
 			nh("~"),
 			it(nh),
-			gotInitialTf(false)
+			gotInitialTf(false),
+			rtabTfExists(false)
 		{
 			image_sub = it.subscribe("/image", 1, &ArSysSingleBoard::image_callback, this);
 			cam_info_sub = nh.subscribe("/camera_info", 1, &ArSysSingleBoard::cam_info_callback, this);
@@ -278,35 +280,56 @@ class ArSysSingleBoard
 				ROS_ERROR("cv_bridge exception: %s", e.what());
 				return;
 			}
-			
-			if(!gotInitialTf)
+
+			if(!rtabTfExists)
 			{
-				tf::StampedTransform arOffsetTransform;
+				tf::StampedTransform rtabTf;
 
 			    try
 			    {
-					_tfListener.lookupTransform("base_link","ar_board_marker", ros::Time(0), arOffsetTransform);
-					gotInitialTf = true;
-
-					tf::Transform blToArucoTF(arOffsetTransform.getRotation(), arOffsetTransform.getOrigin());
-
-					tf::StampedTransform stampedBlToArucoTF(blToArucoTF.inverse(), ros::Time(0), "arena", "odom");
-					_firstTf = stampedBlToArucoTF;
-					_tfBroadcaster.sendTransform(stampedBlToArucoTF);
+					_tfListener.lookupTransform("odom","base_link", ros::Time(0), rtabTf);
+					rtabTfExists = true;
+					ROS_INFO("Ar_sys: odom->base_link TF Exists from RTAB!");
+					
 			    }
 			    catch (tf::TransformException ex)
 			    {
 					ROS_WARN("%s",ex.what());
 					//ros::Duration(1.0).sleep();
-			    }				
+					//return;
+			    }								
 			}
 			else
 			{
+				if(!gotInitialTf)
+				{
+					tf::StampedTransform arOffsetTransform;
 
-				_firstTf.stamp_ = ros::Time::now();
-				_tfBroadcaster.sendTransform(_firstTf);
+				    try
+				    {
+						_tfListener.lookupTransform("base_link","ar_board_marker", ros::Time(0), arOffsetTransform);
+						gotInitialTf = true;
+
+						tf::Transform blToArucoTF(arOffsetTransform.getRotation(), arOffsetTransform.getOrigin());
+
+						tf::StampedTransform stampedBlToArucoTF(blToArucoTF.inverse(), ros::Time(0), "arena", "odom");
+						_firstTf = stampedBlToArucoTF;
+						_tfBroadcaster.sendTransform(stampedBlToArucoTF);
+				    }
+				    catch (tf::TransformException ex)
+				    {
+						ROS_WARN("%s",ex.what());
+						//ros::Duration(1.0).sleep();
+				    }				
+				}
+				else
+				{
+					_firstTf.stamp_ = ros::Time::now();
+					_tfBroadcaster.sendTransform(_firstTf);
+			    }
+			}
 			
-		    }
+
 
 		}
 

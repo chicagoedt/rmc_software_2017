@@ -29,8 +29,8 @@ void    StatsMonitor::updateTxStats(const QByteArray& buffer)
     {
         _mutex.lock();
 
-            _stats._txTotalBytes  += buffer.size();
-            _stats._txBytesPerSec += buffer.size();
+            _stats._txTotalBytes  += (uint)buffer.size();
+            _stats._txBytesPerSec += (uint)buffer.size();
             _stats._txPacketPerSec++;
 
         _mutex.unlock();

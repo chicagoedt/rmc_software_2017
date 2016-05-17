@@ -285,31 +285,31 @@ void    JoystickConnector::onJoystickButtonEvent( const SDL_JoyButtonEvent& even
 
 void    JoystickConnector::onControllerButtonEvent( const SDL_ControllerButtonEvent& )
 {
-    //qDebug() << "OnControllerButtonEvent";
+    qDebug() << "OnControllerButtonEvent";
 }
 
 void    JoystickConnector::onControllerAxisEvent( const SDL_ControllerAxisEvent& )
 {
-    //qDebug() << "OnControllerAxisEvent";
+    qDebug() << "OnControllerAxisEvent";
 }
 
 void    JoystickConnector::addControllerEvent( const SDL_ControllerDeviceEvent& )
 {
-    //qDebug() << "AddControllerEvent";
+    qDebug() << "AddControllerEvent";
 }
 
 void    JoystickConnector::removeControllerEvent( const SDL_ControllerDeviceEvent& )
 {
-    //qDebug() << "RemoveControllerEvent";
+    qDebug() << "RemoveControllerEvent";
 }
 
 void    JoystickConnector::addJoystickEvent( const SDL_JoyDeviceEvent& )
 {
-    //qDebug() << "AddJoystickEvent";
+    qDebug() << "AddJoystickEvent";
 }
 
 void    JoystickConnector::removeJoystickEvent( const SDL_JoyDeviceEvent& )
 {
-    //qDebug() << "RemoveJoystickEvent";
+    qDebug() << "RemoveJoystickEvent";
 }
 

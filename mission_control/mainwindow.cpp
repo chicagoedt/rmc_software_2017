@@ -43,6 +43,9 @@ MainWindow::~MainWindow()
     if( _logger)
         delete _logger;
 
+    if( _datalogger)
+        delete _datalogger;
+
     if( _ui )
         delete _ui;
 }
@@ -55,12 +58,14 @@ void MainWindow::initialize()
     _arenaWindow->show();
 
     qRegisterMetaType<eStatus>("eStatus");
-    qRegisterMetaType<eStatus>("eStatus");
     qRegisterMetaType<InputUpdate>("InputUpdate");
     qRegisterMetaType<eBtnState>("eBtnState");
     qRegisterMetaType<Stats>("Stats");
+    qRegisterMetaType<RMCEnDecoder::TVec>("RMCEnDecoder::TVec");
 
-    _logger = new QFile("EDTPanel.log");
+    _logger     = new QFile("EDTPanel.log");
+    _datalogger = new QFile("EDTPanel.bin");
+
     _ui->pushButtonLog->setStyleSheet("color: green");
 
     _udpSender  = new UDPSender(this);
@@ -120,6 +125,9 @@ void MainWindow::initialize()
     connect(_inputThrottler, SIGNAL(PublishMessage(const QByteArray&)),
                                        _statsMonitor, SLOT(updateTxStats(const QByteArray&)));
 
+    connect(_inputThrottler, SIGNAL(PublishMessage(const QByteArray&)),
+                                       this, SLOT(logTxData(const QByteArray&)));
+
     connect(_inputThrottler, SIGNAL(ActuatorState(int)),
                                        this, SLOT(actuatorState(int)));
 
@@ -145,7 +153,7 @@ void MainWindow::initialize()
                                        this, SLOT(statsUpdate(const Stats&)));
 
     connect(_tcpSender, SIGNAL(onRMCMessage(RMCEnDecoder::TVec)),
-                                       this, SLOT(on_rmcMessage(RMCEnDecoder::TVec msg)));
+                                       this, SLOT(on_rmcMessage(RMCEnDecoder::TVec)));
 
     connect(this, SIGNAL(onRMCMessage(const RMCData&)),
                                        _arenaWindow, SLOT(on_rmcMessage(const RMCData&)));
@@ -318,7 +326,7 @@ void MainWindow::on_pushButtonConnect_clicked()
     try
     {
         if( _ui->pushButtonConnect->isChecked() )
-            OpenNetworkConnection();
+            openNetworkConnection();
         else
             closeNetworkConnection();
     }
@@ -333,7 +341,7 @@ void MainWindow::on_pushButtonConnect_clicked()
     }
 }
 
-void MainWindow::OpenNetworkConnection()
+void MainWindow::openNetworkConnection()
 {
     if( _udpSender->isConnected() == false )
     {
@@ -350,8 +358,6 @@ void MainWindow::OpenNetworkConnection()
     if( _tcpSender->isConnected() == false )
     {
         _tcpSender->connect(_ui->hostAddressTextBox->text(), (quint16)_ui->spinBoxTCPPort->value() );
-       // _ui->tcpConnectionStatus->setText("TCP CONNECTED");
-        //_ui->tcpConnectionStatus->setStyleSheet("color: red");
         _ui->pushButtonConnect->setStyleSheet("color: red");
         _ui->pushButtonConnect->setText("Disconnect");
         _ui->spinBoxUDPPort->setEnabled(false);
@@ -483,6 +489,12 @@ void MainWindow::on_pushButtonLog_clicked()
         _ui->pushButtonLog->setStyleSheet("color: red");
         _ui->pushButtonLog->setText("Log : On");
         _logger->open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Append);
+        _datalogger->open(QIODevice::WriteOnly | QIODevice::Truncate);
+
+        // Write message sizes stored in this file version
+        int messageSize = MAX_MSG_SIZE;
+
+        _datalogger->write((char*)&messageSize, sizeof(messageSize));
 
          QTextStream textStreamLogger(_logger);
          textStreamLogger << "++++ Opened ++++\n";
@@ -492,6 +504,7 @@ void MainWindow::on_pushButtonLog_clicked()
         QTextStream textStreamLogger(_logger);
         textStreamLogger << "---- Closed ----\n";
         _logger->close();
+        _datalogger->close();
         _ui->pushButtonLog->setText("Log : Off");
         _ui->pushButtonLog->setStyleSheet("color: green");
     }
@@ -559,10 +572,23 @@ void MainWindow::on_tcpStreamCheckBox_clicked()
 
 void MainWindow::on_rmcMessage(RMCEnDecoder::TVec msg)
 {
+    if( _datalogger->isOpen())
+    {
+        _datalogger->write("R", sizeof("R"));   // Rx data to Robot
+        _datalogger->write((char*)msg.buffer(), msg.size());
+    }
+
     const RMCData& rmcData = _rmcDecoder.decodeMessage(msg);
 
     emit onRMCMessage(rmcData);
-
-    //_ui->tcpConnectionStatus->setText("TCP CONNECTED");
-    //_ui->tcpConnectionStatus->setStyleSheet("color: red");
 }
+
+void    MainWindow::logTxData(const QByteArray& msg)
+{
+    if( _datalogger->isOpen())
+    {
+        _datalogger->write("T", sizeof("T"));   // Rx Data from Robot
+        _datalogger->write((char*)msg.data(), msg.size());
+    }
+}
+

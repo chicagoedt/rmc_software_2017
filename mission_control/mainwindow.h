@@ -82,11 +82,13 @@ class MainWindow : public QMainWindow
 
         void on_rmcMessage(RMCEnDecoder::TVec msg);
 
+        void logTxData(const QByteArray& msg);
+
     private:
         void    logTrace(const eStatus& status,
                          const QString& message);
         void    closeConnectors(void);
-        void    OpenNetworkConnection(void);
+        void    openNetworkConnection(void);
         void    closeNetworkConnection(void);
         void    resetLCD();
 
@@ -101,9 +103,9 @@ class MainWindow : public QMainWindow
         QLabel*             _labelDeviceName;
         QLabel*             _tcpConnectionStatus;
         QFile*              _logger;
+        QFile*              _datalogger;
         QTimer*             _lcdTimer;
         QTime               _lcdTimeValue;
-        QTextStream*        _textStreamLogger;
         InputThrottler*     _inputThrottler;
         JoystickConnector*  _joystickConnector;
         UDPSender*          _udpSender;

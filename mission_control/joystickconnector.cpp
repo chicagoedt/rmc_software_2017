@@ -153,7 +153,12 @@ void    JoystickConnector::handleController(void)
         if( SDL_WaitEvent(&event ) )
         {
             if(  event.type == SDL_JOYDEVICEREMOVED)
+            {
+                // Hack Attack - This is work around SDL bug sending SDL_CONTROLLERAXISMOTION
+                // with wierd values before SDL_JOYDEVICEREMOVED
+                resetSpeed();
                 return;
+            }
 
             if( !( event.type == SDL_JOYBUTTONDOWN && event.jbutton.button == 0) )
             {
@@ -314,5 +319,18 @@ void    JoystickConnector::addJoystickEvent( const SDL_JoyDeviceEvent& )
 void    JoystickConnector::removeJoystickEvent( const SDL_JoyDeviceEvent& )
 {
     qDebug() << "RemoveJoystickEvent";
+}
+
+void    JoystickConnector::resetSpeed()
+{
+    qDebug() << "resetSpeed";
+
+    _currentState._axisLeft._x  = 0;
+    _currentState._axisRight._x = 0;
+
+    _currentState._axisLeft._y  = 0;
+    _currentState._axisRight._y = 0;
+
+    emit deviceUpdate( _currentState );
 }
 

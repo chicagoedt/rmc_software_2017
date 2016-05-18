@@ -79,6 +79,7 @@ class JoystickConnector : public QThread
         void            removeControllerEvent( const SDL_ControllerDeviceEvent& event );
         void            addJoystickEvent( const SDL_JoyDeviceEvent& event);
         void            removeJoystickEvent( const SDL_JoyDeviceEvent& event);
+        void            resetSpeed(void);
 
      private:
         InputUpdate _currentState;

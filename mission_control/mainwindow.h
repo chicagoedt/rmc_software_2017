@@ -111,7 +111,6 @@ class MainWindow : public QMainWindow
         UDPSender*          _udpSender;
         TCPSender*          _tcpSender;
         StatsMonitor*       _statsMonitor;
-        bool                _streamTCP;
         RMCEnDecoder        _rmcDecoder;
 };
 

@@ -29,8 +29,6 @@ MainWindow::MainWindow(QWidget *parent) :
     _ui->statusBar->addPermanentWidget(_labelDevice);
     _ui->statusBar->addPermanentWidget(_labelDeviceName, 1);
 
-    _streamTCP = _ui->tcpStreamCheckBox->isChecked(); // Whether or not to stream joystick data over TCP or not (UDP)
-
     _ui->lcdRateNumber->display( _ui->horizontalRateSlider->value());
 
     _ui->pushButtonConnect->setStyleSheet("color: green");
@@ -55,7 +53,7 @@ void MainWindow::initialize()
     if( _joystickConnector )
         return;
 
-    _arenaWindow->show();
+    //_arenaWindow->show();
 
     qRegisterMetaType<eStatus>("eStatus");
     qRegisterMetaType<InputUpdate>("InputUpdate");
@@ -110,17 +108,8 @@ void MainWindow::initialize()
     connect(_joystickConnector, SIGNAL(deviceBtnUpdate(eBtnState, int)),
                                        this, SLOT(deviceBtnUpdate(eBtnState, int)));
 
-    //if(_streamTCP)
-    //{
-        connect(_inputThrottler, SIGNAL(PublishMessage(const QByteArray&)),
-                                           _tcpSender, SLOT(publishMessage(const QByteArray&)));
-    //}
-    //else
-    //{
-    //    connect(_inputThrottler, SIGNAL(PublishMessage(const QByteArray&)),
-    //                                       _udpSender, SLOT(publishMessage(const QByteArray&)));
-    //}
-
+    connect(_inputThrottler, SIGNAL(PublishMessage(const QByteArray&)),
+                                       _tcpSender, SLOT(publishMessage(const QByteArray&)));
 
     connect(_inputThrottler, SIGNAL(PublishMessage(const QByteArray&)),
                                        _statsMonitor, SLOT(updateTxStats(const QByteArray&)));
@@ -282,6 +271,13 @@ void MainWindow::deviceUpdate(const InputUpdate& state)
 
 void MainWindow::actuatorState( int level )
 {
+    if( level == 2)
+        level = 2;
+    else if( level == 0)
+        level = 1;
+    else if( level == 1)
+        level = 0;
+
     _ui->lcdActuatorNumber->display( level );
     _ui->progressBarActuator->setValue( level );
 
@@ -290,7 +286,7 @@ void MainWindow::actuatorState( int level )
     else if (level == 2)
         _ui->lcdActuatorNumber->setPalette(QColor::fromRgb(255, 255, 0));
     else
-        _ui->lcdActuatorNumber->setPalette(QColor::fromRgb(255, 135, 0));
+        _ui->lcdActuatorNumber->setPalette(QColor::fromRgb(0, 200, 0));
 }
 
 void MainWindow::diggingState(bool enabled)
@@ -345,7 +341,7 @@ void MainWindow::openNetworkConnection()
 {
     if( _udpSender->isConnected() == false )
     {
-        _udpSender->connect(_ui->hostAddressTextBox->text(), (quint16)_ui->spinBoxUDPPort->value() );
+        //_udpSender->connect(_ui->hostAddressTextBox->text(), (quint16)_ui->spinBoxUDPPort->value() );
         _ui->pushButtonConnect->setStyleSheet("color: red");
         _ui->pushButtonConnect->setText("Disconnect");
         _ui->spinBoxUDPPort->setEnabled(false);
@@ -372,7 +368,7 @@ void MainWindow::closeNetworkConnection()
 {
     if( _udpSender->isConnected() )
     {
-        _udpSender->disconnect();
+        //_udpSender->disconnect();
         _ui->pushButtonConnect->setStyleSheet("color: green");
         _ui->pushButtonConnect->setText("Connect");
         _ui->spinBoxUDPPort->setEnabled(true);
@@ -450,6 +446,7 @@ void    MainWindow::logTrace(const eStatus& status,
             msg +=  message;
 
             qWarning() << message;
+            closeNetworkConnection();
             break;
 
         case eError:

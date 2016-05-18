@@ -41,6 +41,7 @@ class InputThrottler : public QThread
         void    PublishMessage(const QByteArray& buffer);
         void    ActuatorState( int level );
         void    DiggingState(bool enabled);
+        void    EStopUpdate(bool enable);
 
     private:
         void    PackBits();
@@ -55,6 +56,7 @@ class InputThrottler : public QThread
         int             _actuatorLevel;
         bool            _updated;
         bool            _digging;
+        bool            _eStop;
         unsigned int    _updatesMaxPerSecRate;
         unsigned int    _updatesPerSecRate;
         unsigned int    _sleepInterval;

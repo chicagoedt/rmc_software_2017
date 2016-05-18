@@ -244,8 +244,6 @@ void    JoystickConnector::onJoystickAxisEvent( const SDL_JoyAxisEvent& event)
 
         //qDebug() << "AXIS_RIGHTX " << event.value << _currentState._axisRight._x;
     }
-
-
     else if(event.axis == SDL_CONTROLLER_AXIS_RIGHTY)
     {
         if( qAbs<Sint32>(event.value) < DEAD_ZONE)
@@ -263,12 +261,8 @@ void    JoystickConnector::onJoystickAxisEvent( const SDL_JoyAxisEvent& event)
 
         //qDebug() << "AXIS_RIGHTY " << event.value << _currentState._axisRight._y;
     }
-
-
-
-/*
     else{
-        if( qAbs<Sint32>(event.value) < DEAD_ZONE_LEFT)
+        if( qAbs<Sint32>(event.value) < DEAD_ZONE)
             _currentState._axisRight._y = 0;
         else if(qAbs<Sint32>(event.value) > 32767 )
         {
@@ -279,7 +273,7 @@ void    JoystickConnector::onJoystickAxisEvent( const SDL_JoyAxisEvent& event)
             _currentState._axisRight._y = -event.value;
         qDebug() << "AXIS_RIGHTX " << event.value << _currentState._axisRight._x;
     }
-    */
+
     emit deviceUpdate( _currentState );
 }
 

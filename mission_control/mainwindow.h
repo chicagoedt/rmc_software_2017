@@ -84,6 +84,8 @@ class MainWindow : public QMainWindow
 
         void logTxData(const QByteArray& msg);
 
+        void on_EStopUpdate(bool enable);
+
     private:
         void    logTrace(const eStatus& status,
                          const QString& message);

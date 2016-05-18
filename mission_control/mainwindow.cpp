@@ -32,6 +32,7 @@ MainWindow::MainWindow(QWidget *parent) :
     _ui->lcdRateNumber->display( _ui->horizontalRateSlider->value());
 
     _ui->pushButtonConnect->setStyleSheet("color: green");
+    _ui->lableEStop->setStyleSheet("color: green");
 }
 
 MainWindow::~MainWindow()
@@ -61,8 +62,8 @@ void MainWindow::initialize()
     qRegisterMetaType<Stats>("Stats");
     qRegisterMetaType<RMCEnDecoder::TVec>("RMCEnDecoder::TVec");
 
-    _logger     = new QFile("EDTPanel.log");
-    _datalogger = new QFile("EDTPanel.bin");
+    _logger     = new QFile("/tmp/EDTPanel.log");
+    _datalogger = new QFile("/tmp/EDTPanel.bin");
 
     _ui->pushButtonLog->setStyleSheet("color: green");
 
@@ -123,6 +124,9 @@ void MainWindow::initialize()
     connect(_inputThrottler, SIGNAL(DiggingState(bool)),
                                        this, SLOT(diggingState(bool)));
 
+    connect(_inputThrottler, SIGNAL(EStopUpdate(bool)),
+                                        this, SLOT(on_EStopUpdate(bool)));
+
     connect(_tcpSender, SIGNAL(publishBackupUDPMessage(const QByteArray&)),
                                        _udpSender, SLOT(publishMessage(const QByteArray&)));
 
@@ -159,9 +163,6 @@ void MainWindow::initialize()
     _ui->lcdActuatorNumber->setPalette(QColor::fromRgb(0, 200, 0));
     _ui->labelDig->setStyleSheet("QLabel { background-color : rgb(0, 200, 0) }");
     _ui->labelLock->setStyleSheet("QLabel { background-color : rgb(0, 200, 0) }");
-
-    _ui->labelJoyHz->setText( QString::number(1000.0 / (double)_ui->horizontalRateSlider->value(),
-                                              'f', 2) );
 
     _inputThrottler->Initialize();
 }
@@ -313,8 +314,6 @@ void MainWindow::on_horizontalRateSlider_sliderReleased()
 void MainWindow::on_horizontalRateSlider_valueChanged(int value)
 {
     _ui->lcdRateNumber->display(value);
-
-    _ui->labelJoyHz->setText( QString::number(1000.0 / (double)value, 'f', 2) );
 }
 
 void MainWindow::on_pushButtonConnect_clicked()
@@ -587,5 +586,13 @@ void    MainWindow::logTxData(const QByteArray& msg)
         _datalogger->write("T", sizeof("T"));   // Rx Data from Robot
         _datalogger->write((char*)msg.data(), msg.size());
     }
+}
+
+void    MainWindow::on_EStopUpdate(bool enable)
+{
+    if( enable)
+        _ui->lableEStop->setStyleSheet("color: red");
+    else
+        _ui->lableEStop->setStyleSheet("color: green");
 }
 

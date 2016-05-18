@@ -26,6 +26,8 @@ class ArenaWindow : public QWidget
         void clearPoints();
         void drawOrientation();
 
+        void paintEvent(QPaintEvent *event);
+
     private slots:
         void on_rmcMessage(const RMCData& msg);
 

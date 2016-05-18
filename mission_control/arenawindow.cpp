@@ -1,15 +1,17 @@
 #include "arenawindow.h"
 #include "ui_arenawindow.h"
 #include <vector>
-#include <QLabel>
 #include <list>
+#include <QPainter>
 
 ArenaWindow::ArenaWindow(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::arenaWindow)
 {
+    setWindowFlags(Qt::Window);
     ui->setupUi(this);
     statusNotActive();
+    //setWindowFlags ( Qt::CustomizeWindowHint | Qt::WindowTitleHint);
 }
 
 ArenaWindow::~ArenaWindow()
@@ -20,6 +22,7 @@ ArenaWindow::~ArenaWindow()
 void ArenaWindow::on_rmcMessage(const RMCData& msg)
 {
     _points.push_back(msg);
+    update();
 }
 
 // display drawing mode
@@ -36,17 +39,6 @@ void ArenaWindow::statusNotActive()
     ui->status->setStyleSheet("color: green");
 }
 
-// draw the point(s)
-void ArenaWindow::drawPoints()
-{
-    statusActive();
-
-    for(const RMCData &point : _points)
-    {
-
-    }
-}
-
 // clears all the point(s)
 void ArenaWindow::clearPoints()
 {
@@ -59,4 +51,12 @@ void ArenaWindow::drawOrientation(){
 
 }
 
+void ArenaWindow::paintEvent(QPaintEvent*)
+{
+    QPainter painter(this);
 
+    for(const RMCData &point : _points)
+    {
+        painter.drawPoint(point.posX(), point.posY());
+    }
+}

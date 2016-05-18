@@ -22,7 +22,7 @@ MainWindow::MainWindow(QWidget *parent) :
     _labelDevice     = new QLabel(" Device: ", this);
     _labelDeviceName = new QLabel("<b>Scanning...</b>", this);
 
-    _arenaWindow = new ArenaWindow();
+    _arenaWindow     = new ArenaWindow();
 
     _ui->statusBar->addPermanentWidget(_labelHost);
     _ui->statusBar->addPermanentWidget(_labelHostName);

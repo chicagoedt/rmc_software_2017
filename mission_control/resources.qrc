@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/">
+        <file>rmc_arena.png</file>
+    </qresource>
+</RCC>

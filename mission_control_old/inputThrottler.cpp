@@ -5,7 +5,7 @@
 //This file deals with the actuator/digging controls.
 
 InputThrottler::InputThrottler(QObject* parent)
-    : QThread(parent), _mode(eAuto), _actuatorLevel(0),
+    : QThread(parent), _mode(eSafety), _actuatorLevel(0),
       _updated(false), _digging(false), _updatesMaxPerSecRate(50),
       _updatesPerSecRate(10), _sleepInterval(100)
 {
@@ -17,15 +17,9 @@ InputThrottler::~InputThrottler()
 
 }
 
-void    InputThrottler::Initialize(void)
-{
-    PackBits();
-    PrintBits();
-}
-
 void    InputThrottler::run(void)
 {
-    emit StatusUpdate( eInfo, QString("Input Throttler thread initialized"));
+    emit StatusUpdate( eOK, QString("Input Throttler thread initialized"));
 
     while( QThread::currentThread()->isRunning() )
     {
@@ -47,7 +41,7 @@ void    InputThrottler::run(void)
         QThread::msleep(_sleepInterval);
     }
 
-    emit StatusUpdate( eInfo, QString("Input Throttler thread terminated"));
+    emit StatusUpdate( eOK, QString("Input Throttler thread terminated"));
 }
 
 void    InputThrottler::SetMode(const eOperationMode mode)
@@ -72,6 +66,7 @@ void    InputThrottler::PackBits()
     _byteArray[1] = ((_state.axisRight().Y() / JOY_PER_MSG_SCALAR) & 0x0F) |
                     ((_state.axisLeft().Y() / JOY_PER_MSG_SCALAR) & 0x0F) << 4;
 }
+
 void    InputThrottler::DeviceUpdate(const InputUpdate& state)
 {
     _lock.lock();
@@ -121,11 +116,10 @@ void    InputThrottler::UpdateRateChanged(unsigned int ups)
 
 void    InputThrottler::DeviceBtnUpdate( eBtnState state, int btnID )
 {
-    //qDebug() << "Button " << btnID;
+    qDebug() << "Button " << btnID;
 
     if( state == eDown )
     {
-        /*
         if( btnID == 6 )    //Decrease Actuator Level
         {
             // Down
@@ -156,52 +150,7 @@ void    InputThrottler::DeviceBtnUpdate( eBtnState state, int btnID )
 
             _lock.unlock();
         }
-        */
-        if( btnID == 3 )    // Up
-        {
-            if( _actuatorLevel == 2)
-                return;
-
-            _lock.lock();
-
-            _actuatorLevel = 2;
-            _updated = true;
-
-            emit ActuatorState(_actuatorLevel);
-
-            _lock.unlock();
-        }
-        else if( btnID == 2 )    // Home
-        {
-            if( _actuatorLevel == 0)
-                return;
-
-            _lock.lock();
-
-            _actuatorLevel = 0;
-
-            _updated = true;
-
-            emit ActuatorState(_actuatorLevel);
-
-            _lock.unlock();
-        }
-        else if( btnID == 1 )    // Down
-        {
-            if( _actuatorLevel == 1)
-                return;
-
-            _lock.lock();
-
-            _actuatorLevel = 1;
-
-            _updated = true;
-
-            emit ActuatorState(_actuatorLevel);
-
-            _lock.unlock();
-        }
-        else if( btnID == 6)
+        else if( btnID == 0)
         {
             _lock.lock();
 

@@ -29,8 +29,8 @@ void    StatsMonitor::updateTxStats(const QByteArray& buffer)
     {
         _mutex.lock();
 
-            _stats._txTotalBytes  += (uint)buffer.size();
-            _stats._txBytesPerSec += (uint)buffer.size();
+            _stats._txTotalBytes  += buffer.size();
+            _stats._txBytesPerSec += buffer.size();
             _stats._txPacketPerSec++;
 
         _mutex.unlock();
@@ -39,7 +39,7 @@ void    StatsMonitor::updateTxStats(const QByteArray& buffer)
 
 void    StatsMonitor::run(void)
 {
-    emit statusUpdate( eInfo, QString("Stats Monitor thread initialized"));
+    emit statusUpdate( eOK, QString("Stats Monitor thread initialized"));
 
     while( QThread::currentThread()->isRunning() )
     {
@@ -55,5 +55,5 @@ void    StatsMonitor::run(void)
         QThread::msleep(1000);
     }
 
-    emit statusUpdate( eInfo, QString("Stats Monitor thread terminated"));
+    emit statusUpdate( eOK, QString("Stats Monitor thread terminated"));
 }

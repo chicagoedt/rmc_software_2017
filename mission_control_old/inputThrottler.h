@@ -24,8 +24,6 @@ class InputThrottler : public QThread
         explicit InputThrottler(QObject* parent = 0L);
         virtual ~InputThrottler();
 
-        void    Initialize(void);
-
         void    SetMode(const eOperationMode mode);
         void    SetMaxUpdateRate(unsigned int upsMax);
 

@@ -22,8 +22,6 @@ MainWindow::MainWindow(QWidget *parent) :
     _labelDevice     = new QLabel(" Device: ", this);
     _labelDeviceName = new QLabel("<b>Scanning...</b>", this);
 
-    _arenaWindow     = new ArenaWindow();
-
     _ui->statusBar->addPermanentWidget(_labelHost);
     _ui->statusBar->addPermanentWidget(_labelHostName);
     _ui->statusBar->addPermanentWidget(_labelDevice);
@@ -43,9 +41,6 @@ MainWindow::~MainWindow()
     if( _logger)
         delete _logger;
 
-    if( _datalogger)
-        delete _datalogger;
-
     if( _ui )
         delete _ui;
 }
@@ -55,28 +50,21 @@ void MainWindow::initialize()
     if( _joystickConnector )
         return;
 
-    _arenaWindow->show();
-
+    qRegisterMetaType<eStatus>("eStatus");
     qRegisterMetaType<eStatus>("eStatus");
     qRegisterMetaType<InputUpdate>("InputUpdate");
     qRegisterMetaType<eBtnState>("eBtnState");
     qRegisterMetaType<Stats>("Stats");
-    qRegisterMetaType<RMCEnDecoder::TVec>("RMCEnDecoder::TVec");
 
-    _logger     = new QFile("EDTPanel.log");
-    _datalogger = new QFile("EDTPanel.bin");
-
+    _logger = new QFile("EDTPanel.log");
     _ui->pushButtonLog->setStyleSheet("color: green");
 
     _udpSender  = new UDPSender(this);
     _tcpSender  = new TCPSender(this);
 
 
-    connect(_udpSender, SIGNAL(networkMessageTrace(const eDirection, const QString&)),
-                  this, SLOT(networkMessageTrace(const eDirection, const QString&)));
-
-    connect(_tcpSender, SIGNAL(networkMessageTrace(const eDirection, const QString&)),
-                  this, SLOT(networkMessageTrace(const eDirection, const QString&)));
+    connect(_udpSender, SIGNAL(networkMessageTrace(const UDPSender::eDirection, const QString&)),
+                                      this, SLOT(networkMessageTrace(const UDPSender::eDirection, const QString&)));
 
     _inputThrottler    = new InputThrottler(this);
     _joystickConnector = new JoystickConnector(this);
@@ -110,23 +98,20 @@ void MainWindow::initialize()
     connect(_joystickConnector, SIGNAL(deviceBtnUpdate(eBtnState, int)),
                                        this, SLOT(deviceBtnUpdate(eBtnState, int)));
 
-    //if(_streamTCP)
-    //{
+    if(_streamTCP)
+    {
         connect(_inputThrottler, SIGNAL(PublishMessage(const QByteArray&)),
                                            _tcpSender, SLOT(publishMessage(const QByteArray&)));
-    //}
-    //else
-    //{
-    //    connect(_inputThrottler, SIGNAL(PublishMessage(const QByteArray&)),
-    //                                       _udpSender, SLOT(publishMessage(const QByteArray&)));
-    //}
+    }
+    else
+    {
+        connect(_inputThrottler, SIGNAL(PublishMessage(const QByteArray&)),
+                                           _udpSender, SLOT(publishMessage(const QByteArray&)));
+    }
 
 
     connect(_inputThrottler, SIGNAL(PublishMessage(const QByteArray&)),
                                        _statsMonitor, SLOT(updateTxStats(const QByteArray&)));
-
-    connect(_inputThrottler, SIGNAL(PublishMessage(const QByteArray&)),
-                                       this, SLOT(logTxData(const QByteArray&)));
 
     connect(_inputThrottler, SIGNAL(ActuatorState(int)),
                                        this, SLOT(actuatorState(int)));
@@ -138,10 +123,10 @@ void MainWindow::initialize()
                                        _udpSender, SLOT(publishMessage(const QByteArray&)));
 
     connect(_udpSender, SIGNAL(statusUpdate(const eStatus&, const QString&)),
-                                       this, SLOT(statusUDPUpdate(const eStatus&, const QString&)));
+                                       this, SLOT(statusUpdate(const eStatus&, const QString&)));
 
     connect(_tcpSender, SIGNAL(statusUpdate(const eStatus&, const QString&)),
-                                       this, SLOT(statusTCPUpdate(const eStatus&, const QString&)));
+                                       this, SLOT(statusUpdate(const eStatus&, const QString&)));
 
     connect(_inputThrottler, SIGNAL(BitsUpdate(const QString&)),
                                        this, SLOT(bitsUpdate(const QString&)));
@@ -151,12 +136,6 @@ void MainWindow::initialize()
 
     connect(_statsMonitor, SIGNAL(statsUpdate(const Stats&)),
                                        this, SLOT(statsUpdate(const Stats&)));
-
-    connect(_tcpSender, SIGNAL(onRMCMessage(RMCEnDecoder::TVec)),
-                                       this, SLOT(on_rmcMessage(RMCEnDecoder::TVec)));
-
-    connect(this, SIGNAL(onRMCMessage(const RMCData&)),
-                                       _arenaWindow, SLOT(on_rmcMessage(const RMCData&)));
 
     _inputThrottler->start();
     _statsMonitor->start();
@@ -173,8 +152,6 @@ void MainWindow::initialize()
 
     _ui->labelJoyHz->setText( QString::number(1000.0 / (double)_ui->horizontalRateSlider->value(),
                                               'f', 2) );
-
-    _inputThrottler->Initialize();
 }
 
 void    MainWindow::closeEvent(QCloseEvent* event)
@@ -186,15 +163,12 @@ void    MainWindow::closeEvent(QCloseEvent* event)
     if (resBtn != QMessageBox::Yes)
         event->ignore();
     else
-    {
-        _arenaWindow->close();
         event->accept();
-    }
 }
 
 void MainWindow::deviceBtnUpdate( eBtnState state, int btnID )
 {
-    if( state == eDown && btnID == 0 ) // Btn labeled 1 on joy
+    if( state == eDown && btnID == 2 ) // Btn labeled 3 on joy
     {
         if( _joystickConnector->toggleInputLock() )
         {
@@ -259,18 +233,6 @@ void MainWindow::statusUpdate(const eStatus& status,
     logTrace(status, message);
 }
 
-void MainWindow::statusUDPUpdate(const eStatus& status,
-                                 const QString& message)
-{
-    logTrace(status, message);
-}
-
-void MainWindow::statusTCPUpdate(const eStatus& status,
-                                 const QString& message)
-{
-    logTrace(status, message);
-}
-
 void MainWindow::deviceUpdate(const InputUpdate& state)
 {
     _ui->labelJoyXLeftValue->setText(QString::number( state.axisLeft().X()));
@@ -287,7 +249,7 @@ void MainWindow::actuatorState( int level )
 
     if( level == 0)
         _ui->lcdActuatorNumber->setPalette(QColor::fromRgb(240, 0, 0));
-    else if (level == 2)
+    else if (level == 3)
         _ui->lcdActuatorNumber->setPalette(QColor::fromRgb(255, 255, 0));
     else
         _ui->lcdActuatorNumber->setPalette(QColor::fromRgb(255, 135, 0));
@@ -326,7 +288,7 @@ void MainWindow::on_pushButtonConnect_clicked()
     try
     {
         if( _ui->pushButtonConnect->isChecked() )
-            openNetworkConnection();
+            OpenNetworkConnection();
         else
             closeNetworkConnection();
     }
@@ -341,7 +303,7 @@ void MainWindow::on_pushButtonConnect_clicked()
     }
 }
 
-void MainWindow::openNetworkConnection()
+void MainWindow::OpenNetworkConnection()
 {
     if( _udpSender->isConnected() == false )
     {
@@ -429,35 +391,19 @@ void    MainWindow::logTrace(const eStatus& status,
 {
     QString msg = QDateTime::currentDateTime().toString("hh:mm:ss");
 
-    switch(status)
+    if( status == eOK )
     {
-        case eInfo:
-            msg += " INF  - ";
-            msg +=  message;
+        msg += " OK  - ";
+        msg +=  message;
 
-            qDebug() << message;
-            break;
+        qDebug() << message;
+    }
+    else
+    {
+        msg += " ERR - ";
+        msg +=  message;
 
-        case eConnected:
-            msg += " CON - ";
-            msg +=  message;
-
-            qWarning() << message;
-            break;
-
-        case eDisconnected:
-            msg += " DIS - ";
-            msg +=  message;
-
-            qWarning() << message;
-            break;
-
-        case eError:
-            msg += " ERR - ";
-            msg +=  message;
-
-            qWarning() << message;
-            break;
+        qWarning() << message;
     }
 
     if( _logger->isOpen() == false )
@@ -468,7 +414,7 @@ void    MainWindow::logTrace(const eStatus& status,
     textStreamLogger << "-- " << message;
 }
 
-void    MainWindow::networkMessageTrace(const eDirection dir,
+void    MainWindow::networkMessageTrace(const UDPSender::eDirection dir,
                                         const QString& message)
 {
     if( _logger->isOpen() == false )
@@ -476,7 +422,7 @@ void    MainWindow::networkMessageTrace(const eDirection dir,
 
     QTextStream textStreamLogger(_logger);
 
-    if( dir == eIn )
+    if( dir == UDPSender::eIn )
         textStreamLogger << "<- " << message;
     else
         textStreamLogger << "-> " << message;
@@ -489,12 +435,6 @@ void MainWindow::on_pushButtonLog_clicked()
         _ui->pushButtonLog->setStyleSheet("color: red");
         _ui->pushButtonLog->setText("Log : On");
         _logger->open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Append);
-        _datalogger->open(QIODevice::WriteOnly | QIODevice::Truncate);
-
-        // Write message sizes stored in this file version
-        int messageSize = MAX_MSG_SIZE;
-
-        _datalogger->write((char*)&messageSize, sizeof(messageSize));
 
          QTextStream textStreamLogger(_logger);
          textStreamLogger << "++++ Opened ++++\n";
@@ -504,7 +444,6 @@ void MainWindow::on_pushButtonLog_clicked()
         QTextStream textStreamLogger(_logger);
         textStreamLogger << "---- Closed ----\n";
         _logger->close();
-        _datalogger->close();
         _ui->pushButtonLog->setText("Log : Off");
         _ui->pushButtonLog->setStyleSheet("color: green");
     }
@@ -569,26 +508,3 @@ void MainWindow::on_tcpStreamCheckBox_clicked()
 {
 
 }
-
-void MainWindow::on_rmcMessage(RMCEnDecoder::TVec msg)
-{
-    if( _datalogger->isOpen())
-    {
-        _datalogger->write("R", sizeof("R"));   // Rx data to Robot
-        _datalogger->write((char*)msg.buffer(), msg.size());
-    }
-
-    const RMCData& rmcData = _rmcDecoder.decodeMessage(msg);
-
-    emit onRMCMessage(rmcData);
-}
-
-void    MainWindow::logTxData(const QByteArray& msg)
-{
-    if( _datalogger->isOpen())
-    {
-        _datalogger->write("T", sizeof("T"));   // Rx Data from Robot
-        _datalogger->write((char*)msg.data(), msg.size());
-    }
-}
-

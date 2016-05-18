@@ -325,6 +325,9 @@ void    JoystickConnector::resetSpeed()
     _currentState._axisLeft._y  = 0;
     _currentState._axisRight._y = 0;
 
+    _lockState = true;
+
+    emit deviceLock();
     emit deviceUpdate( _currentState );
 }
 

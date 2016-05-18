@@ -109,6 +109,9 @@ void MainWindow::initialize()
     connect(_joystickConnector, SIGNAL(deviceBtnUpdate(eBtnState, int)),
                                        this, SLOT(deviceBtnUpdate(eBtnState, int)));
 
+    connect(_joystickConnector, SIGNAL(deviceLock(void)),
+                                       this, SLOT(on_deviceLock(void)));
+
     connect(_inputThrottler, SIGNAL(PublishMessage(const QByteArray&)),
                                        _tcpSender, SLOT(publishMessage(const QByteArray&)));
 
@@ -124,7 +127,7 @@ void MainWindow::initialize()
     connect(_inputThrottler, SIGNAL(DiggingState(bool)),
                                        this, SLOT(diggingState(bool)));
 
-    connect(_inputThrottler, SIGNAL(EStopUpdate(bool)),
+    connect(_inputThrottler, SIGNAL(on_EStopUpdate(bool)),
                                         this, SLOT(on_EStopUpdate(bool)));
 
     connect(_tcpSender, SIGNAL(publishBackupUDPMessage(const QByteArray&)),
@@ -199,6 +202,13 @@ void MainWindow::deviceBtnUpdate( eBtnState state, int btnID )
             _ui->labelLock->setStyleSheet("QLabel { background-color : rgb(250, 0, 0) }");
         }
     }
+}
+
+void MainWindow::on_deviceLock(void)
+{
+    _statsMonitor->toggleInputLock(true);
+    _ui->labelLock->setText("Control Locked");
+    _ui->labelLock->setStyleSheet("QLabel { background-color : rgb(0, 200, 0) }");
 }
 
 void MainWindow::resetLCD()

@@ -86,6 +86,8 @@ class MainWindow : public QMainWindow
 
         void on_EStopUpdate(bool enable);
 
+        void on_deviceLock(void);
+
     private:
         void    logTrace(const eStatus& status,
                          const QString& message);

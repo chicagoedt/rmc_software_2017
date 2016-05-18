@@ -63,6 +63,7 @@ class JoystickConnector : public QThread
         void    deviceDisconnected(void);
         void    deviceUpdate(const InputUpdate& state);
         void    deviceBtnUpdate( eBtnState state, int btnID );
+        void    deviceLock(void);
 
         void    statusUpdate(const eStatus& status,
                              const QString& message);

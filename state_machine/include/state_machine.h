@@ -12,11 +12,14 @@
 #include <tf/transform_listener.h>
 #include <std_msgs/Bool.h>
 #include <std_msgs/Float64.h>
+#include <std_msgs/Int16.h>
 #include <geometry_msgs/Twist.h>
 #include <sensor_msgs/Imu.h>
 #include <roboteq_node/Actuators.h>
 #include <state_machine/SensorStatus.h>
 #include <state_machine/ValidateSensors.h>
+#include <pose_follower/SetMaxVelocity.h>
+#include <std_srvs/Empty.h>
 
 #include <math.h>
 
@@ -33,13 +36,11 @@ typedef actionlib::SimpleActionClient<rmc_simulation::PanServoAction> PanServoCl
 class StateMachineBase
 {
 
-	const int MAX_GOAL_POINTS; // Refer to Goal Points vector
-
 	enum eDigPosition
 	{
-		eDig = 850,
-		eHome = 0,
-		eDump = -800
+		eDig = 750,
+		eHome = 200,
+		eDump = -1000
 	};
 
 	public:
@@ -53,6 +54,7 @@ class StateMachineBase
 	private:
 
         	void moveActuators(bool goUp);
+		void findAruco(const char c);
 		
 		bool startConnectionAC;
 		bool sendGoalToAC(geometry_msgs::Pose goalPose);
@@ -62,6 +64,7 @@ class StateMachineBase
         	bool moveToGoalPoint(geometry_msgs::Pose waypoint);
 		void setActuatorPosition(eDigPosition digPosition);
 		void setServoAngle(float angle);
+		void updateCurrentSpeed(float driveSpeed);
 		
 		void dock();
 		void undock();
@@ -81,11 +84,17 @@ class StateMachineBase
 		ros::Publisher  _digPub;
 		ros::Publisher  _arucoPub;
 		ros::Publisher  _actuatorPub;
+		ros::Publisher  _digstatePub;
 
 		ros::ServiceClient _actuatorClient;
 		ros::ServiceClient _validatorClient;
+		ros::ServiceClient _poseFollowerClient;
+		ros::ServiceClient _rtabClient;
 
 		state_machine::SensorStatus _currentSensorRequest;
+
+		const float _driveSpeed; // This value is 0 as pose_follower identifies a requested drive speed of 0, as the speed as to which the node itself was initialized too
+		double _digDriveSpeed; // double, not float as we get this as ros param
 
 		float 	_previous_x_accel;
 		bool  	_didDock;
@@ -129,6 +138,8 @@ class StateMachineBase
         bool _foundMarker;
 
         bool _isSimulation;
+	bool _turnStartLeft;
+	bool _turnStartRight;
 
 };
 

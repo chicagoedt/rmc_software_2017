@@ -46,8 +46,11 @@
 #include <geometry_msgs/Twist.h>
 #include <nav_msgs/Odometry.h>
 #include <base_local_planner/trajectory_planner_ros.h>
+#include <pose_follower/SetMaxVelocity.h>
+#include <std_msgs/Float64.h>
 
 namespace pose_follower {
+
   class PoseFollower : public nav_core::BaseLocalPlanner {
     public:
       PoseFollower();
@@ -72,6 +75,8 @@ namespace pose_follower {
       void odomCallback(const nav_msgs::Odometry::ConstPtr& msg);
       bool stopped();
 
+      bool setMaxVelocityCallback(SetMaxVelocity::Request& request, SetMaxVelocity::Response& response);
+
       tf::TransformListener* tf_;
       costmap_2d::Costmap2DROS* costmap_ros_;
       ros::Publisher vel_pub_;
@@ -93,6 +98,9 @@ namespace pose_follower {
       std::vector<geometry_msgs::PoseStamped> global_plan_;
       base_local_planner::TrajectoryPlannerROS collision_planner_;
       int samples_;
+
+      ros::ServiceServer _service;
+      float _initialMaxVelLinear;
   };
 };
 #endif

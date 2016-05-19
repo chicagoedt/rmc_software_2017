@@ -127,6 +127,16 @@ bool MissionValidator::validateServo(void)
 		ROS_ERROR("-- Servo Not Validated --");
         }
 
+        servoAngle.data = -2.61799; // 150 degress in radians
+        _servoPub.publish(servoAngle);
+        ros::spinOnce();
+        ros::Duration(10).sleep();
+
+        servoAngle.data = 0; // 150 degress in radians
+        _servoPub.publish(servoAngle);
+        ros::spinOnce();
+        ros::Duration(5).sleep();
+
 	return _currentStatusMsg.servo;
 }
 
@@ -164,7 +174,7 @@ bool MissionValidator::validateHardware(void)
 	ROS_DEBUG("-- Validating Roboteq --");
 	_currentStatusMsg.roboteq = true;
         roboteq_node::Actuators srv;
-        srv.request.actuator_position = 0;
+        srv.request.actuator_position = 200;
 
         ROS_DEBUG("-- Trying to set actuators to 0 --");
         if(_actuatorClient.call(srv))  // blocking call

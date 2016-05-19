@@ -3,15 +3,26 @@
 
   <param name="useAruco" type="int" value="1"/>
 
-  <param name="values_for_average" type="int" value="20"/>         <!-- This param is used to determine how many of the previous data are saved and averaged -->
-  <param name="threshold_for_average" type="double" value="1.2"/>   <!-- Used to determine how much a value needs to be above average to be a 'hit' -->
-  <param name="num_to_dock" type="int" value="3"/>             <!-- How many consecutive hits are needed to determine dock state -->
-  <param name="arucoDistance" type="double" value="1.090"/>
+  <!-- This param is used to determine how many of the previous data are saved and averaged -->
+  <param name="values_for_average" type="int" value="20"/>           
+
+  <!-- Used to determine how much a value needs to be above average to be a 'hit' -->
+  <param name="threshold_for_average" type="double" value="1.2"/>   
+
+  <!-- How many consecutive hits are needed to determine dock state -->
+  <param name="num_to_dock" type="int" value="3"/>             
+
+  <param name="arucoDistance" type="double" value="1.0"/>
+
+  <param name="starting_orientation" type="string" value="north"/> <!-- north, east, south, west -->
 
   <node pkg="state_machine" type="mission_validator" name="mission_validator" output="screen"/>
 
   <node pkg="state_machine" type="state_machine_node" name="state_machine" output="screen" >
         <rosparam command="load" file="$(find rmc_config)/yaml/waypoints.yaml" />
   </node>
+
+<!-- do not uncomment for now -->
+<!--  <include file="$(fine state_machine)/launch/posePub.launch"/> -->
 
 </launch>

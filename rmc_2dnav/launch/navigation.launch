@@ -8,7 +8,7 @@
 <!--
   <node name="map_server" pkg="map_server" type="map_server" args="$(find rmc_2dnav)/maps/blank_map.yaml"/>  
 -->
-  <node name="map_server" pkg="map_server" type="map_server" args="$(find rmc_2dnav)/maps/edt_test_arena.yaml"/>  
+  <node name="map_server" pkg="map_server" type="map_server" args="$(find rmc_2dnav)/maps/rmc-2016-arena.yaml"/>  
 
 <!--
   <node pkg="tf" type="static_transform_publisher" name="map_broadcaster" args="0 0 0 0 0 0 map odom 30" />

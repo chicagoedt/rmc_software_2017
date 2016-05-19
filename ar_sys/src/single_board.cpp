@@ -159,8 +159,8 @@ class ArSysSingleBoard
 
 					//transform *= imOffsetTransform.inverse();
 
-					//tf::StampedTransform stampedTransform(transform, msg->header.stamp, "blackfly_optical_link", "ar_board_marker");
 					tf::StampedTransform stampedTransform(transform, msg->header.stamp, "blackfly_optical_link", "ar_board_marker");
+					//tf::StampedTransform stampedTransform(transform, ros::Time::now(), "blackfly_optical_link", "ar_board_marker");
 
 					ros::spinOnce();
 

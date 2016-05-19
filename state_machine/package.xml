@@ -26,12 +26,14 @@
   <build_depend>tf</build_depend>
   <build_depend>rmc_simulation</build_depend>
   <build_depend>roboteq_node</build_depend>
+  <build_depend>pose_follower</build_depend>
   <run_depend>actionlib</run_depend>
   <run_depend>geometry_msgs</run_depend>
   <run_depend>move_base_msgs</run_depend>
   <run_depend>roscpp</run_depend>
   <run_depend>tf</run_depend>
   <run_depend>roboteq_node</run_depend>
+  <run_depend>pose_follower</run_depend>
 
   <export>
     <!-- You can specify that this package is a metapackage here: -->

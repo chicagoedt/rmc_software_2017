@@ -69,10 +69,7 @@ void    InputThrottler::PackBits()
 
     _byteArray[0] = (char)_mode |
                     ((_actuatorLevel << 3) & 0x00FF) |
-                    (char)_digging << 2;
-
-    if(_docking)
-        _byteArray[0] = 0x40;
+                    (char)_digging << 2 | (_docking ?  0x40 : 0x00);
 
     if( _eStop )
         _byteArray[0] = _byteArray[0] | 0x80;
@@ -135,50 +132,7 @@ void    InputThrottler::DeviceBtnUpdate( eBtnState state, int btnID )
 
     if( state == eDown )
     {
-        /*
-        if( btnID == 6 )    //Decrease Actuator Level
-        {
-            // Down
-            if( _actuatorLevel == 0)
-                return;
-
-            _lock.lock();
-
-            --_actuatorLevel;
-            _updated = true;
-
-            emit ActuatorState(_actuatorLevel);
-
-            _lock.unlock();
-        }
-        else if( btnID == 7 )    //Increase Actuator Level
-        {
-            // Up
-            if( _actuatorLevel == 3)
-                return;
-
-            _lock.lock();
-
-            ++_actuatorLevel;
-            _updated = true;
-
-            emit ActuatorState(_actuatorLevel);
-
-            _lock.unlock();
-        }
-        */
-        if( btnID == 5 )    // Docking
-        {
-            _lock.lock();
-
-            _docking = !_docking;
-            _updated = true;
-
-            emit DockingState(_docking);
-
-            _lock.unlock();
-        }
-        else if( btnID == 3 )    // Up
+        if( btnID == 3 )    // Up
         {
             if( _actuatorLevel == 2)
                 return;
@@ -222,7 +176,17 @@ void    InputThrottler::DeviceBtnUpdate( eBtnState state, int btnID )
 
             _lock.unlock();
         }
-        else if( btnID == 7)
+        else if( btnID == 5)    // Docking
+        {
+            _lock.lock();
+
+            _docking = !_docking;
+            _updated = true;
+            emit DockingState(_docking);
+
+            _lock.unlock();
+        }
+        else if( btnID == 7)    // Digging
         {
             _lock.lock();
 

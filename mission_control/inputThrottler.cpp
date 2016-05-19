@@ -6,7 +6,8 @@
 
 InputThrottler::InputThrottler(QObject* parent)
     : QThread(parent), _mode(eAuto), _actuatorLevel(0),
-      _updated(false), _digging(false), _eStop(false), _updatesMaxPerSecRate(50),
+      _updated(false), _digging(false), _docking(false),
+      _eStop(false), _updatesMaxPerSecRate(50),
       _updatesPerSecRate(10), _sleepInterval(100)
 {
     _byteArray.reserve(2);
@@ -69,6 +70,9 @@ void    InputThrottler::PackBits()
     _byteArray[0] = (char)_mode |
                     ((_actuatorLevel << 3) & 0x00FF) |
                     (char)_digging << 2;
+
+    if(_docking)
+        _byteArray[0] = 0x40;
 
     if( _eStop )
         _byteArray[0] = _byteArray[0] | 0x80;
@@ -163,7 +167,18 @@ void    InputThrottler::DeviceBtnUpdate( eBtnState state, int btnID )
             _lock.unlock();
         }
         */
-        if( btnID == 3 )    // Up
+        if( btnID == 5 )    // Docking
+        {
+            _lock.lock();
+
+            _docking = !_docking;
+            _updated = true;
+
+            emit DockingState(_docking);
+
+            _lock.unlock();
+        }
+        else if( btnID == 3 )    // Up
         {
             if( _actuatorLevel == 2)
                 return;

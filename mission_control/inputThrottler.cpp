@@ -207,7 +207,7 @@ void    InputThrottler::DeviceBtnUpdate( eBtnState state, int btnID )
 
             _lock.unlock();
         }
-        else if( btnID == 6)
+        else if( btnID == 7)
         {
             _lock.lock();
 

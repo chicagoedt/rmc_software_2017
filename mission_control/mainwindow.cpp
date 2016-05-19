@@ -127,6 +127,9 @@ void MainWindow::initialize()
     connect(_inputThrottler, SIGNAL(DiggingState(bool)),
                                        this, SLOT(diggingState(bool)));
 
+    connect(_inputThrottler, SIGNAL(DockingState(bool)),
+                                       this, SLOT(dockinggState(bool)));
+
     connect(_inputThrottler, SIGNAL(on_EStopUpdate(bool)),
                                         this, SLOT(on_EStopUpdate(bool)));
 
@@ -165,6 +168,7 @@ void MainWindow::initialize()
 
     _ui->lcdActuatorNumber->setPalette(QColor::fromRgb(0, 200, 0));
     _ui->labelDig->setStyleSheet("QLabel { background-color : rgb(0, 200, 0) }");
+    _ui->labelDock->setStyleSheet("QLabel { background-color : rgb(0, 200, 0) }");
     _ui->labelLock->setStyleSheet("QLabel { background-color : rgb(0, 200, 0) }");
 
     _inputThrottler->Initialize();
@@ -311,6 +315,20 @@ void MainWindow::diggingState(bool enabled)
     {
         _ui->labelDig->setText("OFF");
         _ui->labelDig->setStyleSheet("QLabel { background-color : rgb(0, 200, 0) }");
+    }
+}
+
+void MainWindow::dockinggState(bool enabled)
+{
+    if( enabled )
+    {
+        _ui->labelDock->setText("ON");
+        _ui->labelDock->setStyleSheet("QLabel { background-color : red; }");
+    }
+    else
+    {
+        _ui->labelDock->setText("OFF");
+        _ui->labelDock->setStyleSheet("QLabel { background-color : rgb(0, 200, 0) }");
     }
 }
 

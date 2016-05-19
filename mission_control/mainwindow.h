@@ -57,6 +57,7 @@ class MainWindow : public QMainWindow
 
         void actuatorState( int level );
         void diggingState(bool enabled);
+        void dockinggState(bool enabled);
         void deviceBtnUpdate( eBtnState state, int btnID );
 
         void on_pushButtonConnect_clicked();

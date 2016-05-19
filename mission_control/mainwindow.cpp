@@ -130,7 +130,7 @@ void MainWindow::initialize()
     connect(_inputThrottler, SIGNAL(DockingState(bool)),
                                        this, SLOT(dockinggState(bool)));
 
-    connect(_inputThrottler, SIGNAL(on_EStopUpdate(bool)),
+    connect(_inputThrottler, SIGNAL(EStopUpdate(bool)),
                                         this, SLOT(on_EStopUpdate(bool)));
 
     connect(_tcpSender, SIGNAL(publishBackupUDPMessage(const QByteArray&)),
@@ -589,10 +589,6 @@ void MainWindow::on_pushButtonResetStats_clicked()
     _statsMonitor->resetStats();
 }
 
-void MainWindow::on_tcpStreamCheckBox_clicked()
-{
-
-}
 
 void MainWindow::on_rmcMessage(RMCEnDecoder::TVec msg)
 {

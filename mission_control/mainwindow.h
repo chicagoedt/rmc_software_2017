@@ -79,8 +79,6 @@ class MainWindow : public QMainWindow
 
         void on_pushButtonResetStats_clicked();
 
-        void on_tcpStreamCheckBox_clicked();
-
         void on_rmcMessage(RMCEnDecoder::TVec msg);
 
         void logTxData(const QByteArray& msg);

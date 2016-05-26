@@ -39,6 +39,7 @@ class InputThrottler : public QThread
         void    StatusUpdate(const eStatus& status, const QString& message);
         void    BitsUpdate(const QString& message);
         void    PublishMessage(const QByteArray& buffer);
+        void    FilteredMessage(void);
         void    ActuatorState( int level );
         void    DiggingState(bool enabled);
         void    DockingState(bool enabled);

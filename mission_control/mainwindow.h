@@ -87,6 +87,8 @@ class MainWindow : public QMainWindow
 
         void on_deviceLock(void);
 
+        void filteredMessage(void);
+
     private:
         void    logTrace(const eStatus& status,
                          const QString& message);
@@ -115,6 +117,7 @@ class MainWindow : public QMainWindow
         TCPSender*          _tcpSender;
         StatsMonitor*       _statsMonitor;
         RMCEnDecoder        _rmcDecoder;
+        unsigned int        _filteredMessage;
 };
 
 #endif // MAINWINDOW_H

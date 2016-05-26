@@ -12,7 +12,7 @@ const QString MainWindow::APP_NAME = QString("Mission Control");
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent), _ui(new Ui::MainWindow),
-    _joystickConnector(0L), _udpSender(0L), _tcpSender(0L)
+    _joystickConnector(0L), _udpSender(0L), _tcpSender(0L), _filteredMessage(0)
 {
     _ui->setupUi(this);
 
@@ -120,6 +120,9 @@ void MainWindow::initialize()
 
     connect(_inputThrottler, SIGNAL(PublishMessage(const QByteArray&)),
                                        this, SLOT(logTxData(const QByteArray&)));
+
+    connect(_inputThrottler, SIGNAL(FilteredMessage(void)),
+                                       this, SLOT(filteredMessage(void)));
 
     connect(_inputThrottler, SIGNAL(ActuatorState(int)),
                                        this, SLOT(actuatorState(int)));
@@ -586,6 +589,7 @@ void MainWindow::statsUpdate(const Stats& stats)
 
 void MainWindow::on_pushButtonResetStats_clicked()
 {
+    _filteredMessage = 0;
     _statsMonitor->resetStats();
 }
 
@@ -610,6 +614,12 @@ void    MainWindow::logTxData(const QByteArray& msg)
         _datalogger->write("T", sizeof("T"));   // Rx Data from Robot
         _datalogger->write((char*)msg.data(), msg.size());
     }
+}
+
+void    MainWindow::filteredMessage(void)
+{
+    _filteredMessage++;
+    _ui->lineEditSkipedMessages->setText(QString::number(_filteredMessage));
 }
 
 void    MainWindow::on_EStopUpdate(bool enable)

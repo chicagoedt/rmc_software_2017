@@ -34,13 +34,22 @@ void    InputThrottler::run(void)
 
         if(_updated )
         {
+            QByteArray lastByteArray(_byteArray);
+
             _updated = false;
-            _lock.unlock();
 
             PackBits();
-            PrintBits();
 
-            emit PublishMessage(_byteArray);
+            _lock.unlock();
+
+            if( lastByteArray != _byteArray)
+            {
+                PrintBits();
+
+                emit PublishMessage(_byteArray);
+            }
+            else
+                emit FilteredMessage();
         }
         else
             _lock.unlock();
@@ -220,7 +229,7 @@ void    InputThrottler::PrintBits()
             msg.append( (_byteArray.at(i) & (1<<(7-b))) ? '1' : '0');
 
         if( i < _byteArray.count() )
-            msg.append(" ");
+            msg.append("  ");
     }
 
     emit BitsUpdate(msg);

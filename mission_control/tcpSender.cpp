@@ -47,7 +47,7 @@ void    TCPSender::disconnect(void)
     emit statusUpdate( eDisconnected, QString("TCPSender Disconnect"));
 }
 
-void    TCPSender::error(QAbstractSocket::SocketError socketError)
+void    TCPSender::error(QAbstractSocket::SocketError)
 {
     emit statusUpdate(eDisconnected, QString("TCPSender ") + _tcpSocket->errorString());
     _tcpSocket->disconnectFromHost();

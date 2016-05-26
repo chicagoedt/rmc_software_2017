@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>789</width>
-    <height>523</height>
+    <width>788</width>
+    <height>554</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -637,7 +637,7 @@
                   </widget>
                  </item>
                  <item>
-                  <widget class="QGroupBox" name="groupBox_2">
+                  <widget class="QGroupBox" name="groupBox_5">
                    <property name="sizePolicy">
                     <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
                      <horstretch>0</horstretch>
@@ -1351,6 +1351,50 @@
                           </layout>
                          </item>
                          <item>
+                          <widget class="QGroupBox" name="groupBox_6">
+                           <property name="title">
+                            <string>Optimization Stats</string>
+                           </property>
+                           <layout class="QHBoxLayout" name="horizontalLayout_17">
+                            <item>
+                             <widget class="QLabel" name="label_8">
+                              <property name="sizePolicy">
+                               <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                                <horstretch>0</horstretch>
+                                <verstretch>0</verstretch>
+                               </sizepolicy>
+                              </property>
+                              <property name="minimumSize">
+                               <size>
+                                <width>50</width>
+                                <height>0</height>
+                               </size>
+                              </property>
+                              <property name="text">
+                               <string>Skip Msg</string>
+                              </property>
+                             </widget>
+                            </item>
+                            <item>
+                             <widget class="QLineEdit" name="lineEditSkipedMessages">
+                              <property name="text">
+                               <string>0</string>
+                              </property>
+                              <property name="maxLength">
+                               <number>255</number>
+                              </property>
+                              <property name="alignment">
+                               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                              </property>
+                              <property name="readOnly">
+                               <bool>true</bool>
+                              </property>
+                             </widget>
+                            </item>
+                           </layout>
+                          </widget>
+                         </item>
+                         <item>
                           <widget class="QPushButton" name="pushButtonResetStats">
                            <property name="text">
                             <string>Reset Stats</string>
@@ -1683,7 +1727,7 @@
                          <enum>QFrame::NoFrame</enum>
                         </property>
                         <property name="text">
-                         <string>00000000 00000000</string>
+                         <string>00000000  00000000</string>
                         </property>
                         <property name="textFormat">
                          <enum>Qt::PlainText</enum>

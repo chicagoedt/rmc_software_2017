@@ -38,7 +38,7 @@ class StateMachineBase
 
 	enum eDigPosition
 	{
-		eDig = 750,
+		eDig = 850,
 		eHome = 200,
 		eDump = -1000
 	};

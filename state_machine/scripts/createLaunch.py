@@ -11,13 +11,18 @@ filep1 = '''<?xml version="1.0" encoding="utf-8"?>
   <param name="num_to_dock" type="int" value="3"/>             <!-- How many consecutive hits are needed to determine dock state -->
   <param name="arucoDistance" type="double" value="'''
 
-filep2= '''"/>
+filep2='''"/>
+
+  <param name="starting_orientation" type="string" value="east"/> <!-- north, east, south, west -->
 
   <node pkg="state_machine" type="mission_validator" name="mission_validator" output="screen"/>
 
   <node pkg="state_machine" type="state_machine_node" name="state_machine" output="screen" >
         <rosparam command="load" file="$(find rmc_config)/yaml/waypoints.yaml" />
   </node>
+
+<!-- do not uncomment for now -->
+<!--  <include file="$(fine state_machine)/launch/posePub.launch"/> -->
 
 </launch>
 '''

@@ -179,19 +179,18 @@ bool StateMachineBase::moveToGoalPoint(geometry_msgs::Pose waypoint)
     		ROS_INFO("Waiting for the move_base action server to come up");
   	}
 
-        if(_robotState == eDigging)
-        {
-                for(int i = 0; i < 15; i++)
-                {
-                        std_msgs::Float64 digVel;
-                        digVel.data = 450;
-                        _digPub.publish(digVel);
-                        ROS_WARN_THROTTLE(1, "Digging...");
+	if(_robotState == eDigging)
+		for(int i = 0; i < 15; i++)
+		{
+			std_msgs::Float64 digVel;
+			digVel.data = 450;
+			_digPub.publish(digVel);
+			ROS_WARN_THROTTLE(1, "Digging...");
 
-                        ros::spinOnce();
-                        ros::Duration(0.1).sleep();
-                }
-        }
+			ros::spinOnce();
+			ros::Duration(0.1).sleep();
+		}
+	}
 
 	move_base_msgs::MoveBaseGoal moveBaseGoal;
         
@@ -406,62 +405,69 @@ void StateMachineBase::run()
 
 	while(1)
 	{
-                setActuatorPosition(eHome);
+		setActuatorPosition(eHome);
 
 
-                //ros::Duration(2.0).sleep();
+		//ros::Duration(2.0).sleep();
 
-                _robotState = eDriveToDig; // Start digging motors
+		_robotState = eDriveToDig; // Start digging motors
 
-                if(moveToGoalPoint(_digStartPose))
-                {
-                        updateCurrentSpeed(_digDriveSpeed); // should be 0.25
-                        setActuatorPosition(eDig);
+		if(moveToGoalPoint(_digStartPose))
+		{
+			updateCurrentSpeed(_digDriveSpeed); // should be 0.25
+			setActuatorPosition(eDig);
 
-                        ROS_INFO("Lowering Actuators to Dig...");
+			ROS_INFO("Lowering Actuators to Dig...");
 
-                        if(!_isSimulation)
-                                ros::Duration(15.0).sleep();
-                        else
-                                ros::Duration(1.0).sleep();
+			if(!_isSimulation)
+				ros::Duration(15.0).sleep();
+			else
+				ros::Duration(1.0).sleep();
 
-                        _robotState = eDigging; // Start digging motors
+			_robotState = eDigging; // Start digging motors
 
-                        if(moveToGoalPoint(_digEndPose))
-                        {
-                                updateCurrentSpeed(0); // go back to default drive speed (zero is equivalent)
-                                setActuatorPosition(eHome);
-                                ROS_INFO("Raising Actuators to Home Position...");
+			if(moveToGoalPoint(_digEndPose))
+			{
+				updateCurrentSpeed(0); // go back to default drive speed (zero is equivalent)
+				setActuatorPosition(eHome);
+				ROS_INFO("Raising Actuators to Home Position...");
 
-                                if(!_isSimulation)
-                                        ros::Duration(3.0).sleep();
-                                else
-                                        ros::Duration(1.5).sleep();
+				if(!_isSimulation)
+					ros::Duration(3.0).sleep();
+				else
+					ros::Duration(1.5).sleep();
 
-                                _robotState = eDriveToDig;
+				_robotState = eDriveToDig;
 
-                                if(moveToGoalPoint(_dockingPose))
-                                {
-                                        _robotState = eDumping;
-                                        setActuatorPosition(eDump);
-                                        dock();
+				if(moveToGoalPoint(_dockingPose))
+				{
+					_robotState = eDumping;
+					setActuatorPosition(eDump);
+					dock();
 
-                                        ROS_INFO("Raising Actuators to Dump Position...");
+					ROS_INFO("Raising Actuators to Dump Position...");
 
-                                        if(!_isSimulation)
-                                                ros::Duration(31.0).sleep();
-                                        else
-                                                ros::Duration(2.0).sleep();
+					if(!_isSimulation)
+						ros::Duration(31.0).sleep();
+					else
+						ros::Duration(2.0).sleep();
 
-                                        setActuatorPosition(eHome);                                  
-                                        ros::Duration(7.0).sleep();
+					setActuatorPosition(eHome);					
+					ros::Duration(3.0).sleep();
 
-                                        undock();
-                                }
-                        }
-                }
-
+					undock();
+				}
+			}
+		}			
   	}
+/*
+	setActuatorPosition(eDump);
+	dock();
+	ros::Duration(31.0).sleep();
+	setActuatorPosition(eHome);
+	ros::Duration(6.0).sleep();
+	undock();
+*/
 }
 
 void StateMachineBase::moveActuators(bool goUp)
@@ -573,6 +579,7 @@ void StateMachineBase::undock()
 void StateMachineBase::dock()
 {
 	int useAruco = 0;
+	_didDock=0;
 	double arucoDistance = 0;
 	_nh.param("values_for_average", _values_for_average, 15);
 	_nh.param("threshold_for_average", _threshold, 1.2);
@@ -683,14 +690,13 @@ void StateMachineBase::dock()
 			}
 
 			if ((dock_progress.toSec() - dock_duration.toSec()) > 9){
-                                _didDock = 1;
-                                ROS_INFO_STREAM("Docked with Time");
-                                msg.linear.x = 0;
-                                _arucoPub.publish(msg);
-                                ros::spinOnce();
-                                loop_rate.sleep();
-                        }
-
+				_didDock = 1;
+				ROS_INFO_STREAM("Docked with Time");
+				msg.linear.x = 0;
+				_arucoPub.publish(msg);
+				ros::spinOnce();
+				loop_rate.sleep();
+			}
 
 		}
 	}

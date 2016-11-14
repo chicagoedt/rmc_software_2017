@@ -1,9 +1,11 @@
 #include "state_machine.h"
+#include "undocking.cpp"
 
 #define GRAVITY 9.81
 
 StateMachineBase::StateMachineBase(void):
-	_driveSpeed(0.0), _moveBaseAC("move_base", true), _panServoAC("pan_servo", true), _nhLocal("~"), _robotState(eInitializing), _foundMarker(false)
+	_moveBaseAC("move_base", true), _panServoAC("pan_servo", true), _nhLocal("~"),
+   MAX_GOAL_POINTS(12), _robotState(eInitializing), _foundMarker(false)
 {
 	_previous_x_accel = 0;
 	_didDock = 0;
@@ -62,38 +64,17 @@ bool StateMachineBase::Initialize()
       		return false;
 	}
 
-	
-	_digDriveSpeed = 0.25;
-	_nhLocal.param<double>("dig_drive_speed", _digDriveSpeed);
-
-	_isSimulation = false;
-	_nhLocal.param<bool>("simulation", _isSimulation);
-
-	if(!_isSimulation)
-	{
-		_currentSensorRequest.roboteq = true;
-		_nhLocal.param<bool>("Roboteq", _currentSensorRequest.roboteq);
-
-		_currentSensorRequest.servo = true;
-		_nhLocal.param<bool>("Servo", _currentSensorRequest.servo);
-	}
-	else
-	{
-		_currentSensorRequest.roboteq = false;
-		_currentSensorRequest.servo = false;
-	}
-
-	_currentSensorRequest.rtab = true;
-	_nhLocal.param<bool>("RTAB", _currentSensorRequest.rtab);
+	_currentSensorRequest.roboteq = true;
+	_nhLocal.param<bool>("Roboteq", _currentSensorRequest.roboteq);
 
 	_currentSensorRequest.aruco = true;
 	_nhLocal.param<bool>("Aruco", _currentSensorRequest.servo);
 
-	_turnStartLeft = false;
-	_turnStartRight = false;
+	_currentSensorRequest.servo = true;
+	_nhLocal.param<bool>("Servo", _currentSensorRequest.servo);
 
-	_nhLocal.param<bool>("turn_start_left", _turnStartLeft);
-	_nhLocal.param<bool>("turn_start_right", _turnStartRight);
+	_currentSensorRequest.rtab = true;
+	_nhLocal.param<bool>("RTAB", _currentSensorRequest.rtab);
 
 	_currentDigCycleCount = 0;
 
@@ -102,10 +83,6 @@ bool StateMachineBase::Initialize()
   	_arucoSub = _nh.subscribe<geometry_msgs::PoseWithCovarianceStamped> ("ar_single_board/pose", 1, &StateMachineBase::arucoPoseCallback, this);
   	_actuatorClient = _nh.serviceClient<roboteq_node::Actuators>("set_actuators"); // need to figure out how to not make roboteq_node a dependency to state_machine which can also be used by the simulator
 	_validatorClient = _nh.serviceClient<state_machine::ValidateSensors>("validate_sensors");
-	_poseFollowerClient = _nh.serviceClient<pose_follower::SetMaxVelocity>("set_max_velocity");
-	_rtabClient = _nh.serviceClient<std_srvs::Empty>("rtabmap/reset_odom");
-
-	_arucoPub = _nh.advertise<geometry_msgs::Twist>("cmd_vel", 1);
 /*
 	if(initializeServo())
 		ROS_INFO("Servo Initialized.");
@@ -124,25 +101,8 @@ void StateMachineBase::arucoPoseCallback(const geometry_msgs::PoseWithCovariance
 
 void StateMachineBase::setActuatorPosition(eDigPosition digPosition)
 {
-	if(!_isSimulation)
-	{
-		roboteq_node::Actuators srv;
-		srv.request.actuator_position = digPosition;
-
-		if(_actuatorClient.call(srv))  // blocking call
-		{
-			ROS_INFO_STREAM("Moved/Moving to " << digPosition);
-		}
-		else
-		{
-			ROS_ERROR_STREAM("Failed to call actuator service! Check if roboteq's are on...");
-		}
-	}
-	else
-	{
-		ROS_INFO("Simulation Actuators to position.");
-	}
-
+	switch (digPosition)
+	ROS_INFO_STREAM("Moving actuators..");
 }
 
 void StateMachineBase::setServoAngle(float angle)
@@ -155,43 +115,8 @@ void StateMachineBase::setServoAngle(float angle)
 	ros::spinOnce();
 }
 
-void StateMachineBase::updateCurrentSpeed(float driveSpeed)
-{
-	pose_follower::SetMaxVelocity srv;
-	srv.request.max_linear_vel = driveSpeed;	
-	
-	ROS_INFO("Updating speed...");	
-
-	if(_poseFollowerClient.call(srv))
-	{
-		ROS_INFO_STREAM("Setting drive speed to: " << driveSpeed);
-	}
-	else
-	{
-		ROS_ERROR("Cannot set new drive speed!");	
-	}
-}
-
 bool StateMachineBase::moveToGoalPoint(geometry_msgs::Pose waypoint)
 {
-  	while(!_moveBaseAC.waitForServer(ros::Duration(3.0)))
-	{
-    		ROS_INFO("Waiting for the move_base action server to come up");
-  	}
-
-        if(_robotState == eDigging)
-        {
-                for(int i = 0; i < 15; i++)
-                {
-                        std_msgs::Float64 digVel;
-                        digVel.data = 450;
-                        _digPub.publish(digVel);
-                        ROS_WARN_THROTTLE(1, "Digging...");
-
-                        ros::spinOnce();
-                        ros::Duration(0.1).sleep();
-                }
-        }
 
 	move_base_msgs::MoveBaseGoal moveBaseGoal;
         
@@ -217,14 +142,10 @@ bool StateMachineBase::moveToGoalPoint(geometry_msgs::Pose waypoint)
 		if(_robotState == eDigging)
 		{
 			std_msgs::Float64 digVel;
-			digVel.data = 450;
+			digVel.data = -400;
 			_digPub.publish(digVel);
-			ROS_WARN_THROTTLE(1, "Digging...");
+			ROS_WARN("Digging...");
 		}	
-		else
-		{
-			ROS_INFO_THROTTLE(1, "Moving to waypoint...");
-		}
 		ros::spinOnce();
 		ros::Duration(0.1).sleep();	
 	}
@@ -249,7 +170,6 @@ bool StateMachineBase::callSensorValidator(state_machine::ValidateSensors srv)
 
 		ROS_WARN("--------------------------------------------------");
 		// bunch of if's so that status print statements are color coordinated
-		// TODO: Its printing out all of them false, even though at least one should be true
 		if(srv.request.sensors.roboteq)
 			if(srv.response.status.roboteq == true)
 				ROS_INFO("Roboteq = True");
@@ -262,7 +182,7 @@ bool StateMachineBase::callSensorValidator(state_machine::ValidateSensors srv)
 			if(srv.response.status.aruco == true)
 				ROS_INFO("Aruco TF = True");
 			else
-				ROS_WARN("Aruco TF = False");
+				ROS_ERROR("Aruco TF = False");
 		else
 			ROS_WARN("Aruco = Unknown");
 
@@ -290,81 +210,11 @@ bool StateMachineBase::callSensorValidator(state_machine::ValidateSensors srv)
 		}
 		else
 		{
-			ROS_WARN("-- Sensors could not be initialized. Exiting... --");
+			ROS_ERROR("-- Sensors could not be initialized. Exiting... --"); return false;
 		}
 	}
 
 }
-
-void StateMachineBase::findAruco(const char c){
-    ros::Rate loop_rate(10);
-    tf::StampedTransform board2base;
-    unsigned long time = 0;
-    ROS_INFO_STREAM("To upper c: " << toupper(c)); 
-    switch (toupper(c)){
-        case 'E':
-	    {
-            bool foundTransform = false;
-            while (!foundTransform){
-                try {
-                    _tf_listener.lookupTransform("/ar_board_marker", "/base_link", ros::Time(0), board2base);
-                    foundTransform = true;
-                    std_srvs::Empty srv;
-                    _rtabClient.call(srv);
-
-			// rosservice call /rtabmap/reset_odom
-                }
-                catch (tf::TransformException ex) {
-                    geometry_msgs::Twist msg;
-                    msg.angular.z = ((time % 70) < 45) ? -0.9 : 0.0;
-                    _arucoPub.publish(msg);
-                    ros::spinOnce();
-                    loop_rate.sleep();
-		    time++;
-                }
-            }
-            geometry_msgs::Twist msg;
-            msg.angular.z = 0;
-            _arucoPub.publish(msg);
-            ros::spinOnce();
-            loop_rate.sleep();
-            break;
-	    }
-        case 'N':
-	    {
-            bool foundTransform = false;
-            setServoAngle(1.57);
-            while (!foundTransform){
-                try {
-                    _tf_listener.lookupTransform("/ar_board_marker", "/base_link", ros::Time(0), board2base);
-                    foundTransform = true;
-                    std_srvs::Empty srv;
-                    _rtabClient.call(srv);
-                }
-                catch (tf::TransformException ex) {
-                    geometry_msgs::Twist msg;
-                    msg.angular.z = ((time % 70) < 45) ? 0.9 : 0.0;
-                    _arucoPub.publish(msg);
-                    ros::spinOnce();
-                    loop_rate.sleep();
-		    time++;
-                }
-            }
-            geometry_msgs::Twist msg;
-            msg.angular.z = 0;
-            _arucoPub.publish(msg);
-            ros::spinOnce();
-            loop_rate.sleep();
-	    setServoAngle(0);
-            break;
-		}
-	default:
-		ROS_WARN("Not facing any direction!");
-		break;
-	}
-}
-	
-
 
 void StateMachineBase::run()
 {
@@ -375,93 +225,52 @@ void StateMachineBase::run()
 	// TODO: add request component to ValidateSensors message so that we can request specific
 	//       validations (all, or individual)
 	state_machine::ValidateSensors srv;
-	if (!_isSimulation) 
+	srv.request.sensors.roboteq 	= _currentSensorRequest.roboteq;
+	srv.request.sensors.rtab 	= _currentSensorRequest.rtab;
+	srv.request.sensors.servo 	= _currentSensorRequest.servo; 
+	srv.request.sensors.aruco 	= _currentSensorRequest.aruco;
+
+	if(!callSensorValidator(srv))
+		return;
+
+
+	setActuatorPosition(eHome);
+
+ 	ros::Duration(5.0).sleep();
+
+	_robotState = eDriveToDig; // Start digging motors
+
+	if(moveToGoalPoint(_digStartPose))
 	{
-		srv.request.sensors.roboteq 	= _currentSensorRequest.roboteq;
-		srv.request.sensors.rtab 	= _currentSensorRequest.rtab;
-		srv.request.sensors.servo 	= _currentSensorRequest.servo; 
-		srv.request.sensors.aruco 	= _currentSensorRequest.aruco;
+		setActuatorPosition(eDig);
+		ros::Duration(12.0).sleep();
+        	ROS_INFO("Lower Actuators to Dig...");
 
-		callSensorValidator(srv);
-	}
+		_robotState = eDigging; // Start digging motors
 
-	std::string orient;
-        _nh.getParam("starting_orientation", orient);
+		if(moveToGoalPoint(_digEndPose))
+		{
+			setActuatorPosition(eHome);
+			ros::Duration(8.0).sleep();
+        		ROS_INFO("Raising Actuators to Home Position...");
+			
+			_robotState = eDriveToDig;
 
-        if (srv.response.status.aruco == false)
-	{
-                if (orient == "north") 
-			findAruco('N');
-                else if (orient == "east") 
-			findAruco('E');
-                else if (orient == "west") 
-			findAruco('W');
-                else if (orient == "south") 
-			findAruco('S');
-		else
-			ROS_WARN("No direction selected!");
-        }
+			if(moveToGoalPoint(_dockingPose))
+			{
+				_robotState = eDumping;
+				dock();
 
-	ROS_INFO_STREAM("Got here.. facing: " << orient);
+                        	setActuatorPosition(eDump);
+                        	ros::Duration(15.0).sleep();
+                        	ROS_INFO("Raising Actuators to Dump Position...");
+			}
+		}
 
-	while(1)
-	{
-                setActuatorPosition(eHome);
+	}			
 
-
-                //ros::Duration(2.0).sleep();
-
-                _robotState = eDriveToDig; // Start digging motors
-
-                if(moveToGoalPoint(_digStartPose))
-                {
-                        updateCurrentSpeed(_digDriveSpeed); // should be 0.25
-                        setActuatorPosition(eDig);
-
-                        ROS_INFO("Lowering Actuators to Dig...");
-
-                        if(!_isSimulation)
-                                ros::Duration(15.0).sleep();
-                        else
-                                ros::Duration(1.0).sleep();
-
-                        _robotState = eDigging; // Start digging motors
-
-                        if(moveToGoalPoint(_digEndPose))
-                        {
-                                updateCurrentSpeed(0); // go back to default drive speed (zero is equivalent)
-                                setActuatorPosition(eHome);
-                                ROS_INFO("Raising Actuators to Home Position...");
-
-                                if(!_isSimulation)
-                                        ros::Duration(3.0).sleep();
-                                else
-                                        ros::Duration(1.5).sleep();
-
-                                _robotState = eDriveToDig;
-
-                                if(moveToGoalPoint(_dockingPose))
-                                {
-                                        _robotState = eDumping;
-                                        setActuatorPosition(eDump);
-                                        dock();
-
-                                        ROS_INFO("Raising Actuators to Dump Position...");
-
-                                        if(!_isSimulation)
-                                                ros::Duration(31.0).sleep();
-                                        else
-                                                ros::Duration(2.0).sleep();
-
-                                        setActuatorPosition(eHome);                                  
-                                        ros::Duration(7.0).sleep();
-
-                                        undock();
-                                }
-                        }
-                }
-
-  	}
+	StateMachineBase::dock();
+  
 }
 
 void StateMachineBase::moveActuators(bool goUp)
@@ -532,44 +341,6 @@ void StateMachineBase::dockCallback(const sensor_msgs::Imu::ConstPtr& msg)
 	//_previous_x_accel = current_x_accel;
 }
 
-void StateMachineBase::undock()
-{
-    //int xvel = 0;
-    ros::Publisher undockPub = _nh.advertise<geometry_msgs::Twist>("cmd_vel", 1);
-    tf::TransformListener tfListener(ros::Duration(1.0));
-    tf::StampedTransform map2base;
-    ros::Rate loop_rate(23);
-
-    ROS_INFO("Un-docking...");
-
-    bool foundTransform = 0;
-    geometry_msgs::Twist msg;
-    ros::spinOnce();
-    loop_rate.sleep();
-    while (!foundTransform)
-    {
-        try
-        {
-	    tfListener.waitForTransform("/odom", "/base_link", ros::Time::now(), ros::Duration(0.1));
-            tfListener.lookupTransform("/odom", "/base_link", ros::Time(0), map2base/*transform*/);
-            foundTransform = 1;
-            ROS_INFO("Found map->base_link transform!");
-        }
-        catch (tf::TransformException ex){
-            ROS_INFO_STREAM("Not found");
-            msg.linear.x = .25;
-            undockPub.publish(msg);
-            ros::spinOnce();
-            loop_rate.sleep();
-        }
-    }
-    msg.linear.x = 0;
-    undockPub.publish(msg);
-    ros::spinOnce();
-    loop_rate.sleep();
-}
-
-
 void StateMachineBase::dock()
 {
 	int useAruco = 0;
@@ -603,7 +374,6 @@ void StateMachineBase::dock()
 				loop_rate.sleep();
 			}
 		}
-
 		ROS_INFO("Finished Docking");
 		geometry_msgs::Twist msg;
 		msg.linear.x = 0;
@@ -618,10 +388,9 @@ void StateMachineBase::dock()
 // testing failsafe system
 		//ROS_INFO_STREAM("DOCKING." << _average_imu_g.size() << " ");
 
-		//_imuSub = _nh.subscribe("imu/data", 1, &StateMachineBase::dockCallback, this);
+		_imuSub = _nh.subscribe("imu/data", 1, &StateMachineBase::dockCallback, this);
 
 		_above_threshold_count = 0;
-		ros::Time dock_duration = ros::Time::now();
 // end testing
 		while (!_didDock)
 		{
@@ -638,12 +407,10 @@ void StateMachineBase::dock()
 					foundTransform = 1;
 				}
 				catch (tf::TransformException ex){
-				  ROS_ERROR("Docking Error: %s",ex.what());
-				
+				  ROS_ERROR("%s",ex.what());
 				  msg.linear.x = 0;
-				  _arucoPub.publish(msg);
 				  ros::spinOnce();
-				  ros::Duration(0.1).sleep();
+				  ros::Duration(0.5).sleep();
 				}	
 			}
 
@@ -661,8 +428,7 @@ void StateMachineBase::dock()
 
 			if (absYaw > .02) msg.angular.z = (yaw > 0) ? .15 : -.15;
 
-			//ROS_INFO_STREAM("Transform: " << x << " " << y << " " << z);
-			ROS_INFO_STREAM("Transform difference: " << ((x-0.1) - arucoDistance));
+			ROS_INFO_STREAM("Transform: " << x << " " << y << " " << z);
 			//ROS_INFO_STREAM("Rotation:  " << roll << " " << pitch << " " << yaw);
 			msg.linear.x = -0.24;
 			
@@ -671,9 +437,7 @@ void StateMachineBase::dock()
 			loop_rate.sleep();
 			x = ( x > 0) ? x : -1*x ;
 
-			ros::Time dock_progress = ros::Time::now();
-
-			if ((x) < arucoDistance){
+			if ((x - 0.1) < arucoDistance){
 				_didDock = 1;
 				ROS_INFO_STREAM("Docked with ArUco");
 				msg.linear.x = 0;
@@ -682,17 +446,6 @@ void StateMachineBase::dock()
 				loop_rate.sleep();
 			}
 
-			if ((dock_progress.toSec() - dock_duration.toSec()) > 9){
-                                _didDock = 1;
-                                ROS_INFO_STREAM("Docked with Time");
-                                msg.linear.x = 0;
-                                _arucoPub.publish(msg);
-                                ros::spinOnce();
-                                loop_rate.sleep();
-                        }
-
-
 		}
 	}
 }
-

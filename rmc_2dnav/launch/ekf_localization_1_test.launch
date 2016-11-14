@@ -21,20 +21,26 @@
     <param name="transform_time_offset" value="0.0"/>
 
     <param name="odom0" value="rtabmap/odom"/>
-<!--
     <param name="imu0" value="imu/data"/>
--->
+
     <rosparam param="odom0_config">[true, true, true, 
                                    true,  true, true, 
                                    false, false, false,
                                    false, false, false,
                                    false, false, false]</rosparam>
 
+<!--
     <rosparam param="imu0_config">[false, false, false,
                                    true, true, true,
                                    false, false, false,
                                    true, true, true,
                                    false,  false, false]</rosparam>
+-->
+    <rosparam param="imu0_config">[false, false, false,
+                                   false, false, false,
+                                   false, false, false,
+                                   false, false, false,
+                                   true,  false, false]</rosparam>
 
     <!-- imu covariance is static. therefore, differential 
          needs to be false as error will accumulate when differentiating -->

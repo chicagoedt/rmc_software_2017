@@ -120,6 +120,7 @@ public:
      */
     friend ostream & operator<<(ostream &str,const Marker &M)
     {
+        
         str<<M.id<<"=";
         for (int i=0;i<4;i++)
             str<<"("<<M[i].x<< ","<<M[i].y<<") ";
@@ -129,7 +130,7 @@ public:
         str<<"Rxyz=";
         for (int i=0;i<3;i++)
             str<<M.Rvec.ptr<float>(0)[i]<<" ";
-
+        
         return str;
     }
     

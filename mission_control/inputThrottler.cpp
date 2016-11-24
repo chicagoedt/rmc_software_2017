@@ -2,6 +2,7 @@
 #include <QBitArray>
 #include <QDebug>
 
+#define RMC_2016
 //This file deals with the actuator/digging controls.
 
 InputThrottler::InputThrottler(QObject* parent)
@@ -76,6 +77,7 @@ void    InputThrottler::PackBits()
 {
     _byteArray.clear();
 
+#ifdef RMC_2016
     _byteArray[0] = (char)_mode |
                     ((_actuatorLevel << 3) & 0x00FF) |
                     (char)_digging << 2 | (_docking ?  0x40 : 0x00);
@@ -87,7 +89,11 @@ void    InputThrottler::PackBits()
 
     _byteArray[1] = ((_state.axisRight().Y() / JOY_PER_MSG_SCALAR) & 0x0F) |
                     ((_state.axisLeft().Y() / JOY_PER_MSG_SCALAR) & 0x0F) << 4;
+#else // RMC_2017
+
+#endif
 }
+
 void    InputThrottler::DeviceUpdate(const InputUpdate& state)
 {
     _lock.lock();

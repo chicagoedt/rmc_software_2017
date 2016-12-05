@@ -696,7 +696,7 @@ void StateMachineBase::dock()
 // testing failsafe system
 		//ROS_INFO_STREAM("DOCKING." << _average_imu_g.size() << " ");
 
-		//_imuSub = _nh.subscribe("imu/data", 1, &StateMachineBase::dockCallback, this);
+		_imuSub = _nh.subscribe("imu/data", 1, &StateMachineBase::dockCallback, this);
 
 		_above_threshold_count = 0;
 		ros::Time dock_duration = ros::Time::now();

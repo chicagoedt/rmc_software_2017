@@ -13,7 +13,7 @@
   <param name="num_to_dock" type="int" value="3"/>             
 
   <!-- <param name="arucoDistance" type="double" value="1.0"/> -->
-  <param name="arucoDistance" type="double" value="1.1"/>
+  <param name="arucoDistance" type="double" value="0.8"/>
 
   <param name="starting_orientation" type="string" value="north"/> <!-- north, east, south, west -->
 

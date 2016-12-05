@@ -81,6 +81,9 @@ add_executable(pose_publisher_node src/posePublisher/posePublisher.cpp ../rmcDec
 ## as an example, message headers may need to be generated before nodes
 add_dependencies(state_machine_node state_machine_generate_messages_cpp)
 add_dependencies(mission_validator state_machine_generate_messages_cpp)
+add_dependencies(state_machine_node rmc_simulation_generate_messages_cpp)
+add_dependencies(pose_publisher_node rmc_simulation_generate_messages_cpp)
+add_dependencies(mission_validator rmc_simulation_generate_messages_cpp)
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(state_machine_node ${catkin_LIBRARIES} )

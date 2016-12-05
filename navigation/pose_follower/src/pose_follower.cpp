@@ -72,6 +72,7 @@ namespace pose_follower {
     //go no faster than this
     node_private.param("max_vel_lin", max_vel_lin_, 0.9);
     node_private.param("max_vel_th", max_vel_th_, 1.4);
+    _initialMaxVelLinear = max_vel_lin_;
 
     //minimum velocities to keep from getting stuck
     node_private.param("min_vel_lin", min_vel_lin_, 0.1);
@@ -100,8 +101,30 @@ namespace pose_follower {
     odom_sub_ = node.subscribe<nav_msgs::Odometry>("odom", 1, boost::bind(&PoseFollower::odomCallback, this, _1));
     vel_pub_ = node.advertise<geometry_msgs::Twist>("pf/cmd_vel", 10);
 
+    _service = node.advertiseService("set_max_velocity", &PoseFollower::setMaxVelocityCallback, this);
+
     ROS_DEBUG("Initialized");
 }
+
+
+bool PoseFollower::setMaxVelocityCallback(SetMaxVelocity::Request& request, SetMaxVelocity::Response& response)
+{
+	if(request.max_linear_vel == 0)
+	{
+		// If request is 0, that means change drive speed back to the default velocity
+		// pose_follower got from ros param server in initialize() function
+		max_vel_lin_ = _initialMaxVelLinear;
+	}
+	else
+	{
+		max_vel_lin_ = request.max_linear_vel;
+	}
+
+	response.new_max_linear_vel 	= max_vel_lin_; // redundant, but reassures what the speed is now
+
+	return true;
+}
+
 
 void PoseFollower::odomCallback(const nav_msgs::Odometry::ConstPtr& msg)
 {
@@ -222,7 +245,7 @@ bool PoseFollower::computeVelocityCommands(geometry_msgs::Twist& cmd_vel)
     		break;
     	}
     }
-    ROS_INFO("out of loop...");
+    //ROS_INFO("out of loop...");
 
     //if we're not in the goal position, we need to update time
     if(!in_goal_position)

@@ -1,0 +1,12 @@
+image: edt_test_arena-rotated.pgm
+#image: rmc_arena_5cm.png
+#resolution: 0.05
+resolution: 0.05
+#origin: [-0.45,-1.5,0] # needed to switch width and height in actual image as rotation doesnt work
+origin: [-0.60,-1.5,0] # needed to switch width and height in actual image as rotation doesnt work
+#origin: [-1.89,-0.5, -1.57]
+occupied_thresh: 0.65
+free_thresh: 0.196 # Taken from the Willow Garage map in the turtlebot_navigation package
+negate: 0
+width: 3.0
+height: 3.65

@@ -1,4 +1,4 @@
-#include "state_machine.h"
+#include "mission_validator.h"
 #include <signal.h>
 
 void sigIntHandler(int sig)
@@ -12,14 +12,14 @@ void sigIntHandler(int sig)
 
 int main(int argc, char **argv)
 {
-    ros::init(argc, argv, "duo3d_node");
+    	ros::init(argc, argv, "mission_validator");
 
-    StateMachineBase stateMachine;
+    	signal(SIGINT, sigIntHandler);
 
-    signal(SIGINT, sigIntHandler);
+	MissionValidator validator;
 
-    if (stateMachine.Initialize())
-    	stateMachine.run();
+	validator.Initialize();
+	validator.Run();
 
 	return 0;
 }

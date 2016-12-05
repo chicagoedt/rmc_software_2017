@@ -6,15 +6,30 @@
 
 
 <!-- Above is just for future reference incase we need it until aruco pose is figured out -->
-
+<!--
     <node 
       pkg="tf2_ros" 
       type="static_transform_publisher" 
       name="baselink_to_imu" 
       args="0 0 0.15 0 0 0 base_link imu" >
     </node>
+-->
+    <node 
+      pkg="tf2_ros" 
+      type="static_transform_publisher" 
+      name="baselink_to_kinect_link" 
+      args="-0.28 0 0.20 0 -3.525562 3.14159 base_link kinect_link" >
+    </node>
 
-
+<!--
+    <node 
+      pkg="tf2_ros" 
+      type="static_transform_publisher" 
+      name="baselink_to_kinect_link" 
+      args="-0.30 -0.40 0.4191 0 0 0 base_link servo_mount_link" >
+    </node>
+-->
+<!-- set this to if statement for gazebo or using freenect 
     <node 
       pkg="tf2_ros" 
       type="static_transform_publisher" 
@@ -27,12 +42,13 @@
       name="kinect_mount_link_to_camera" 
       args="0 0 0 0 0 -2.37 camera_mount_link camera_link" >
     </node>
+-->
 
     <node
       pkg="tf" 
       type="static_transform_publisher" 
       name="map_to_submap_tf" 
-      args="0 0 0 0 0 3.14159 map submap 25">
+      args="-0.457 0 0.60 0 0 3.14159 map submap 25">
     </node>
     <node
       pkg="tf" 

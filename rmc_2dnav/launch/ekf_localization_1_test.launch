@@ -29,11 +29,18 @@
                                    false, false, false,
                                    false, false, false]</rosparam>
 
+<!--
     <rosparam param="imu0_config">[false, false, false,
                                    true, true, true,
                                    false, false, false,
                                    true, true, true,
                                    false,  false, false]</rosparam>
+-->
+    <rosparam param="imu0_config">[false, false, false,
+                                   false, false, false,
+                                   false, false, false,
+                                   false, false, false,
+                                   true,  false, false]</rosparam>
 
     <!-- imu covariance is static. therefore, differential 
          needs to be false as error will accumulate when differentiating -->

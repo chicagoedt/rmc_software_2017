@@ -8,7 +8,7 @@
 
     <param name="sensor_timeout" value="0.1"/>
 
-    <param name="two_d_mode" value="true"/>
+    <param name="two_d_mode" value="false"/>
 
     <param name="map_frame" value="map"/>
 
@@ -20,42 +20,51 @@
 
     <param name="transform_time_offset" value="0.0"/>
 
+    <param name="odom0" value="rtabmap/odom"/>
+<!--
     <param name="imu0" value="imu/data"/>
-
+-->
+    <rosparam param="odom0_config">[true, true, true, 
+                                   true,  true, true, 
+                                   false, false, false,
+                                   false, false, false,
+                                   false, false, false]</rosparam>
+<!--
     <rosparam param="imu0_config">[false, false, false,
                                    true, true, true,
-                                   true,  false, false,
-                                   true,  true, true,
-                                   false, false, false]</rosparam>
-
-    <param name="imu0_differential" value="true"/>
-
-    <param name="imu0_relative" value="false"/>
-
+                                   false, false, false,
+                                   true, true, true,
+                                   false,  false, false]</rosparam>
+-->
+    <!-- imu covariance is static. therefore, differential 
+         needs to be false as error will accumulate when differentiating -->
+<!--
+    <param name="imu0_differential" value="false"/>
+    <param name="imu0_relative" value="true"/>
     <param name="imu0_remove_gravitational_acceleration" value="true"/>
-
+-->
     <param name="print_diagnostics" value="true"/>
-
+<!--
     <param name="imu0_queue_size" value="1"/>
-
+-->
     <param name="debug"           value="false"/>
     <param name="debug_out_file"  value="debug_ekf_localization.txt"/>
 
-    <rosparam param="process_noise_covariance">[0.05, 0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
-                                                0,    0.05, 0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+    <rosparam param="process_noise_covariance">[0.001, 0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+                                                0,    0.001, 0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
                                                 0,    0,    0.06, 0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
                                                 0,    0,    0,    0.03, 0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
                                                 0,    0,    0,    0,    0.03, 0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
                                                 0,    0,    0,    0,    0,    0.06, 0,     0,     0,    0,    0,    0,    0,    0,    0,
-                                                0,    0,    0,    0,    0,    0,    0.025, 0,     0,    0,    0,    0,    0,    0,    0,
-                                                0,    0,    0,    0,    0,    0,    0,     0.025, 0,    0,    0,    0,    0,    0,    0,
+                                                0,    0,    0,    0,    0,    0,    0.01, 0,     0,    0,    0,    0,    0,    0,    0,
+                                                0,    0,    0,    0,    0,    0,    0,     0.01, 0,    0,    0,    0,    0,    0,    0,
                                                 0,    0,    0,    0,    0,    0,    0,     0,     0.04, 0,    0,    0,    0,    0,    0,
                                                 0,    0,    0,    0,    0,    0,    0,     0,     0,    0.01, 0,    0,    0,    0,    0,
                                                 0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0.01, 0,    0,    0,    0,
                                                 0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0.02, 0,    0,    0,
-                                                0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0.01, 0,    0,
-                                                0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0.01, 0,
-                                                0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0.015]</rosparam>
+                                                0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0.0001, 0,    0,
+                                                0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0.0001, 0,
+                                                0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0.00015]</rosparam>
 
          <rosparam param="initial_estimate_covariance">[1e-9, 0,    0,    0,    0,    0,    0,    0,    0,    0,     0,     0,     0,    0,    0,
                                                         0,    1e-9, 0,    0,    0,    0,    0,    0,    0,    0,     0,     0,     0,    0,    0,
@@ -73,7 +82,7 @@
                                                         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,     0,     0,     0,    1e-9, 0,
                                                         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,     0,     0,     0,    0,    1e-9]</rosparam>
 
-        <remap from="odometry/filtered" to="odometry/filteredIMU"/>
+        <remap from="odometry/filtered" to="odometry/filtered_imu_rtab"/>
 
     </node>
 

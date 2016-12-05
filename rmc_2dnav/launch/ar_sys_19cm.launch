@@ -6,7 +6,7 @@
         <node name="image_proc" pkg="image_proc" type="image_proc" ns="blackfly" output="screen" />
 <!--
         <node name="image_view_arsys" pkg="image_view" type="image_view" output="screen">
-                <remap from="image" to="/ar_single_board/result"/>
+                <remap from="image" to="/ar_single_board/result"/>r
         </node>
 -->
         <node pkg="ar_sys" type="single_board" name="ar_single_board">

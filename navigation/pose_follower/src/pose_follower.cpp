@@ -245,7 +245,7 @@ bool PoseFollower::computeVelocityCommands(geometry_msgs::Twist& cmd_vel)
     		break;
     	}
     }
-    ROS_INFO("out of loop...");
+    //ROS_INFO("out of loop...");
 
     //if we're not in the goal position, we need to update time
     if(!in_goal_position)

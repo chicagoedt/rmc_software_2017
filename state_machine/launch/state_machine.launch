@@ -15,7 +15,7 @@
   <!-- <param name="arucoDistance" type="double" value="1.0"/> -->
   <param name="arucoDistance" type="double" value="1.1"/>
 
-  <param name="starting_orientation" type="string" value="west"/> <!-- north, east, south, west -->
+  <param name="starting_orientation" type="string" value="north"/> <!-- north, east, south, west -->
 
   <node pkg="state_machine" type="mission_validator" name="mission_validator" output="screen"/>
 

@@ -70,6 +70,9 @@ class StateMachineBase
 		void undock();
 		void dockCallback(const sensor_msgs::Imu::ConstPtr& msg);
 
+		void babyStep(double x);
+		void digAvoid(move_base_msgs::MoveBaseGoal originalGoal);
+
 	private:
 
 		ros::NodeHandle	_nh;
@@ -80,7 +83,7 @@ class StateMachineBase
 
 		ros::Subscriber _imuSub;
 		ros::Publisher	_servoPub;
-		ros::Publisher  _imuPub;
+		ros::Publisher  _velPub;
 		ros::Publisher  _digPub;
 		ros::Publisher  _arucoPub;
 		ros::Publisher  _actuatorPub;

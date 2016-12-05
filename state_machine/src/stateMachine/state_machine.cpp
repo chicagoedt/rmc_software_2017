@@ -66,7 +66,7 @@ bool StateMachineBase::Initialize()
 	_digDriveSpeed = 0.25;
 	_nhLocal.param<double>("dig_drive_speed", _digDriveSpeed);
 
-	_isSimulation = false;
+	_isSimulation = true;
 	_nhLocal.param<bool>("simulation", _isSimulation);
 
 	if(!_isSimulation)
@@ -104,6 +104,8 @@ bool StateMachineBase::Initialize()
 	_validatorClient = _nh.serviceClient<state_machine::ValidateSensors>("validate_sensors");
 	_poseFollowerClient = _nh.serviceClient<pose_follower::SetMaxVelocity>("set_max_velocity");
 	_rtabClient = _nh.serviceClient<std_srvs::Empty>("rtabmap/reset_odom");
+	//_imuSub = _nh.subscribe("imu/data", 1, &StateMachineBase::dockCallback, this);
+	_velPub = _nh.advertise<geometry_msgs::Twist>("cmd_vel", 1);
 
 	_arucoPub = _nh.advertise<geometry_msgs::Twist>("cmd_vel", 1);
 /*
@@ -113,6 +115,77 @@ bool StateMachineBase::Initialize()
 		ROS_ERROR("TF of Servo not changing!");
 */
   	return true;
+}
+
+// Move forward/backward by the amount specified.
+void StateMachineBase::babyStep(double x) {
+	//ROS_INFO("Taking a baby step.");
+	double x_vel;
+	if (x > 0.0) {
+		x_vel = 0.5;
+	} else if (x < 0.0)
+		x_vel = -0.5;
+	geometry_msgs::Twist temp_cmd_vel;
+	temp_cmd_vel.linear.x = x_vel;
+	tf::StampedTransform b2m;
+	_tf_listener.lookupTransform("map", "base_link", ros::Time(0), b2m);
+	tf::Vector3 startPoint = b2m.getOrigin();
+
+	bool areWeThereYet = false;
+	while (!areWeThereYet) {
+		_velPub.publish(temp_cmd_vel);
+		ros::spinOnce();
+		_tf_listener.lookupTransform("map", "base_link", ros::Time(0), b2m);
+		areWeThereYet = ((startPoint.distance(b2m.getOrigin())) > x);
+		ros::Duration(0.01).sleep();
+	}
+	temp_cmd_vel.linear.x = 0.0;
+	_velPub.publish(temp_cmd_vel);
+	ros::spinOnce();
+}
+
+// Called if we hit gravel/a boulder while digging.
+void StateMachineBase::digAvoid(move_base_msgs::MoveBaseGoal originalGoal) {
+
+	ROS_WARN("OH SHIT WE HIT A BOULDER");
+	ROS_WARN("HANG ON I GOT DIS");
+	_moveBaseAC.cancelGoal();
+
+	// Stop the digging mechanism.
+	ROS_INFO("Stopping dig motor...");
+	_robotState = eDriveToDig;
+	std_msgs::Float64 digVel;
+	digVel.data = 0;
+	_digPub.publish(digVel);
+
+	// Back up a tiny bit.
+	ROS_INFO("Backing up...");
+	babyStep(-0.2);
+
+	// Lift actuators.
+	ROS_INFO("Raising Actuators to Home Position...");
+    setActuatorPosition(eHome);
+
+    if(!_isSimulation)
+            ros::Duration(3.0).sleep();
+    else
+            ros::Duration(1.5).sleep();
+
+    // Move forward to clear the obstacle.
+    ROS_INFO("Jumping obstacle...");
+    babyStep(0.7);
+
+    // Resume digging.
+    ROS_INFO("Back in business!");
+
+    ROS_INFO("Lowering actuators...");
+    setActuatorPosition(eDig);
+    if(!_isSimulation)
+        ros::Duration(15.0).sleep();
+    else
+        ros::Duration(1.0).sleep();
+    _moveBaseAC.sendGoal(originalGoal);
+    _robotState = eDigging;
 }
 
 void StateMachineBase::arucoPoseCallback(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr& poseMsg)
@@ -210,8 +283,8 @@ bool StateMachineBase::moveToGoalPoint(geometry_msgs::Pose waypoint)
         //_moveBaseAC.waitForResult();
 
         //ROS_INFO("Got result...");
-
-
+    bool digAvoidTested = false;
+    // while moving, either dig or don't dig
 	while(_moveBaseAC.getState() != actionlib::SimpleClientGoalState::SUCCEEDED)
 	{
 		if(_robotState == eDigging)
@@ -220,13 +293,18 @@ bool StateMachineBase::moveToGoalPoint(geometry_msgs::Pose waypoint)
 			digVel.data = 450;
 			_digPub.publish(digVel);
 			ROS_WARN_THROTTLE(1, "Digging...");
+//			if (we stop moving while digging)
+				if (!digAvoidTested) {digAvoid(moveBaseGoal); digAvoidTested = true;}
+
 		}	
 		else
 		{
 			ROS_INFO_THROTTLE(1, "Moving to waypoint...");
 		}
 		ros::spinOnce();
-		ros::Duration(0.1).sleep();	
+		ros::Duration(0.1).sleep();
+
+
 	}
 /*
         if(_moveBaseAC.getState() == actionlib::SimpleClientGoalState::SUCCEEDED)
@@ -296,6 +374,8 @@ bool StateMachineBase::callSensorValidator(state_machine::ValidateSensors srv)
 
 }
 
+// Finds the Aruco marker based on an initial direction passed to it from state_machine.launch
+// This may or may not be cheating. End goal is to rewrite this so that it doesn't need a parameter.
 void StateMachineBase::findAruco(const char c){
     ros::Rate loop_rate(10);
     tf::StampedTransform board2base;
@@ -377,7 +457,7 @@ void StateMachineBase::run()
 	state_machine::ValidateSensors srv;
 	if (!_isSimulation) 
 	{
-		srv.request.sensors.roboteq 	= _currentSensorRequest.roboteq;
+		srv.request.sensors.roboteq = _currentSensorRequest.roboteq;
 		srv.request.sensors.rtab 	= _currentSensorRequest.rtab;
 		srv.request.sensors.servo 	= _currentSensorRequest.servo; 
 		srv.request.sensors.aruco 	= _currentSensorRequest.aruco;
@@ -464,6 +544,7 @@ void StateMachineBase::run()
   	}
 }
 
+// Code not currently used anywhere according to Andriy
 void StateMachineBase::moveActuators(bool goUp)
 {
     ROS_INFO("ACTUATORS MOVING");
@@ -585,9 +666,6 @@ void StateMachineBase::dock()
 
 		ROS_INFO_STREAM("DOCKING." << _average_imu_g.size() << " ");
 
-		_imuSub = _nh.subscribe("imu/data", 1, &StateMachineBase::dockCallback, this);
-		_imuPub = _nh.advertise<geometry_msgs::Twist>("cmd_vel", 1);
-
 		_above_threshold_count = 0;
 		ros::Rate loop_rate(250);
 		ros::spinOnce();
@@ -598,7 +676,7 @@ void StateMachineBase::dock()
 			{
 				geometry_msgs::Twist msg;
 				msg.linear.x = -.1;
-				_imuPub.publish(msg);
+				_velPub.publish(msg);
 				ros::spinOnce();
 				loop_rate.sleep();
 			}
@@ -607,7 +685,7 @@ void StateMachineBase::dock()
 		ROS_INFO("Finished Docking");
 		geometry_msgs::Twist msg;
 		msg.linear.x = 0;
-		_imuPub.publish(msg);
+		_velPub.publish(msg);
 		ros::spinOnce();
 	}
 	else 

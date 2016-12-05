@@ -12,6 +12,7 @@
 #include <tf/transform_listener.h>
 #include <std_msgs/Bool.h>
 #include <std_msgs/Float64.h>
+#include <std_msgs/Int16.h>
 #include <geometry_msgs/Twist.h>
 #include <sensor_msgs/Imu.h>
 #include <roboteq_node/Actuators.h>
@@ -72,15 +73,16 @@ class StateMachineBase
 		ros::NodeHandle	_nh;
 		ros::NodeHandle	_nhLocal;
 
-        	ros::Subscriber _servoSub; 
-       		ros::Subscriber _arucoSub; 
-
+		ros::Subscriber _servoSub; 
+		ros::Subscriber _arucoSub; 
 		ros::Subscriber _imuSub;
+
 		ros::Publisher	_servoPub;
 		ros::Publisher  _imuPub;
 		ros::Publisher  _digPub;
 		ros::Publisher  _arucoPub;
 		ros::Publisher  _actuatorPub;
+		ros::Publisher  _digstatePub;
 
 		ros::ServiceClient _actuatorClient;
 		ros::ServiceClient _validatorClient;

@@ -63,36 +63,24 @@ bool StateMachineBase::Initialize()
       		return false;
 	}
 
-	_isSimulation = true;
-	_nhLocal.param<bool>("simulation", _isSimulation);
-
-	if(!_isSimulation)
-	{
-		_currentSensorRequest.roboteq = true;
-		_nhLocal.param<bool>("Roboteq", _currentSensorRequest.roboteq);
-
-		_currentSensorRequest.servo = true;
-		_nhLocal.param<bool>("Servo", _currentSensorRequest.servo);
-	}
-	else
-	{
-		_currentSensorRequest.roboteq = false;
-		_currentSensorRequest.servo = false;
-	}
-
-	_currentSensorRequest.rtab = true;
-	_nhLocal.param<bool>("RTAB", _currentSensorRequest.rtab);
+	_currentSensorRequest.roboteq = true;
+	_nhLocal.param<bool>("Roboteq", _currentSensorRequest.roboteq);
 
 	_currentSensorRequest.aruco = true;
 	_nhLocal.param<bool>("Aruco", _currentSensorRequest.servo);
+
+	_currentSensorRequest.servo = true;
+	_nhLocal.param<bool>("Servo", _currentSensorRequest.servo);
+
+	_currentSensorRequest.rtab = true;
+	_nhLocal.param<bool>("RTAB", _currentSensorRequest.rtab);
 
 	_currentDigCycleCount = 0;
 
 	_servoPub = _nh.advertise<std_msgs::Float64>("blackfly_mount_joint/command", 5);
 	_digPub = _nh.advertise<std_msgs::Float64>("dig_vel", 1);
-	_digstatePub = _nh.advertise<std_msgs::Int16>("dig_state", 1);
   	_arucoSub = _nh.subscribe<geometry_msgs::PoseWithCovarianceStamped> ("ar_single_board/pose", 1, &StateMachineBase::arucoPoseCallback, this);
-  	_actuatorClient = _nh.serviceClient<roboteq_node::Actuators>("set_actuators"); // need to figure out how to not make roboteq_node a dependency to state_machine which can also be used by the simulator
+   nh.serviceClient<roboteq_node::Actuators>("set_actuators"); // need to figure out how to not make roboteq_node a dependency to state_machine which can also be used by the simulator
 	_validatorClient = _nh.serviceClient<state_machine::ValidateSensors>("validate_sensors");
 /*
 	if(initializeServo())
@@ -112,26 +100,16 @@ void StateMachineBase::arucoPoseCallback(const geometry_msgs::PoseWithCovariance
 
 void StateMachineBase::setActuatorPosition(eDigPosition digPosition)
 {
-	if(!_isSimulation)
-	{
-		roboteq_node::Actuators srv;
-		srv.request.actuator_position = digPosition;
+	//roboteq_node::Actuators srv;
+	//srv.request.actuator_position = digPosition;
 
-		if(_actuatorClient.call(srv))  // blocking call
-		{
-			ROS_INFO_STREAM("Moved/Moving to " << digPosition);
-			std_msgs::Int16 msg;
-			msg.data = static_cast <unsigned short> (digPosition);
-			_digstatePub.publish(msg);
-		}
-		else
-		{
-			ROS_ERROR_STREAM("Failed to call actuator service! Check if roboteq's are on...");
-		}
+	if(_actuatorClient.call(srv))  // blocking call
+	{
+		ROS_INFO_STREAM("Moved/Moving to " << digPosition);
 	}
 	else
 	{
-		ROS_INFO("Simulation Actuators to position.");
+		//ROS_ERROR_STREAM("Failed to call actuator service! Check if roboteq's are on...");
 	}
 
 }
@@ -236,14 +214,10 @@ bool StateMachineBase::callSensorValidator(state_machine::ValidateSensors srv)
 		
 		ROS_WARN("--------------------------------------------------");
 
-		if(srv.response.validated)
-		{
-			ROS_INFO("-- Sensors Initialized and Validated --"); return true;
-		}
-		else
-		{
-			ROS_ERROR("-- Sensors could not be initialized. Exiting... --"); return false;
-		}
+		if(srv.response.validated) {
+			ROS_INFO("-- Sensors Initialized and Validated --"); return true;}
+		else {
+			ROS_ERROR("-- Sensors could not be initialized. Exiting... --"); return false;}
 	}
 
 }
@@ -256,7 +230,6 @@ void StateMachineBase::run()
 
 	// TODO: add request component to ValidateSensors message so that we can request specific
 	//       validations (all, or individual)
-	if (!_isSimulation) {
 	state_machine::ValidateSensors srv;
 	srv.request.sensors.roboteq 	= _currentSensorRequest.roboteq;
 	srv.request.sensors.rtab 	= _currentSensorRequest.rtab;
@@ -265,27 +238,33 @@ void StateMachineBase::run()
 
 	if(!callSensorValidator(srv))
 		return;
-	}
 
-	setActuatorPosition(eHome);
-
- 	ros::Duration(1).sleep();
+/*
+        while(!_foundMarker)
+        {
+                ros::Duration(1.0).sleep();
+                ROS_INFO("Looking for Aruco Marker...");
+		ros::spinOnce();
+        }
+        ROS_INFO("Found Aruco Marker!");
+*/
+	//setActuatorPosition(eHome);
 
 	_robotState = eDriveToDig; // Start digging motors
 
 	if(moveToGoalPoint(_digStartPose))
 	{
-		setActuatorPosition(eDig);
-		//ros::Duration(12.0).sleep();
-        	ROS_INFO("Lower Actuators to Dig...");
+		//setActuatorPosition(eDig);
+		ros::Duration(12.0).sleep();
+        	//ROS_INFO("Lower Actuators to Dig...");
 
 		_robotState = eDigging; // Start digging motors
 
 		if(moveToGoalPoint(_digEndPose))
 		{
-			setActuatorPosition(eHome);
-			//ros::Duration(8.0).sleep();
-        		ROS_INFO("Raising Actuators to Home Position...");
+			//setActuatorPosition(eHome);
+			ros::Duration(8.0).sleep();
+        		//ROS_INFO("Raising Actuators to Home Position...");
 			
 			_robotState = eDriveToDig;
 
@@ -294,29 +273,29 @@ void StateMachineBase::run()
 				_robotState = eDumping;
 				dock();
 
-                        	setActuatorPosition(eDump);
-                        	//ros::Duration(15.0).sleep();
-                        	ROS_INFO("Raising Actuators to Dump Position...");
+                        	//setActuatorPosition(eDump);
+                        	ros::Duration(15.0).sleep();
+                        	//ROS_INFO("Raising Actuators to Dump Position...");
 			}
 		}
 
-	}			
+	}	
+		
 
-//	StateMachineBase::dock();
-StateMachineBase::undock();
+	//StateMachineBase::dock();
   
 }
 
 void StateMachineBase::moveActuators(bool goUp)
 {
     ROS_INFO("ACTUATORS MOVING");
-    _actuatorPub = _nh.advertise<std_msgs::Float64>("joint1_position_controller/command", 1);
+    //_actuatorPub = _nh.advertise<std_msgs::Float64>("joint1_position_controller/command", 1);
     std_msgs::Float64 msg;
     msg.data = goUp ? 1.9 : 0.0;
     ros::Rate loop_rate(10);
 
     for (int i = 0; i < 10; i++){
-        _actuatorPub.publish(msg);
+        //_actuatorPub.publish(msg);
         ros::spinOnce();
         loop_rate.sleep();
     }
@@ -375,6 +354,39 @@ void StateMachineBase::dockCallback(const sensor_msgs::Imu::ConstPtr& msg)
 	//_previous_x_accel = current_x_accel;
 }
 
+void StateMachineBase::undock()
+{
+	//int xvel = 0;
+	ros::Publisher undockPub = _nh.advertise<geometry_msgs::Twist>("cmd_vel", 1);
+	tf::TransformListener tfListener;
+	tf::StampedTransform map2base;
+	ros::Rate loop_rate(50);
+
+
+	bool foundTransform = 0;
+	geometry_msgs::Twist msg;
+	ros::spinOnce();
+	loop_rate.sleep();
+	while (!foundTransform){
+		try
+		{
+			_tf_listener.lookupTransform("/base_link", "/map", ros::Time(0), map2base/*transform*/);
+			foundTransform = 1;
+		}
+		catch (tf::TransformException ex){
+			ROS_INFO_STREAM("Not found");
+			msg.linear.x = .2;
+			undockPub.publish(msg);
+			ros::spinOnce();
+			loop_rate.sleep();
+		}
+	}
+	msg.linear.x = 0;
+	undockPub.publish(msg);
+	ros::spinOnce();
+	loop_rate.sleep();
+}
+
 void StateMachineBase::dock()
 {
 	int useAruco = 0;
@@ -422,7 +434,7 @@ void StateMachineBase::dock()
 // testing failsafe system
 		//ROS_INFO_STREAM("DOCKING." << _average_imu_g.size() << " ");
 
-		//_imuSub = _nh.subscribe("imu/data", 1, &StateMachineBase::dockCallback, this);
+		_imuSub = _nh.subscribe("imu/data", 1, &StateMachineBase::dockCallback, this);
 
 		_above_threshold_count = 0;
 // end testing
@@ -471,7 +483,7 @@ void StateMachineBase::dock()
 			loop_rate.sleep();
 			x = ( x > 0) ? x : -1*x ;
 
-			if ((x - 0.1) < arucoDistance){
+			if (x < arucoDistance){
 				_didDock = 1;
 				ROS_INFO_STREAM("Docked with ArUco");
 				msg.linear.x = 0;
@@ -482,40 +494,5 @@ void StateMachineBase::dock()
 
 		}
 	}
-}
-
-void StateMachineBase::undock()
-{
-    //int xvel = 0;
-    ros::Publisher undockPub = _nh.advertise<geometry_msgs::Twist>("cmd_vel", 1);
-    tf::TransformListener tfListener;
-    tf::StampedTransform map2base;
-    ros::Rate loop_rate(50);
-
-
-    bool foundTransform = 0;
-    geometry_msgs::Twist msg;
-    ros::spinOnce();
-    loop_rate.sleep();
-    while (!foundTransform){
-        try
-        {
-            _tf_listener.lookupTransform("/base_link", "/ar_board_marker", ros::Time(0), map2base/*transform*/);
-			double x = map2base.getOrigin().getX();
-            foundTransform = (x < 1) 0 : 1;
-        }
-        catch (tf::TransformException ex){
-            ROS_INFO_STREAM("Not found");
-            msg.linear.x = .25;
-            undockPub.publish(msg);
-            ros::spinOnce();
-            loop_rate.sleep();
-        }
-    }
-	std_srvs::Empty srv;
-	_rtabOdomClient.call(srv);
-    msg.linear.x = 0;
-    undockPub.publish(msg);
-    ros::spinOnce();
-    loop_rate.sleep();
+	StateMachineBase::undock();
 }

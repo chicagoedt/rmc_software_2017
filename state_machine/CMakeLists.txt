@@ -75,6 +75,8 @@ include_directories(include ${catkin_INCLUDE_DIRS})
 ## Declare a cpp executable
 add_executable(state_machine_node src/stateMachine/state_machine.cpp src/stateMachine/main.cpp)
 add_executable(mission_validator src/missionValidator/mission_validator.cpp src/missionValidator/main.cpp)
+add_executable(serial_interface_node src/serialInterface/serialInterface.cpp)
+add_executable(pose_publisher_node src/posePublisher/posePublisher.cpp ../rmcDecode/rmcEnDecoder.cpp ../rmcDecode/rmcData.cpp src/posePublisher/serialPort.cpp)
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
@@ -84,6 +86,8 @@ add_dependencies(mission_validator state_machine_generate_messages_cpp)
 ## Specify libraries to link a library or executable target against
 target_link_libraries(state_machine_node ${catkin_LIBRARIES} )
 target_link_libraries(mission_validator ${catkin_LIBRARIES} )
+target_link_libraries(serial_interface_node ${catkin_LIBRARIES} )
+target_link_libraries(pose_publisher_node ${catkin_LIBRARIES} )
 
 set(CMAKE_BUILD_TYPE Debug)
 

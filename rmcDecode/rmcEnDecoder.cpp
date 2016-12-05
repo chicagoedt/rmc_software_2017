@@ -1,6 +1,7 @@
 #include "rmcEnDecoder.h"
+#include <bitset>
 
-RMCEnDecoder::RMCEnDecoder(void)
+RMCEnDecoder::RMCEnDecoder(void):_printDebug(false)
 {
 }
 

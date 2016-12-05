@@ -283,7 +283,7 @@ bool StateMachineBase::moveToGoalPoint(geometry_msgs::Pose waypoint)
         //_moveBaseAC.waitForResult();
 
         //ROS_INFO("Got result...");
-    bool digAvoidTested = false;
+//    bool digAvoidTested = false;
     // while moving, either dig or don't dig
 	while(_moveBaseAC.getState() != actionlib::SimpleClientGoalState::SUCCEEDED)
 	{
@@ -294,7 +294,7 @@ bool StateMachineBase::moveToGoalPoint(geometry_msgs::Pose waypoint)
 			_digPub.publish(digVel);
 			ROS_WARN_THROTTLE(1, "Digging...");
 //			if (we stop moving while digging)
-				if (!digAvoidTested) {digAvoid(moveBaseGoal); digAvoidTested = true;}
+//				if (!digAvoidTested) {digAvoid(moveBaseGoal); digAvoidTested = true;}
 
 		}	
 		else

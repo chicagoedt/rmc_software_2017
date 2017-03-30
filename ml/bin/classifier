@@ -1,5 +1,4 @@
 #! /usr/bin/env python
-
 import rospy
 from std_msgs.msg import String
 from sensor_msgs.msg import Imu
@@ -24,8 +23,6 @@ class SubAndPub:
         self.pub.publish(collision)
         if training:
             f.write(d + self.time.get_time())
-            
-
 
 def main():
     a = SubAndPub()

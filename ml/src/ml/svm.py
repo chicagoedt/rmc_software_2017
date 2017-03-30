@@ -1,3 +1,4 @@
+import rospkg
 import numpy as np
 from sklearn import svm
 #from sklearn import joblib

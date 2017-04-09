@@ -24,6 +24,6 @@
   </node>
 
 <!-- do not uncomment for now -->
-<!--  <include file="$(fine state_machine)/launch/posePub.launch"/> -->
+<!--  <include file="$(find state_machine)/launch/posePub.launch"/> -->
 
 </launch>

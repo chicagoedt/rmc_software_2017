@@ -68,7 +68,9 @@ class StateMachineBase
 		
 		void dock();
 		void undock();
+		void clearImuQueue();
 		void dockCallback(const sensor_msgs::Imu::ConstPtr& msg);
+		void avoidCallback(const sensor_msgs::Imu::ConstPtr& msg);
 
 		void babyStep(double x);
 		void digAvoid(move_base_msgs::MoveBaseGoal originalGoal);
@@ -139,6 +141,8 @@ class StateMachineBase
         std::stack<eState> _stateStack;
 
         bool _foundMarker;
+
+        bool _didHitRock;
 
         bool _isSimulation;
 	bool _turnStartLeft;

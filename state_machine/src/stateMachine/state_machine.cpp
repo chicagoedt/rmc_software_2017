@@ -37,6 +37,14 @@ bool StateMachineBase::Initialize()
       		return false;
 	}
 
+	if (_nh.hasParam("values_for_average") && _nh.hasParam("threshold_for_average") && _nh.hasParam("num_to_dock")) {
+		_nh.param("values_for_average", _values_for_average, 15);
+		_nh.param("threshold_for_average", _threshold, 1.2);
+		_nh.param("num_to_dock", _num_to_dock, 5);
+	} else {
+		ROS_WARN("IMU Values Not Properly Configured");
+	}
+
 	if (_nhLocal.hasParam("DigStart"))
 	{
 		std::vector<double>   pose;
@@ -167,13 +175,13 @@ void StateMachineBase::digAvoid(move_base_msgs::MoveBaseGoal originalGoal) {
     setActuatorPosition(eHome);
 
     if(!_isSimulation)
-            ros::Duration(3.0).sleep();
+            ros::Duration(5.0).sleep();
     else
             ros::Duration(1.5).sleep();
 
     // Move forward to clear the obstacle.
     ROS_INFO("Jumping obstacle...");
-    babyStep(0.7);
+    babyStep(0.9);
 
     // Resume digging.
     ROS_INFO("Back in business!");
@@ -252,43 +260,62 @@ bool StateMachineBase::moveToGoalPoint(geometry_msgs::Pose waypoint)
     		ROS_INFO("Waiting for the move_base action server to come up");
   	}
 
-        if(_robotState == eDigging)
-        {
-                for(int i = 0; i < 15; i++)
-                {
-                        std_msgs::Float64 digVel;
-                        digVel.data = 450;
-                        _digPub.publish(digVel);
-                        ROS_WARN_THROTTLE(1, "Digging...");
+    if(_robotState == eDigging)
+    {
+            for(int i = 0; i < 15; i++)
+            {
+                    std_msgs::Float64 digVel;
+                    digVel.data = 450;
+                    _digPub.publish(digVel);
+                    ROS_WARN_THROTTLE(1, "Digging...");
 
-                        ros::spinOnce();
-                        ros::Duration(0.1).sleep();
-                }
-        }
+                    ros::spinOnce();
+                    ros::Duration(0.1).sleep();
+            }
+    }
 
 	move_base_msgs::MoveBaseGoal moveBaseGoal;
         
-        moveBaseGoal.target_pose.header.frame_id   = "map";
-        moveBaseGoal.target_pose.header.stamp      = ros::Time::now();
+    moveBaseGoal.target_pose.header.frame_id   = "map";
+    moveBaseGoal.target_pose.header.stamp      = ros::Time::now();
 
-        moveBaseGoal.target_pose.pose.position     = waypoint.position;
-        moveBaseGoal.target_pose.pose.orientation  = tf::createQuaternionMsgFromRollPitchYaw(0, 0, 0);
+    moveBaseGoal.target_pose.pose.position     = waypoint.position;
+    moveBaseGoal.target_pose.pose.orientation  = tf::createQuaternionMsgFromRollPitchYaw(0, 0, 0);
 
-        ROS_INFO_STREAM("Sending goal(X, Y):" << "[ " << moveBaseGoal.target_pose.pose.position.x << " , " << moveBaseGoal.target_pose.pose.position.y << " ]");
 
-        _moveBaseAC.sendGoal(moveBaseGoal);
 
-        ROS_INFO("Sent Goal...");
+    ROS_INFO_STREAM("Sending goal(X, Y):" << "[ " << moveBaseGoal.target_pose.pose.position.x << " , " << moveBaseGoal.target_pose.pose.position.y << " ]");
 
-        //_moveBaseAC.waitForResult();
+    _moveBaseAC.sendGoal(moveBaseGoal);
 
-        //ROS_INFO("Got result...");
+    ROS_INFO("Sent Goal...");
+
+	//_moveBaseAC.cancelAllGoals();
+
+    //_moveBaseAC.waitForResult();
+
+    //ROS_INFO("Got result...");
 //    bool digAvoidTested = false;
-    // while moving, either dig or don't dig
+// while moving, either dig or don't dig
+    this->_didHitRock = false;
+    ros::Subscriber avoidSub;
+    if (_robotState == eDigging) {
+    	avoidSub = _nh.subscribe("imu/data", 1, &StateMachineBase::avoidCallback, this); // we subscribe here so that we can get rid of subscriber right away, and not waste time
+    }
+
+    ros::Rate dur(250);
+
 	while(_moveBaseAC.getState() != actionlib::SimpleClientGoalState::SUCCEEDED)
 	{
 		if(_robotState == eDigging)
 		{
+			// if (_average_imu_g.size() > _values_for_average) {
+			// 	dur = ros::Duration(.001);
+			// }
+        	if (_didHitRock) { // this iVar will be set with a callback while digging if we hit a rock
+        		StateMachineBase::digAvoid(moveBaseGoal);
+        	}
+
 			std_msgs::Float64 digVel;
 			digVel.data = 450;
 			_digPub.publish(digVel);
@@ -302,10 +329,12 @@ bool StateMachineBase::moveToGoalPoint(geometry_msgs::Pose waypoint)
 			ROS_INFO_THROTTLE(1, "Moving to waypoint...");
 		}
 		ros::spinOnce();
-		ros::Duration(0.1).sleep();
+		dur.sleep();
 
 
 	}
+
+	return true;
 /*
         if(_moveBaseAC.getState() == actionlib::SimpleClientGoalState::SUCCEEDED)
         {
@@ -452,6 +481,9 @@ void StateMachineBase::run()
  	//ros::Duration(3.0).sleep();
  	ROS_INFO("Starting!");
 
+ 	_robotState = eDigging; // Start digging motors
+	 moveToGoalPoint(_digEndPose);
+
 	// TODO: add request component to ValidateSensors message so that we can request specific
 	//       validations (all, or individual)
 	state_machine::ValidateSensors srv;
@@ -495,15 +527,20 @@ void StateMachineBase::run()
 
                 if(moveToGoalPoint(_digStartPose))
                 {
+
+                		StateMachineBase::clearImuQueue();
+
                         updateCurrentSpeed(_digDriveSpeed); // should be 0.25
                         setActuatorPosition(eDig);
 
                         ROS_INFO("Lowering Actuators to Dig...");
 
-                        if(!_isSimulation)
-                                ros::Duration(15.0).sleep();
-                        else
-                                ros::Duration(1.0).sleep();
+                        ros::Duration dur;
+                        if(!_isSimulation) {
+                        	ros::Duration(15.0).sleep();
+                        } else {
+                        	ros::Duration(1.0).sleep();
+                        }
 
                         _robotState = eDigging; // Start digging motors
 
@@ -524,6 +561,7 @@ void StateMachineBase::run()
                                 {
                                         _robotState = eDumping;
                                         setActuatorPosition(eDump);
+                                        StateMachineBase::clearImuQueue();
                                         dock();
 
                                         ROS_INFO("Raising Actuators to Dump Position...");
@@ -560,6 +598,74 @@ void StateMachineBase::moveActuators(bool goUp)
     }
 }
 
+void StateMachineBase::clearImuQueue() {
+	while (_average_imu_g.size() > 0) {
+		_average_imu_g.pop_front();
+	}
+}
+
+void StateMachineBase::avoidCallback(const sensor_msgs::Imu::ConstPtr& msg)
+{
+	// double roll, pitch, yaw;
+	// float x = msg->orientation.x;
+	// float y = msg->orientation.y;
+	// float z = msg->orientation.z;
+	// float w = msg->orientation.w;
+
+	// tf::Quaternion q(x,y,z,w); tf::Matrix3x3(q).getRPY(roll, pitch, yaw);
+
+	// double xAccel = msg->linear_acceleration.x - GRAVITY * sin(pitch);
+	// if (xAccel < .05) {
+	// 	this->_didHitRock = true;
+	// }
+	//ROS_INFO_STREAM("We in this bitch");
+
+	double roll, pitch, yaw;
+	float x = msg->orientation.x;
+	float y = msg->orientation.y;
+	float z = msg->orientation.z;
+	float w = msg->orientation.w;
+
+	tf::Quaternion q(x,y,z,w); tf::Matrix3x3(q).getRPY(roll, pitch, yaw);
+	//ROS_INFO_STREAM("RPY: " << roll << " " << pitch << " " << yaw);
+	double xImuAcceleration = msg->linear_acceleration.x;
+	double xRealAcceleration = xImuAcceleration-GRAVITY*sin(pitch);
+	//ROS_INFO_STREAM("Pitch: "<<pitch);
+	//ROS_INFO_STREAM("Size: " << _average_imu_g.size() << " Accel: " << xRealAcceleration<<"    "<<_above_threshold_count);
+	if (_average_imu_g.size() < _values_for_average)
+	{
+		ROS_INFO_STREAM("IM HERE");
+		_average_imu_g.push_back(xRealAcceleration);
+	}
+	else
+	{
+		double average = 0; double total = 0; double count = _average_imu_g.size();
+		int i;
+		for (i = 0; i < _average_imu_g.size(); i++)
+		{
+			//ROS_INFO_STREAM("g: "<<_average_imu_g[i]);
+			total+=_average_imu_g[i];
+		}
+
+		average = total/count;
+		ROS_INFO_STREAM("Real x accel: " << xRealAcceleration << " Average: " << average << " threshold: " << -1*_threshold);
+		if (average < (-1 * _threshold))
+		{
+			_above_threshold_count++;
+			if (_above_threshold_count >= _num_to_dock) {_didHitRock = 1; ROS_INFO_STREAM("Shit. We hit a rock.");}
+		}
+		else
+		{
+			//ROS_INFO_STREAM("Else reached " << xRealAcceleration);
+			_average_imu_g.pop_front();
+			_average_imu_g.push_back(xRealAcceleration);
+			//if (_above_threshold_count > 0) _numCheck--;
+			//if (_numCheck == 0) {_above_threshold_count = 0; _numCheck = 5;}
+		}
+	}
+
+}
+
 void StateMachineBase::dockCallback(const sensor_msgs::Imu::ConstPtr& msg)
 {
 	double roll, pitch, yaw;
@@ -591,7 +697,7 @@ void StateMachineBase::dockCallback(const sensor_msgs::Imu::ConstPtr& msg)
 
 		average = total/count;
 		//ROS_INFO_STREAM("Average x accel: " << average);
-		if (xRealAcceleration > _threshold)
+		if (xRealAcceleration > _threshold) // SHOULD BE AVERAGE?????
 		{
 			_above_threshold_count++;
 			if (_above_threshold_count >= _num_to_dock) {_didDock = 1; ROS_INFO_STREAM("Docked with imu");}
@@ -655,9 +761,6 @@ void StateMachineBase::dock()
 {
 	int useAruco = 0;
 	double arucoDistance = 0;
-	_nh.param("values_for_average", _values_for_average, 15);
-	_nh.param("threshold_for_average", _threshold, 1.2);
-	_nh.param("num_to_dock", _num_to_dock, 5);
 	_nh.param("useAruco", useAruco, 0);
 	_nh.param("arucoDistance", arucoDistance, 1.01);
 	if (useAruco) ROS_INFO("USING ARUCO!");

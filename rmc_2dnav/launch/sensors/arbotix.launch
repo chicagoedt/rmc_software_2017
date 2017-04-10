@@ -3,5 +3,6 @@
 
   <node name="arbotix" pkg="arbotix_python" type="arbotix_driver" output="screen">
     <rosparam file="$(find rmc_config)/yaml/arbotix.yaml" command="load" />
+    <param name="port" value="/dev/ttyUSB1"/>
   </node>
 </launch>

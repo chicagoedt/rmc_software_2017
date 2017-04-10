@@ -1,0 +1,3 @@
+DockingPosition: [1.0,  0.0]
+DigStart: [4.45, 0.0]
+DigDistance: 1.5 #total distance in meters to travel *while* digging

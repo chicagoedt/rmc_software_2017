@@ -300,7 +300,7 @@ bool StateMachineBase::moveToGoalPoint(geometry_msgs::Pose waypoint)
     this->_didHitRock = false;
     ros::Subscriber avoidSub;
     if (_robotState == eDigging) {
-    	avoidSub = _nh.subscribe("imu/data", 1, &StateMachineBase::avoidCallback, this); // we subscribe here so that we can get rid of subscriber right away, and not waste time
+    	//avoidSub = _nh.subscribe("imu/data", 1, &StateMachineBase::avoidCallback, this); // we subscribe here so that we can get rid of subscriber right away, and not waste time
     }
 
     ros::Rate dur(250);
@@ -313,7 +313,7 @@ bool StateMachineBase::moveToGoalPoint(geometry_msgs::Pose waypoint)
 			// 	dur = ros::Duration(.001);
 			// }
         	if (_didHitRock) { // this iVar will be set with a callback while digging if we hit a rock
-        		StateMachineBase::digAvoid(moveBaseGoal);
+        		//StateMachineBase::digAvoid(moveBaseGoal);
         	}
 
 			std_msgs::Float64 digVel;

@@ -10,13 +10,17 @@ StateMachineBase::StateMachineBase(void):
 	_numCheck = 5;
 	_average_imu_g = std::deque<double>();
 
-	_digX = std::vector<double>();
 	_digY = std::vector<double>();
-	_digX.push_back();
-	_digX.push_back();
-	_digX.push_back();
-	_digX.push_back();
-	_digX.push_back();
+	_digY.push_back(0.0);
+	_digY.push_back(-0.9);
+	_digY.push_back(0.9);
+	_digY.push_back(0.45);
+	_digY.push_back(0.45);
+	_digY.push_back(0.0);
+	_digY.push_back(-0.9);
+	_digY.push_back(0.9);
+	_digY.push_back(0.45);
+	_digY.push_back(0.45);
 }
 
 StateMachineBase::~StateMachineBase(void)
@@ -533,8 +537,12 @@ void StateMachineBase::run()
 
                 _robotState = eDriveToDig; // Start digging motors
 
+				_digStartPose.position.y = _digY[_currentY];
+				_currentY++;
                 if(moveToGoalPoint(_digStartPose))
                 {
+
+						
 
                 		StateMachineBase::clearImuQueue();
 

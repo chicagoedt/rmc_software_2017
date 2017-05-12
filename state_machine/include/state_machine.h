@@ -148,9 +148,7 @@ class StateMachineBase
 	bool _turnStartLeft;
 	bool _turnStartRight;
 
-	std::vector<double> _digX;
 	std::vector<double> _digY;
-	int _currentX = 0;
 	int _currentY = 0;
 
 };

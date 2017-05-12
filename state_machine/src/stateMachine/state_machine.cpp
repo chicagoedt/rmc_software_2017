@@ -9,6 +9,14 @@ StateMachineBase::StateMachineBase(void):
 	_didDock = 0;
 	_numCheck = 5;
 	_average_imu_g = std::deque<double>();
+
+	_digX = std::vector<double>();
+	_digY = std::vector<double>();
+	_digX.push_back();
+	_digX.push_back();
+	_digX.push_back();
+	_digX.push_back();
+	_digX.push_back();
 }
 
 StateMachineBase::~StateMachineBase(void)

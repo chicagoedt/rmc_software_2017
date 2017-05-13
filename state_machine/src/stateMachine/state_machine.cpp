@@ -2,6 +2,7 @@
 
 #define GRAVITY 9.81
 
+
 StateMachineBase::StateMachineBase(void):
 	_driveSpeed(0.0), _moveBaseAC("move_base", true), _panServoAC("pan_servo", true), _nhLocal("~"), _robotState(eInitializing), _foundMarker(false)
 {
@@ -494,6 +495,11 @@ void StateMachineBase::run()
  	//ros::Duration(3.0).sleep();
  	ROS_INFO("Starting!");
 
+    //for IMU data collection, this is enabled/disabled in the state machine launch file
+    _startTime = ros::Time::now().sec;
+    _nh.param("save_imu_data", _saveImuData, false);
+    _imuDataSub = _nh.subscribe("imu/data", 1, &StateMachineBase::imuDataCallback, this);
+
  	_robotState = eDigging; // Start digging motors
 	 moveToGoalPoint(_digEndPose);
 
@@ -734,6 +740,28 @@ void StateMachineBase::dockCallback(const sensor_msgs::Imu::ConstPtr& msg)
 	//	_didDock = 1;
 	//}
 	//_previous_x_accel = current_x_accel;
+}
+
+//imu data collection
+void StateMachineBase::imuDataCallback(const sensor_msgs::Imu::ConstPtr& msg){
+    if(!_saveImuData)
+        return;
+
+    int current_time = ros::Time::now().sec - _startTime;
+    double x_acc = msg->linear_acceleration.x;
+    double y_acc = msg->linear_acceleration.y;
+    double z_acc = msg->linear_acceleration.z;
+    double x_ang = msg->angular_velocity.x;
+    double y_ang = msg->angular_velocity.y;
+    double z_ang = msg->angular_velocity.z;
+
+    //if not moving don't save data
+    if( (x_acc || y_acc || x_ang || y_ang) == 0 )
+        return;
+
+    f.open("data.txt", std::ios_base::app);
+    f << x_acc << ',' << y_acc << ',' << z_acc << ',' << x_ang << ',' << y_ang << ',' << z_ang << ',' << current_time << std::endl;
+    f.close();
 }
 
 void StateMachineBase::undock()

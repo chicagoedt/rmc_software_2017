@@ -28,6 +28,8 @@
 #include <sstream>
 #include <stack>
 #include <deque>
+#include <fstream>
+#include <iostream>
 
 typedef actionlib::SimpleActionClient<move_base_msgs::MoveBaseAction> MoveBaseClient;
 typedef actionlib::SimpleActionClient<rmc_simulation::PanServoAction> PanServoClient;
@@ -71,6 +73,7 @@ class StateMachineBase
 		void clearImuQueue();
 		void dockCallback(const sensor_msgs::Imu::ConstPtr& msg);
 		void avoidCallback(const sensor_msgs::Imu::ConstPtr& msg);
+        void imuDataCallback(const sensor_msgs::Imu::ConstPtr& msg);
 
 		void babyStep(double x);
 		void digAvoid(move_base_msgs::MoveBaseGoal originalGoal);
@@ -84,6 +87,7 @@ class StateMachineBase
        		ros::Subscriber _arucoSub; 
 
 		ros::Subscriber _imuSub;
+        ros::Subscriber _imuDataSub;
 		ros::Publisher	_servoPub;
 		ros::Publisher  _velPub;
 		ros::Publisher  _digPub;
@@ -109,6 +113,8 @@ class StateMachineBase
 		int   	_num_to_dock; 			// How many consecutive hits needed to consider dock
 		int   	_above_threshold_count;
 		int   	_numCheck; 			// How many more datum to check for hits
+        int     _startTime;         //state machine start time for imu data collection
+        std::ofstream       f;      //file for saving imu data
 		std::deque<double> 	_average_imu_g; // Double ended queue that stores the imu values
 		tf::StampedTransform  	_tf_base_link_to_map;
 		tf::TransformListener 	_tf_listener;
@@ -145,8 +151,12 @@ class StateMachineBase
         bool _didHitRock;
 
         bool _isSimulation;
-	bool _turnStartLeft;
-	bool _turnStartRight;
+        bool _turnStartLeft;
+	    bool _turnStartRight;
+        bool _saveImuData;
+
+	std::vector<double> _digY;
+	int _currentY;
 
 };
 

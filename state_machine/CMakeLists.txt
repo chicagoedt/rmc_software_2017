@@ -77,10 +77,13 @@ add_executable(state_machine_node src/stateMachine/state_machine.cpp src/stateMa
 add_executable(mission_validator src/missionValidator/mission_validator.cpp src/missionValidator/main.cpp)
 add_executable(pose_publisher_node src/posePublisher/posePublisher.cpp ../rmcDecode/rmcEnDecoder.cpp ../rmcDecode/rmcData.cpp src/posePublisher/serialPort.cpp)
 
+add_executable(encoderPolling src/encoder/encoderPolling.cpp src/encoder/main.cpp)
+
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
 add_dependencies(state_machine_node state_machine_generate_messages_cpp)
 add_dependencies(mission_validator state_machine_generate_messages_cpp)
+add_dependencies(encoderPolling state_machine_generate_messages_cpp)
 add_dependencies(state_machine_node rmc_simulation_generate_messages_cpp)
 add_dependencies(pose_publisher_node rmc_simulation_generate_messages_cpp)
 add_dependencies(mission_validator rmc_simulation_generate_messages_cpp)
@@ -89,6 +92,7 @@ add_dependencies(mission_validator rmc_simulation_generate_messages_cpp)
 target_link_libraries(state_machine_node ${catkin_LIBRARIES} )
 target_link_libraries(mission_validator ${catkin_LIBRARIES} )
 target_link_libraries(pose_publisher_node ${catkin_LIBRARIES} )
+target_link_libraries(encoderPolling ${catkin_LIBRARIES})
 
 set(CMAKE_BUILD_TYPE Debug)
 

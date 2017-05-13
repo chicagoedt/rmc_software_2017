@@ -13,11 +13,13 @@
   <param name="num_to_dock" type="int" value="3"/>             
 
   <!-- <param name="arucoDistance" type="double" value="1.0"/> -->
-  <param name="arucoDistance" type="double" value="0.6"/>
+  <param name="arucoDistance" type="double" value="0.8"/>
 
   <param name="simulation" type="bool" value="false"/>
 
   <param name="starting_orientation" type="string" value="north"/> <!-- north, east, south, west -->
+
+  <param name="save_imu_data" type="bool" value="true"/>
 
   <node pkg="state_machine" type="mission_validator" name="mission_validator" output="screen"/>
 

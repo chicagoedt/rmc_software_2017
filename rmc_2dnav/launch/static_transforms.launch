@@ -57,6 +57,14 @@
       args="0 0 0 1.57 0 0 submap arena 25">
     </node>
 
+
+    <node
+	pkg="tf"
+	type="static_transform_publisher"
+	name="imu_to_rotated_imu"
+	args="0 0 0 3.14159 1.570795 0 imu new_imu 25">
+    </node>
+
 <!-- 
     <node
       pkg="tf" 

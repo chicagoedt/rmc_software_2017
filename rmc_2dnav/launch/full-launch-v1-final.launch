@@ -8,6 +8,8 @@
 
 	<include file="$(find rmc_2dnav)/launch/rtabmap-with-odom-tf.launch"/>
 
+	<include file="$(find rmc_2dnav)/launch/navigation.launch"/>
+
         <!--<include file="$(find rmc_2dnav)/launch/sensors/localization.launch"/>-->
 </launch>
 

@@ -13,14 +13,16 @@
   <param name="num_to_dock" type="int" value="3"/>             
 
   <!-- <param name="arucoDistance" type="double" value="1.0"/> -->
-  <param name="arucoDistance" type="double" value="0.8"/>
+  <param name="arucoDistance" type="double" value="0.6"/>
+
+  <param name="simulation" type="bool" value="false"/>
 
   <param name="starting_orientation" type="string" value="north"/> <!-- north, east, south, west -->
 
   <node pkg="state_machine" type="mission_validator" name="mission_validator" output="screen"/>
 
   <node pkg="state_machine" type="state_machine_node" name="state_machine" output="screen" >
-        <rosparam command="load" file="$(find rmc_config)/yaml/waypoints-nasa-arena.yaml" />
+        <rosparam command="load" file="$(find rmc_config)/yaml/waypoints-edt-arena.yaml" />
   </node>
 
 <!-- do not uncomment for now -->

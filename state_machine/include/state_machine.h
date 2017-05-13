@@ -149,7 +149,7 @@ class StateMachineBase
 	bool _turnStartRight;
 
 	std::vector<double> _digY;
-	int _currentY = 0;
+	int _currentY;
 
 };
 

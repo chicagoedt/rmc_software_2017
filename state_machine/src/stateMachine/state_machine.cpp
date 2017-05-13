@@ -10,6 +10,7 @@ StateMachineBase::StateMachineBase(void):
 	_numCheck = 5;
 	_average_imu_g = std::deque<double>();
 
+	_currentY = 0;
 	_digY = std::vector<double>();
 	_digY.push_back(0.0);
 	_digY.push_back(-0.9);

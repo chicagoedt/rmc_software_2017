@@ -24,7 +24,7 @@
   <node pkg="state_machine" type="mission_validator" name="mission_validator" output="screen"/>
 
   <node pkg="state_machine" type="state_machine_node" name="state_machine" output="screen" >
-        <rosparam command="load" file="$(find rmc_config)/yaml/waypoints-edt-arena.yaml" />
+        <rosparam command="load" file="$(find rmc_config)/yaml/waypoints-nasa-arena.yaml" />
   </node>
 
 <!-- do not uncomment for now -->

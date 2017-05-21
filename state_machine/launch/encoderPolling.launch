@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <launch>
 
-  <param name="port" type="string" value="/dev/ttyACM1"/>
-  <node pkg="state_machine" type="encoderPoller" name="encoderPoller" output="screen" >
+  <param name="port" type="string" value="/dev/ttyACM0"/>
+  <node pkg="state_machine" type="encoderPolling" name="encoderPolling" output="screen" >
   </node>
 
 

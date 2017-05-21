@@ -5,6 +5,7 @@
 void EncoderPoller::run()
 {
 	
+	ROS_INFO_STREAM("starting");
 	_encoderPub = _nh.advertise<std_msgs::Float64>("encoder_data", 1000);
 
 	ros::Rate loop_rate(10);
@@ -16,6 +17,8 @@ void EncoderPoller::run()
 		portPath = "/dev/ttyACM1";
 	}
 	
+	ROS_INFO_STREAM("connected");
+
 	char c;
 	std::fstream f;
 
@@ -28,9 +31,14 @@ void EncoderPoller::run()
 	time(&current);
 	time(&old);
 
+	ROS_INFO_STREAM("Starting 2");
+
 	while(ros::ok()) {
+		
+		ROS_INFO_STREAM("Running");
 	
 		int x = std::cin.peek();
+		ROS_INFO_STREAM(x);
 		if (x == EOF) {
 			time(&current);
 			double diff = difftime(old, current);

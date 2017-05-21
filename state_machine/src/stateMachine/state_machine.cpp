@@ -14,13 +14,13 @@ StateMachineBase::StateMachineBase(void):
 	_currentY = 0;
 	_digY = std::vector<double>();
 	_digY.push_back(0.0);
-	_digY.push_back(-0.9);
-	_digY.push_back(0.9);
+	_digY.push_back(-0.75);
+	_digY.push_back(0.75);
 	_digY.push_back(0.45);
 	_digY.push_back(0.45);
 	_digY.push_back(0.0);
-	_digY.push_back(-0.9);
-	_digY.push_back(0.9);
+	_digY.push_back(-0.75);
+	_digY.push_back(0.75);
 	_digY.push_back(0.45);
 	_digY.push_back(0.45);
 }
@@ -279,7 +279,7 @@ bool StateMachineBase::moveToGoalPoint(geometry_msgs::Pose waypoint)
             for(int i = 0; i < 15; i++)
             {
                     std_msgs::Float64 digVel;
-                    digVel.data = 500;
+                    digVel.data = 650;
                     _digPub.publish(digVel);
                     ROS_WARN_THROTTLE(1, "Digging...");
 
@@ -331,7 +331,7 @@ bool StateMachineBase::moveToGoalPoint(geometry_msgs::Pose waypoint)
         	}
 
 			std_msgs::Float64 digVel;
-			digVel.data = 500;
+			digVel.data = 650;
 			_digPub.publish(digVel);
 			ROS_WARN_THROTTLE(1, "Digging...");
 //			if (we stop moving while digging)
@@ -535,8 +535,6 @@ void StateMachineBase::run()
 
 	ROS_INFO_STREAM("Got here.. facing: " << orient);
 
-	dock();
-
 	while(1)
 	{
                 setActuatorPosition(eHome);
@@ -547,11 +545,10 @@ void StateMachineBase::run()
                 _robotState = eDriveToDig; // Start digging motors
 
 				_digStartPose.position.y = _digY[_currentY];
+				_digEndPose.position.y = _digY[_currentY];
 				_currentY++;
                 if(moveToGoalPoint(_digStartPose))
                 {
-
-						
 
                 		StateMachineBase::clearImuQueue();
 
@@ -559,14 +556,14 @@ void StateMachineBase::run()
 			    for(int i = 0; i < 15; i++)
 			    {
 				    std_msgs::Float64 digVel;
-				    digVel.data = 500;
+				    digVel.data = 650;
 				    _digPub.publish(digVel);
 				    ROS_WARN_THROTTLE(1, "Digging...");
 
 				    ros::spinOnce();
 				    ros::Duration(0.1).sleep();
 			    }
-                        setActuatorPosition(eDig);
+                        //setActuatorPosition(eDig);
 
                         ROS_INFO("Lowering Actuators to Dig...");
                         _robotState = eDigging; // Start digging motors
@@ -918,8 +915,8 @@ void StateMachineBase::dock()
 			loop_rate.sleep();
 			x = ( x > 0) ? x : -1*x ;
 
-			//ROS_INFO_STREAM("Transform: " << x << " " << y << " " << z);
-			//ROS_INFO_STREAM("arucoDistance: " << arucoDistance);
+			ROS_INFO_STREAM("Transform: " << x << " " << y << " " << z);
+			ROS_INFO_STREAM("arucoDistance: " << arucoDistance);
 
 			ros::Time dock_progress = ros::Time::now();
 
@@ -932,14 +929,14 @@ void StateMachineBase::dock()
 				loop_rate.sleep();
 			}
 
-			/*if ((dock_progress.toSec() - dock_duration.toSec()) > 9){
+			if ((dock_progress.toSec() - dock_duration.toSec()) > 9){
                                 _didDock = 1;
                                 ROS_INFO_STREAM("Docked with Time");
                                 msg.linear.x = 0;
                                 _arucoPub.publish(msg);
                                 ros::spinOnce();
                                 loop_rate.sleep();
-                        }*/
+                        }
 
 
 		}

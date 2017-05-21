@@ -17,12 +17,12 @@ StateMachineBase::StateMachineBase(void):
 	_digY.push_back(-0.75);
 	_digY.push_back(0.75);
 	_digY.push_back(0.45);
-	_digY.push_back(0.45);
+	_digY.push_back(-0.45);
 	_digY.push_back(0.0);
 	_digY.push_back(-0.75);
 	_digY.push_back(0.75);
 	_digY.push_back(0.45);
-	_digY.push_back(0.45);
+	_digY.push_back(-0.45);
 }
 
 StateMachineBase::~StateMachineBase(void)
@@ -823,6 +823,7 @@ void StateMachineBase::undock()
 void StateMachineBase::dock()
 {
 	int useAruco = 0;
+	_didDock = 0;
 	double arucoDistance = 0;
 	_nh.param("useAruco", useAruco, 0);
 	_nh.param("arucoDistance", arucoDistance, 1.01);

@@ -2,27 +2,34 @@
 import rospy
 from std_msgs.msg import String
 from sensor_msgs.msg import Imu
-#from svm import SVM
 from ml.svm import SVM
+import time
 
-training = False
+getting_data = True
 data_file = 'data.txt'
-f = None
+f = open(data_file, 'w')
 
 class SubAndPub:
     def __init__(self):
         self.n = rospy.init_node('imu_ml')
         self.pub = rospy.Publisher('boundary_collision', String, queue_size=10)
         self.imu_sub = rospy.Subscriber('imu/data', String , self.imu_callback)
-        self.classifier = SVM(predictions=True)
-        self.time = rospy.Time()
+        self.startTime = int(time.time())
+        rospy.loginfo("START TIME: " + self.startTime)
+
+        self.classifier = None
+        if not getting_data:
+                self.classifier = SVM(predictions=True)
 
     def imu_callback(self, imu_data):
         d = imu_data.linear_acceleration + imu_data.angular_velocity
-        collision = self.classifier.predict(d)
-        self.pub.publish(collision)
-        if training:
-            f.write(d + self.time.get_time())
+        if getting_data:
+            f.write(d + (int(time.time()) - self.startTime))
+            f.write("\n")
+        else:
+            collision = self.classifier.predict(d)
+            self.pub.publish(collision)
+
 
 def main():
     a = SubAndPub()
